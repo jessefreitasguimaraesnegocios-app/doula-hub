@@ -61,7 +61,6 @@ function Services() {
                 </ul>
                 <Link
                   to="/booking"
-                  search={{ pkg: k }}
                   className={`mt-8 inline-flex items-center justify-center rounded-full px-6 py-3.5 text-sm font-medium transition ${
                     featured
                       ? "bg-[var(--cream)] text-foreground hover:translate-y-[-1px]"
