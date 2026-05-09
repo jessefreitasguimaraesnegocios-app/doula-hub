@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TeamRouteImport } from './routes/team'
+import { Route as ShopRouteImport } from './routes/shop'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -17,6 +18,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const TeamRoute = TeamRouteImport.update({
   id: '/team',
   path: '/team',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServicesRoute = ServicesRouteImport.update({
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/services': typeof ServicesRoute
+  '/shop': typeof ShopRoute
   '/team': typeof TeamRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/services': typeof ServicesRoute
+  '/shop': typeof ShopRoute
   '/team': typeof TeamRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/services': typeof ServicesRoute
+  '/shop': typeof ShopRoute
   '/team': typeof TeamRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/services' | '/team'
+  fullPaths: '/' | '/about' | '/services' | '/shop' | '/team'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/services' | '/team'
-  id: '__root__' | '/' | '/about' | '/services' | '/team'
+  to: '/' | '/about' | '/services' | '/shop' | '/team'
+  id: '__root__' | '/' | '/about' | '/services' | '/shop' | '/team'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ServicesRoute: typeof ServicesRoute
+  ShopRoute: typeof ShopRoute
   TeamRoute: typeof TeamRoute
 }
 
@@ -76,6 +86,13 @@ declare module '@tanstack/react-router' {
       path: '/team'
       fullPath: '/team'
       preLoaderRoute: typeof TeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/services': {
@@ -106,6 +123,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ServicesRoute: ServicesRoute,
+  ShopRoute: ShopRoute,
   TeamRoute: TeamRoute,
 }
 export const routeTree = rootRouteImport
