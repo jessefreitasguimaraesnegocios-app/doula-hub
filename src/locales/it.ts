@@ -1,0 +1,158 @@
+import type { Translation } from "./en";
+
+const it: Translation = {
+  brand: "All Things Babies",
+  nav: {
+    home: "Home",
+    about: "Chi siamo",
+    services: "Servizi",
+    team: "Le Doule",
+    shop: "Negozio",
+    contact: "Contatti",
+    book: "Prenota una consulenza",
+  },
+  home: {
+    eyebrow: "Cura, con il cuore",
+    title: "Non sei mai stata fatta per affrontarlo da sola.",
+    subtitle:
+      "Supporto compassionevole e basato su evidenze durante gravidanza, parto e i primi giorni.",
+    cta: "Prenota la tua consulenza gratuita",
+    secondary: "Conosci le nostre doule",
+    promiseTitle: "Uno spazio sicuro, fin dal primo ciao.",
+    promiseBody:
+      "Ogni famiglia merita una presenza calma e competente al suo fianco. Ascoltiamo prima, pianifichiamo insieme e camminiamo con te — a casa, in ospedale e nelle ore tranquille dopo.",
+    pillars: {
+      one: { title: "Supporto continuo", body: "Dalla gravidanza al postpartum — una persona di fiducia che conosce la tua storia." },
+      two: { title: "Basato su evidenze", body: "Doule certificate formate sulle migliori pratiche attuali." },
+      three: { title: "Inclusivo e affermativo", body: "Cura per ogni famiglia, ogni parto, ogni storia — senza giudizio." },
+    },
+    stepsTitle: "Come funziona",
+    steps: {
+      one: { title: "Consulenza gratuita", body: "Una videochiamata accogliente di 30 minuti per conoscerci." },
+      two: { title: "Scegli il tuo pacchetto", body: "Scegli il supporto adatto alla tua famiglia." },
+      three: { title: "Trova la tua doula", body: "Ti abbiniamo alla doula giusta per te." },
+      four: { title: "Siamo con te", body: "Dalla gravidanza al postpartum, in ogni passo." },
+    },
+    testimonialsTitle: "Storie di famiglie che abbiamo accompagnato",
+  },
+  about: {
+    title: "Ciao, sono la tua doula.",
+    body:
+      "Ho fondato All Things Babies perché ogni persona che partorisce merita una compagnia calma e informata. Con oltre un decennio di supporto a famiglie, guido un piccolo team di doule certificate che condividono una convinzione: tu sei l'esperta del tuo corpo.",
+    valuesTitle: "In cosa crediamo",
+    values: {
+      one: { title: "Presenza, non performance", body: "Non abbiamo fretta. Siamo con te." },
+      two: { title: "Scelta informata", body: "La conoscenza è potere. Diamo entrambi." },
+      three: { title: "Saggezza del corpo", body: "Il tuo istinto è reale. Ti aiutiamo a fidarti." },
+    },
+    certsTitle: "Certificazioni e formazione",
+    certs: ["DONA International Certificata", "Spinning Babies® Certificata", "Consulente Allattamento (CLC)", "Primo Soccorso Salute Mentale"],
+  },
+  services: {
+    title: "Cura che ti incontra dove sei",
+    subtitle: "Scegli il pacchetto adatto alla tua famiglia. Combinazioni personalizzate sono benvenute.",
+    bookCta: "Prenota questo pacchetto",
+    items: {
+      birth: {
+        name: "Pacchetto Doula del Parto",
+        price: "€1.650",
+        body: "Tre visite prenatali, supporto continuo al parto e due visite postpartum.",
+        features: ["Supporto illimitato via messaggio e chiamata", "Piano del parto", "Supporto continuo al travaglio", "Due visite postpartum", "Guida all'allattamento"],
+      },
+      postpartum: {
+        name: "Cura Postpartum",
+        price: "€42/ora",
+        body: "Cura diurna o notturna durante il quarto trimestre.",
+        features: ["Cura del neonato", "Supporto allattamento", "Preparazione pasti leggeri", "Supporto emotivo", "Cura fratelli"],
+      },
+      bereavement: {
+        name: "Doula del Lutto",
+        price: "Tariffa flessibile",
+        body: "Supporto specializzato e delicato in caso di perdita.",
+        features: ["Presenza al tuo fianco", "Ricordi", "Supporto familiare", "Connessione risorse"],
+      },
+      lactation: {
+        name: "Visita Allattamento",
+        price: "€160",
+        body: "Supporto a casa o online per un allattamento sereno.",
+        features: ["Valutazione attacco", "Piano alimentare", "Guida tiralatte", "Follow-up"],
+      },
+    },
+  },
+  team: {
+    title: "Le mani che ti sostengono",
+    subtitle: "Un piccolo team certificato — scelto per il calore e la dedizione.",
+    specialties: "Specialità",
+    languages: "Lingue",
+  },
+  shop: {
+    title: "Piccole cose dolci per inizi dolci",
+    subtitle: "Essenziali selezionati per gravidanza, postpartum e i primi giorni.",
+    addToCart: "Aggiungi alla borsa",
+    soon: "In arrivo",
+  },
+  contact: {
+    title: "Ci piacerebbe sentirti",
+    subtitle: "Che tu sia a 6 o 36 settimane — scrivici. Non esistono domande sciocche.",
+    name: "Il tuo nome",
+    email: "Email",
+    phone: "Telefono (opzionale)",
+    message: "Come possiamo supportarti?",
+    send: "Invia messaggio",
+    sent: "Grazie — ti contatteremo entro 24 ore.",
+  },
+  booking: {
+    title: "Cominciamo insieme",
+    subtitle: "Un percorso semplice e sicuro. Circa 4 minuti.",
+    next: "Continua",
+    back: "Indietro",
+    finish: "Conferma e paga",
+    steps: {
+      package: "Scegli il pacchetto",
+      doula: "Scegli la doula",
+      intake: "La tua storia",
+      schedule: "Prenota consulenza",
+      payment: "Conferma e paga",
+    },
+    doulaAny: "Trova la doula ideale per me",
+    intake: {
+      dueDate: "Data presunta del parto",
+      firstBaby: "È il tuo primo bambino?",
+      birthLocation: "Dove pensi di partorire?",
+      provider: "Operatore sanitario",
+      concerns: "C'è qualcosa che dovremmo sapere?",
+      partner: "Nome del partner (opzionale)",
+      address: "Indirizzo",
+      yes: "Sì",
+      no: "No",
+      hospital: "Ospedale",
+      birthCenter: "Casa maternità",
+      home: "Casa",
+      undecided: "Sto ancora decidendo",
+    },
+    schedule: {
+      title: "Scegli un orario per la tua consulenza gratuita di 30 minuti",
+      platform: "Piattaforma video",
+      platforms: ["Zoom", "Google Meet", "Microsoft Teams", "Apple FaceTime"],
+      date: "Data",
+      time: "Ora",
+    },
+    payment: {
+      summary: "Riepilogo ordine",
+      total: "Totale oggi",
+      secure: "Pagamento sicuro tramite Stripe",
+      terms: "Confermando, accetti i nostri termini e la politica di cancellazione.",
+      success: "Prenotazione confermata",
+      successBody: "Un'email di conferma è in arrivo con il tuo certificato e il link della consulenza.",
+    },
+  },
+  footer: {
+    tagline: "Cura della doula per ogni famiglia.",
+    rights: "Tutti i diritti riservati.",
+    quick: "Esplora",
+    contact: "Contattaci",
+  },
+  language: "Lingua",
+};
+
+export default it;
