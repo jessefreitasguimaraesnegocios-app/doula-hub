@@ -33,7 +33,7 @@ function Home() {
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 pt-12 pb-24 md:grid-cols-2 md:pt-20 md:pb-32">
           <div className="space-y-6">
             <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-foreground/70 backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--clay)]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-clay" />
               {t("home.eyebrow")}
             </p>
             <h1 className="font-serif text-5xl leading-[1.05] text-foreground md:text-7xl">
@@ -45,7 +45,7 @@ function Home() {
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <Link
                 to="/booking"
-                className="group inline-flex items-center gap-2 rounded-full bg-primary px-7 py-4 text-sm font-medium text-primary-foreground shadow-[var(--shadow-warm)] transition hover:translate-y-[-1px]"
+                className="group inline-flex items-center gap-2 rounded-full bg-primary px-7 py-4 text-sm font-medium text-primary-foreground shadow-(--shadow-warm) transition hover:-translate-y-px"
               >
                 {t("home.cta")}
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
@@ -59,15 +59,15 @@ function Home() {
             </div>
           </div>
           <div className="relative">
-            <div className="absolute -inset-6 rounded-[3rem] bg-gradient-to-br from-[var(--sage)]/30 to-[var(--clay)]/20 blur-2xl" />
+            <div className="absolute -inset-6 rounded-[3rem] bg-linear-to-br from-sage/30 to-clay/20 blur-2xl" />
             <img
               src={heroImg}
               alt="A pregnant person gently holding her belly"
               width={1600}
               height={1200}
-              className="relative aspect-[4/5] w-full rounded-[2.5rem] object-cover shadow-[var(--shadow-warm)]"
+              className="relative aspect-4/5 w-full rounded-[2.5rem] object-cover shadow-(--shadow-warm)"
             />
-            <div className="absolute -bottom-6 -left-6 hidden rounded-2xl bg-card p-5 shadow-[var(--shadow-soft)] sm:block">
+            <div className="absolute -bottom-6 -left-6 hidden rounded-2xl bg-card p-5 shadow-(--shadow-soft) sm:block">
               <p className="text-3xl font-serif text-primary">10+</p>
               <p className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">
                 Years caring<br />for families
@@ -86,7 +86,7 @@ function Home() {
             loading="lazy"
             width={1080}
             height={1500}
-            className="aspect-[4/5] w-full rounded-[2rem] object-cover shadow-[var(--shadow-soft)]"
+            className="aspect-4/5 w-full rounded-[2rem] object-cover shadow-(--shadow-soft)"
           />
           <div>
             <h2 className="font-serif text-4xl leading-tight text-foreground md:text-5xl">
@@ -122,8 +122,8 @@ function Home() {
           </div>
           <ol className="mt-16 grid gap-8 md:grid-cols-4">
             {(["one", "three", "two", "four"] as const).map((k, i) => (
-              <li key={k} className="relative rounded-3xl bg-card p-8 shadow-[var(--shadow-soft)]">
-                <span className="font-serif text-5xl text-[var(--sage)]/60">0{i + 1}</span>
+              <li key={k} className="relative rounded-3xl bg-card p-8 shadow-(--shadow-soft)">
+                <span className="font-serif text-5xl text-sage/60">0{i + 1}</span>
                 <p className="mt-3 font-serif text-xl text-foreground">{t(`home.steps.${k}.title`)}</p>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(`home.steps.${k}.body`)}</p>
               </li>
@@ -144,8 +144,8 @@ function Home() {
               { name: "Sofia R.", body: "The postpartum care saved my mental health. Warm meals, patient guidance, and gentle hands." },
               { name: "Amara T.", body: "From our first call I felt safe. She advocated for me when I couldn't find my own words." },
             ].map((tt) => (
-              <figure key={tt.name} className="rounded-3xl bg-card p-8 shadow-[var(--shadow-soft)]">
-                <Quote className="h-6 w-6 text-[var(--clay)]" />
+              <figure key={tt.name} className="rounded-3xl bg-card p-8 shadow-(--shadow-soft)">
+                <Quote className="h-6 w-6 text-clay" />
                 <blockquote className="mt-4 text-base leading-relaxed text-foreground/80">"{tt.body}"</blockquote>
                 <figcaption className="mt-6 text-sm font-medium text-muted-foreground">— {tt.name}</figcaption>
               </figure>
@@ -164,7 +164,7 @@ function Home() {
               <p className="mt-4 text-base text-primary-foreground/80">{t("home.subtitle")}</p>
               <Link
                 to="/booking"
-                className="mt-8 inline-flex items-center gap-2 rounded-full bg-[var(--cream)] px-8 py-4 text-sm font-medium text-foreground shadow-lg transition hover:translate-y-[-1px]"
+                className="mt-8 inline-flex items-center gap-2 rounded-full bg-cream px-8 py-4 text-sm font-medium text-foreground shadow-lg transition hover:-translate-y-px"
               >
                 {t("nav.book")} <ArrowRight className="h-4 w-4" />
               </Link>

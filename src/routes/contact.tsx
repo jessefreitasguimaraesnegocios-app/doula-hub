@@ -69,7 +69,7 @@ function Contact() {
           e.preventDefault();
           setSent(true);
         }}
-        className="space-y-5 rounded-3xl bg-card p-8 shadow-[var(--shadow-soft)]"
+        className="space-y-5 rounded-3xl bg-card p-8 shadow-(--shadow-soft)"
       >
         <Field label={t("contact.name")} name="name" required />
         <Field label={t("contact.email")} name="email" type="email" required />
@@ -84,12 +84,12 @@ function Contact() {
         </div>
         <button
           type="submit"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-sm font-medium text-primary-foreground hover:translate-y-[-1px]"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-sm font-medium text-primary-foreground hover:-translate-y-px"
         >
           {t("contact.send")} <Send className="h-4 w-4" />
         </button>
         {sent && (
-          <p className="text-center text-sm text-[var(--sage-deep)]">{t("contact.sent")}</p>
+          <p className="text-center text-sm text-sage-deep">{t("contact.sent")}</p>
         )}
       </form>
     </div>

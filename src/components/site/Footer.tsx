@@ -89,7 +89,7 @@ export function Footer() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-6 py-6 text-xs text-muted-foreground sm:flex-row">
           <p>© {new Date().getFullYear()} {t("brand")}. {t("footer.rights")}</p>
           <p className="inline-flex items-center gap-1.5">
-            Made with <Heart className="h-3 w-3 fill-[var(--clay)] text-[var(--clay)]" /> for growing families
+            Made with <Heart className="h-3 w-3 fill-clay text-clay" /> for growing families
           </p>
         </div>
       </div>

@@ -14,6 +14,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { I18nClientLanguageSync } from "@/components/I18nClientLanguageSync";
 import { SiteCmsThemeSync } from "@/components/SiteCmsThemeSync";
+import { SupabaseSiteBootstrap } from "@/components/SupabaseSiteBootstrap";
 import { CartProvider } from "@/context/cart-context";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -122,6 +123,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <CartProvider>
         <I18nClientLanguageSync />
+        <SupabaseSiteBootstrap />
         <SiteCmsThemeSync />
         <div className="flex min-h-screen flex-col">
           <Header />

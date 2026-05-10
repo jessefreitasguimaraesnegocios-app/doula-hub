@@ -33,7 +33,7 @@ function About() {
           alt="Portrait of the founder in doula scrubs, smiling"
           width={1000}
           height={1250}
-          className="aspect-[4/5] w-full rounded-[2rem] object-cover shadow-[var(--shadow-warm)]"
+          className="aspect-4/5 w-full rounded-[2rem] object-cover shadow-(--shadow-warm)"
         />
         <div>
           <h1 className="font-serif text-5xl text-foreground md:text-6xl">{t("about.title")}</h1>
@@ -46,7 +46,7 @@ function About() {
           <h2 className="font-serif text-4xl text-foreground md:text-5xl">{t("about.valuesTitle")}</h2>
           <div className="mt-12 grid gap-8 md:grid-cols-3">
             {values.map(({ key, icon: Icon }) => (
-              <div key={key} className="rounded-3xl bg-card p-8 shadow-[var(--shadow-soft)]">
+              <div key={key} className="rounded-3xl bg-card p-8 shadow-(--shadow-soft)">
                 <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary">
                   <Icon className="h-5 w-5" />
                 </div>
@@ -65,7 +65,7 @@ function About() {
             <ul className="mt-8 space-y-4">
               {certs.map((c) => (
                 <li key={c} className="flex items-center gap-3 text-foreground/90">
-                  <span className="grid h-8 w-8 place-items-center rounded-full bg-[var(--sage)]/30 text-[var(--sage-deep)]">
+                  <span className="grid h-8 w-8 place-items-center rounded-full bg-sage/30 text-sage-deep">
                     <Award className="h-4 w-4" />
                   </span>
                   {c}
@@ -79,7 +79,7 @@ function About() {
             loading="lazy"
             width={1080}
             height={1500}
-            className="aspect-[4/5] w-full rounded-[2rem] object-cover shadow-[var(--shadow-soft)]"
+            className="aspect-4/5 w-full rounded-[2rem] object-cover shadow-(--shadow-soft)"
           />
         </div>
       </section>

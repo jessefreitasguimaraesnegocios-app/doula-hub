@@ -200,7 +200,7 @@ function Booking() {
   if (done) {
     return (
       <section className="mx-auto flex max-w-xl flex-col items-center px-6 py-32 text-center">
-        <div className="grid h-20 w-20 place-items-center rounded-full bg-[var(--sage)]/30 text-[var(--sage-deep)]">
+        <div className="grid h-20 w-20 place-items-center rounded-full bg-sage/30 text-sage-deep">
           <Check className="h-10 w-10" />
         </div>
         <h1 className="mt-8 font-serif text-5xl text-foreground">{t("booking.payment.success")}</h1>
@@ -244,7 +244,7 @@ function Booking() {
         ))}
       </ol>
 
-      <div className="mt-12 rounded-[2rem] bg-card p-8 shadow-[var(--shadow-soft)] md:p-12">
+      <div className="mt-12 rounded-[2rem] bg-card p-8 shadow-(--shadow-soft) md:p-12">
         {step === 0 && (
           <div className="grid gap-4 sm:grid-cols-2">
             {PKGS.map((k) => {
@@ -283,7 +283,7 @@ function Booking() {
                   {d.img ? (
                     <img src={d.img} alt={d.name} className="aspect-square w-full object-cover" />
                   ) : (
-                    <div className="grid aspect-square place-items-center bg-[var(--sage)]/20 font-serif text-3xl text-[var(--sage-deep)]">
+                    <div className="grid aspect-square place-items-center bg-sage/20 font-serif text-3xl text-sage-deep">
                       ✦
                     </div>
                   )}
@@ -489,8 +489,8 @@ function Booking() {
               <BookField label={t("booking.schedule.date")} type="date" value={form.date} onChange={(v) => update("date", v)} />
               <BookField label={t("booking.schedule.time")} type="time" value={form.time} onChange={(v) => update("time", v)} />
             </div>
-            <div className="flex items-center gap-3 rounded-2xl bg-[var(--sage)]/15 p-4 text-sm text-foreground/80">
-              <Video className="h-5 w-5 shrink-0 text-[var(--sage-deep)]" />
+            <div className="flex items-center gap-3 rounded-2xl bg-sage/15 p-4 text-sm text-foreground/80">
+              <Video className="h-5 w-5 shrink-0 text-sage-deep" />
               {t("booking.schedule.linkNote", { platform: form.platform })}
             </div>
           </div>
@@ -607,14 +607,14 @@ function BookSupportMultiPicker({
       <button
         type="button"
         onClick={open}
-        className={`mt-2 flex min-h-[3rem] w-full items-center rounded-2xl border border-border bg-background px-4 py-3 text-left text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${value.length === 0 ? "text-muted-foreground" : "text-foreground"}`}
+        className={`mt-2 flex min-h-12 w-full items-center rounded-2xl border border-border bg-background px-4 py-3 text-left text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${value.length === 0 ? "text-muted-foreground" : "text-foreground"}`}
       >
         <span className="line-clamp-3">{summary}</span>
       </button>
 
       <dialog
         ref={dialogRef}
-        className="fixed left-1/2 top-1/2 z-50 w-[min(100%-2rem,28rem)] -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-border bg-card p-6 text-foreground shadow-lg [&::backdrop]:bg-black/50"
+        className="fixed left-1/2 top-1/2 z-50 w-[min(100%-2rem,28rem)] -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-border bg-card p-6 text-foreground shadow-lg backdrop:bg-black/50"
       >
         <p className="font-serif text-lg leading-snug">{t("booking.intake.supportDialogTitle")}</p>
         <div className="mt-4 max-h-[min(60vh,22rem)] space-y-2 overflow-y-auto pr-1">

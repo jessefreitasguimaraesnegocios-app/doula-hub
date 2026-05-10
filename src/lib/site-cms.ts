@@ -52,6 +52,11 @@ export const DEFAULT_SITE_CMS: SiteCmsV1 = {
   teamDefaultScheduleUrl: "",
 };
 
+/** Merge a remote JSON payload (e.g. Supabase `site_settings.payload`) into defaults. */
+export function mergeSiteCmsFromRemote(partial: unknown): SiteCmsV1 {
+  return mergePartial({ ...DEFAULT_SITE_CMS }, partial);
+}
+
 function mergePartial(base: SiteCmsV1, partial: unknown): SiteCmsV1 {
   if (!partial || typeof partial !== "object") return base;
   const p = partial as Record<string, unknown>;

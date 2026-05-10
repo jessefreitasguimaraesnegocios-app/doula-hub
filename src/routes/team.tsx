@@ -1,9 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Video } from "lucide-react";
 import { toast } from "sonner";
 import { useSiteCms } from "@/hooks/use-site-cms";
 import { DEFAULT_TEAM_SCHEDULE_URL } from "@/lib/site-cms";
+import { asStringArray, fetchPublishedDoulas, type DoulaRow } from "@/lib/supabase/queries";
 import raquelTeam from "@/assets/team-imani.png";
 import d2 from "@/assets/doula-2.jpg";
 import d3 from "@/assets/doula-3.jpg";
@@ -58,6 +61,73 @@ type StaticMember = {
   scheduleUrl?: string;
 };
 
+const BUNDLED_IMG: Record<string, string> = {
+  founder: raquelTeam,
+  sofia: d2,
+  elena: d3,
+  mei: d4,
+};
+
+type TeamCardModel = {
+  key: string;
+  slug: string;
+  kind: "founder" | "doula";
+  useI18n: boolean;
+  img: string;
+  scheduleUrl?: string | null;
+  name?: string;
+  role?: string;
+  bio?: string;
+  specs: string[];
+  langs: string[];
+};
+
+function staticTeamCards(): TeamCardModel[] {
+  return TEAM.map((m) => {
+    if (m.kind === "founder") {
+      return {
+        key: m.id,
+        slug: "founder",
+        kind: "founder",
+        useI18n: true,
+        img: m.img,
+        scheduleUrl: m.scheduleUrl,
+        specs: [],
+        langs: [],
+      };
+    }
+    return {
+      key: m.id,
+      slug: m.id,
+      kind: "doula",
+      useI18n: false,
+      img: m.img,
+      scheduleUrl: m.scheduleUrl,
+      name: m.name,
+      role: m.role,
+      bio: m.bio,
+      specs: m.specs,
+      langs: m.langs,
+    };
+  });
+}
+
+function teamCardsFromDb(rows: DoulaRow[]): TeamCardModel[] {
+  return rows.map((r) => ({
+    key: r.id,
+    slug: r.slug,
+    kind: r.kind,
+    useI18n: r.use_i18n,
+    img: r.photo_url?.trim() || BUNDLED_IMG[r.slug] || raquelTeam,
+    scheduleUrl: r.schedule_url,
+    name: r.name ?? undefined,
+    role: r.role ?? undefined,
+    bio: r.bio ?? undefined,
+    specs: asStringArray(r.specs),
+    langs: asStringArray(r.langs),
+  }));
+}
+
 const TEAM: readonly (FounderMember | StaticMember)[] = [
   { kind: "founder", id: "founder", img: raquelTeam },
   {
@@ -92,9 +162,8 @@ const TEAM: readonly (FounderMember | StaticMember)[] = [
   },
 ];
 
-function scheduleUrlFor(member: FounderMember | StaticMember, cmsDefault: string): string {
-  if (member.kind === "static" && member.scheduleUrl) return member.scheduleUrl;
-  if (member.kind === "founder" && member.scheduleUrl) return member.scheduleUrl;
+function scheduleUrlForCard(card: TeamCardModel, cmsDefault: string): string {
+  if (card.scheduleUrl?.trim()) return card.scheduleUrl.trim();
   const fromCms = cmsDefault.trim();
   return fromCms || DEFAULT_TEAM_SCHEDULE_URL;
 }
@@ -102,12 +171,22 @@ function scheduleUrlFor(member: FounderMember | StaticMember, cmsDefault: string
 function Team() {
   const { t } = useTranslation();
   const cms = useSiteCms();
+  const { data: remoteDoulas } = useQuery({
+    queryKey: ["doulas", "published"],
+    queryFn: fetchPublishedDoulas,
+    staleTime: 60_000,
+  });
+
+  const cards = useMemo(() => {
+    if (remoteDoulas && remoteDoulas.length > 0) return teamCardsFromDb(remoteDoulas);
+    return staticTeamCards();
+  }, [remoteDoulas]);
 
   return (
     <div>
       <section className="relative h-[40vh] min-h-[320px] overflow-hidden">
         <img src={teamHero} alt="" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/20" />
+        <div className="absolute inset-0 bg-linear-to-t from-background via-background/60 to-background/20" />
         <div className="relative mx-auto flex h-full max-w-4xl flex-col items-center justify-end px-6 pb-12 text-center">
           <h1 className="font-serif text-5xl text-foreground md:text-6xl">{t("team.title")}</h1>
           <p className="mt-4 max-w-xl text-lg text-muted-foreground">{t("team.subtitle")}</p>
@@ -116,9 +195,9 @@ function Team() {
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="grid gap-10 sm:grid-cols-2">
-          {TEAM.map((m) => {
+          {cards.map((m) => {
             const content =
-              m.kind === "founder"
+              m.useI18n && m.slug === "founder"
                 ? {
                     name: t("team.founder.name"),
                     role: t("team.founder.role"),
@@ -127,15 +206,15 @@ function Team() {
                     langs: t("team.founder.langs", { returnObjects: true }) as string[],
                   }
                 : {
-                    name: m.name,
-                    role: m.role,
-                    bio: m.bio,
+                    name: m.name ?? "",
+                    role: m.role ?? "",
+                    bio: m.bio ?? "",
                     specs: m.specs,
                     langs: m.langs,
                   };
 
             return (
-              <article key={m.id} className="group rounded-[2rem] bg-card p-6 shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-warm)]">
+              <article key={m.key} className="group rounded-[2rem] bg-card p-6 shadow-(--shadow-soft) transition hover:shadow-(--shadow-warm)">
                 <div className="overflow-hidden rounded-[1.5rem]">
                   <img
                     src={m.img}
@@ -143,19 +222,19 @@ function Team() {
                     loading="lazy"
                     width={800}
                     height={1000}
-                    className="aspect-[4/5] w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                    className="aspect-4/5 w-full object-cover transition duration-700 group-hover:scale-105"
                   />
                 </div>
                 <div className="px-2 pt-6 pb-2">
                   <p className="font-serif text-2xl text-foreground">{content.name}</p>
-                  <p className="text-sm text-[var(--clay)]">{content.role}</p>
+                  <p className="text-sm text-clay">{content.role}</p>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{content.bio}</p>
                   <div className="mt-5 grid gap-3 text-xs">
                     <div>
                       <p className="uppercase tracking-widest text-foreground/50">{t("team.specialties")}</p>
                       <div className="mt-2 flex flex-wrap gap-1.5">
                         {content.specs.map((s) => (
-                          <span key={s} className="rounded-full bg-[var(--sage)]/30 px-3 py-1 text-foreground/80">
+                          <span key={s} className="rounded-full bg-sage/30 px-3 py-1 text-foreground/80">
                             {s}
                           </span>
                         ))}
@@ -169,9 +248,9 @@ function Team() {
                   <button
                     type="button"
                     onClick={() =>
-                      openZoomSchedulerPopup(scheduleUrlFor(m, cms.teamDefaultScheduleUrl), t("team.schedulePopupBlocked"))
+                      openZoomSchedulerPopup(scheduleUrlForCard(m, cms.teamDefaultScheduleUrl), t("team.schedulePopupBlocked"))
                     }
-                    className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary bg-primary px-5 py-3.5 text-sm font-medium text-primary-foreground shadow-[var(--shadow-soft)] transition hover:bg-primary/90"
+                    className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary bg-primary px-5 py-3.5 text-sm font-medium text-primary-foreground shadow-(--shadow-soft) transition hover:bg-primary/90"
                   >
                     <Video className="h-4 w-4 shrink-0" aria-hidden />
                     {t("team.scheduleVideoCall")}

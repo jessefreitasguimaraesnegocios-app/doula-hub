@@ -46,17 +46,17 @@ function Services() {
                 key={k}
                 className={`relative flex flex-col rounded-[2rem] p-8 md:p-10 ${
                   featured
-                    ? "bg-primary text-primary-foreground shadow-[var(--shadow-warm)]"
-                    : "bg-card text-foreground shadow-[var(--shadow-soft)]"
+                    ? "bg-primary text-primary-foreground shadow-(--shadow-warm)"
+                    : "bg-card text-foreground shadow-(--shadow-soft)"
                 }`}
               >
                 {featured && (
-                  <span className="absolute right-6 top-6 rounded-full bg-[var(--cream)]/20 px-3 py-1 text-[10px] font-medium uppercase tracking-widest backdrop-blur">
+                  <span className="absolute right-6 top-6 rounded-full bg-cream/20 px-3 py-1 text-[10px] font-medium uppercase tracking-widest backdrop-blur">
                     Most loved
                   </span>
                 )}
                 <h2 className="font-serif text-3xl">{t(`services.items.${k}.name`)}</h2>
-                <p className={`mt-4 font-serif text-4xl ${featured ? "text-[var(--cream)]" : "text-primary"}`}>
+                <p className={`mt-4 font-serif text-4xl ${featured ? "text-cream" : "text-primary"}`}>
                   {priceFor(k)}
                 </p>
                 <p className={`mt-3 text-sm leading-relaxed ${featured ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
@@ -65,7 +65,7 @@ function Services() {
                 <ul className="mt-6 space-y-3 text-sm">
                   {features.map((f) => (
                     <li key={f} className="flex items-start gap-2">
-                      <Check className={`mt-0.5 h-4 w-4 flex-shrink-0 ${featured ? "text-[var(--cream)]" : "text-[var(--sage-deep)]"}`} />
+                      <Check className={`mt-0.5 h-4 w-4 shrink-0 ${featured ? "text-cream" : "text-sage-deep"}`} />
                       <span>{f}</span>
                     </li>
                   ))}
@@ -74,8 +74,8 @@ function Services() {
                   to="/booking"
                   className={`mt-8 inline-flex items-center justify-center rounded-full px-6 py-3.5 text-sm font-medium transition ${
                     featured
-                      ? "bg-[var(--cream)] text-foreground hover:translate-y-[-1px]"
-                      : "bg-primary text-primary-foreground hover:translate-y-[-1px]"
+                      ? "bg-cream text-foreground hover:-translate-y-px"
+                      : "bg-primary text-primary-foreground hover:-translate-y-px"
                   }`}
                 >
                   {t("services.bookCta")}

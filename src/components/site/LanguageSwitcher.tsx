@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Globe } from "lucide-react";
+import { setLangCookie, type SupportedLang } from "@/lib/i18n-locale";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,9 +33,11 @@ export function LanguageSwitcher() {
           <DropdownMenuItem
             key={l.code}
             onClick={() => {
-              void i18n.changeLanguage(l.code);
+              const code = l.code as SupportedLang;
+              void i18n.changeLanguage(code);
+              setLangCookie(code);
               try {
-                localStorage.setItem("i18nextLng", l.code);
+                localStorage.setItem("i18nextLng", code);
               } catch {
                 /* ignore */
               }

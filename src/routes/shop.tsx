@@ -1,9 +1,12 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import shopHero from "@/assets/shop-hero.jpg";
 import { useCart } from "@/context/cart-context";
 import { SHOP_PRODUCTS } from "@/data/shop-products";
+import { fetchActiveShopProducts } from "@/lib/supabase/queries";
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
@@ -22,12 +25,22 @@ function Shop() {
   const { t } = useTranslation();
   const { addProduct } = useCart();
   const router = useRouter();
+  const { data: remoteProducts } = useQuery({
+    queryKey: ["shop_products", "active"],
+    queryFn: fetchActiveShopProducts,
+    staleTime: 60_000,
+  });
+
+  const products = useMemo(() => {
+    if (remoteProducts && remoteProducts.length > 0) return remoteProducts;
+    return [...SHOP_PRODUCTS];
+  }, [remoteProducts]);
 
   return (
     <div>
       <section className="relative h-[40vh] min-h-[300px] overflow-hidden">
         <img src={shopHero} alt="" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-background via-background/40 to-transparent" />
         <div className="relative mx-auto flex h-full max-w-4xl flex-col items-start justify-end px-6 pb-12">
           <h1 className="font-serif text-5xl text-foreground md:text-6xl">{t("shop.title")}</h1>
           <p className="mt-4 max-w-xl text-lg text-muted-foreground">{t("shop.subtitle")}</p>
@@ -36,7 +49,7 @@ function Shop() {
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
-          {SHOP_PRODUCTS.map((p) => (
+          {products.map((p) => (
             <article key={p.id} className="group">
               <div className="aspect-square overflow-hidden rounded-3xl bg-[oklch(0.92_0.025_75)]">
                 <img
@@ -45,7 +58,7 @@ function Shop() {
                   loading="lazy"
                   width={900}
                   height={900}
-                  className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                  className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                 />
               </div>
               <div className="mt-4 flex items-start justify-between gap-3">
