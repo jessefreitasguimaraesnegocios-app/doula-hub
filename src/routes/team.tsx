@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import founder from "@/assets/founder.jpg";
+import raquelTeam from "@/assets/team-imani.png";
 import d2 from "@/assets/doula-2.jpg";
 import d3 from "@/assets/doula-3.jpg";
 import d4 from "@/assets/doula-4.jpg";
-import teamHero from "@/assets/team-hero.jpg";
+import teamHero from "@/assets/team-hero.png";
 
 export const Route = createFileRoute("/team")({
   head: () => ({
@@ -19,16 +19,23 @@ export const Route = createFileRoute("/team")({
   component: Team,
 });
 
-const TEAM = [
+type FounderMember = { kind: "founder"; id: "founder"; img: string };
+type StaticMember = {
+  kind: "static";
+  id: string;
+  img: string;
+  name: string;
+  role: string;
+  bio: string;
+  specs: string[];
+  langs: string[];
+};
+
+const TEAM: readonly (FounderMember | StaticMember)[] = [
+  { kind: "founder", id: "founder", img: raquelTeam },
   {
-    img: founder,
-    name: "Imani Carter",
-    role: "Founder · Birth & Postpartum Doula",
-    bio: "Over a decade of holding space for families through every kind of birth.",
-    specs: ["Birth doula", "VBAC support", "Bereavement"],
-    langs: ["English", "Spanish"],
-  },
-  {
+    kind: "static",
+    id: "sofia",
     img: d2,
     name: "Sofia Rivera",
     role: "Birth & Lactation Doula",
@@ -37,6 +44,8 @@ const TEAM = [
     langs: ["Spanish", "English", "Portuguese"],
   },
   {
+    kind: "static",
+    id: "elena",
     img: d3,
     name: "Elena Conti",
     role: "Postpartum Doula",
@@ -45,6 +54,8 @@ const TEAM = [
     langs: ["Italian", "English"],
   },
   {
+    kind: "static",
+    id: "mei",
     img: d4,
     name: "Mei Tanaka",
     role: "Bereavement & Birth Doula",
@@ -56,6 +67,7 @@ const TEAM = [
 
 function Team() {
   const { t } = useTranslation();
+
   return (
     <div>
       <section className="relative h-[40vh] min-h-[320px] overflow-hidden">
@@ -69,39 +81,60 @@ function Team() {
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="grid gap-10 sm:grid-cols-2">
-          {TEAM.map((m) => (
-            <article key={m.name} className="group rounded-[2rem] bg-card p-6 shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-warm)]">
-              <div className="overflow-hidden rounded-[1.5rem]">
-                <img
-                  src={m.img}
-                  alt={m.name}
-                  loading="lazy"
-                  width={800}
-                  height={1000}
-                  className="aspect-[4/5] w-full object-cover transition duration-700 group-hover:scale-[1.03]"
-                />
-              </div>
-              <div className="px-2 pt-6 pb-2">
-                <p className="font-serif text-2xl text-foreground">{m.name}</p>
-                <p className="text-sm text-[var(--clay)]">{m.role}</p>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{m.bio}</p>
-                <div className="mt-5 grid gap-3 text-xs">
-                  <div>
-                    <p className="uppercase tracking-widest text-foreground/50">{t("team.specialties")}</p>
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {m.specs.map((s) => (
-                        <span key={s} className="rounded-full bg-[var(--sage)]/30 px-3 py-1 text-foreground/80">{s}</span>
-                      ))}
+          {TEAM.map((m) => {
+            const content =
+              m.kind === "founder"
+                ? {
+                    name: t("team.founder.name"),
+                    role: t("team.founder.role"),
+                    bio: t("team.founder.bio"),
+                    specs: t("team.founder.specs", { returnObjects: true }) as string[],
+                    langs: t("team.founder.langs", { returnObjects: true }) as string[],
+                  }
+                : {
+                    name: m.name,
+                    role: m.role,
+                    bio: m.bio,
+                    specs: m.specs,
+                    langs: m.langs,
+                  };
+
+            return (
+              <article key={m.id} className="group rounded-[2rem] bg-card p-6 shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-warm)]">
+                <div className="overflow-hidden rounded-[1.5rem]">
+                  <img
+                    src={m.img}
+                    alt={content.name}
+                    loading="lazy"
+                    width={800}
+                    height={1000}
+                    className="aspect-[4/5] w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                  />
+                </div>
+                <div className="px-2 pt-6 pb-2">
+                  <p className="font-serif text-2xl text-foreground">{content.name}</p>
+                  <p className="text-sm text-[var(--clay)]">{content.role}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{content.bio}</p>
+                  <div className="mt-5 grid gap-3 text-xs">
+                    <div>
+                      <p className="uppercase tracking-widest text-foreground/50">{t("team.specialties")}</p>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {content.specs.map((s) => (
+                          <span key={s} className="rounded-full bg-[var(--sage)]/30 px-3 py-1 text-foreground/80">
+                            {s}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="uppercase tracking-widest text-foreground/50">{t("team.languages")}</p>
+                      <p className="mt-1.5 text-foreground/80">{content.langs.join(" · ")}</p>
                     </div>
                   </div>
-                  <div>
-                    <p className="uppercase tracking-widest text-foreground/50">{t("team.languages")}</p>
-                    <p className="mt-1.5 text-foreground/80">{m.langs.join(" · ")}</p>
-                  </div>
                 </div>
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       </section>
     </div>

@@ -1,15 +1,34 @@
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Instagram, Mail, Heart } from "lucide-react";
+import logoMark from "@/assets/logo-mark.png";
+
+const CONTACT_EMAIL = "Doula@AllThingsBabies.com";
 
 export function Footer() {
   const { t } = useTranslation();
+  const mailtoHref = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(t("footer.emailSubject"))}`;
+
   return (
     <footer className="mt-24 border-t border-border/50 bg-[oklch(0.94_0.02_80)]">
       <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 md:grid-cols-4">
         <div className="md:col-span-2">
-          <p className="font-serif text-2xl text-foreground">{t("brand")}</p>
-          <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground">
+          <Link
+            to="/"
+            className="group inline-flex max-w-full items-center gap-4 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[oklch(0.94_0.02_80)]"
+          >
+            <img
+              src={logoMark}
+              alt=""
+              width={96}
+              height={96}
+              className="h-16 w-16 shrink-0 object-contain md:h-20 md:w-20"
+            />
+            <span className="font-serif text-2xl text-foreground transition-colors group-hover:text-primary">
+              {t("brand")}
+            </span>
+          </Link>
+          <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted-foreground">
             {t("footer.tagline")}
           </p>
           <div className="mt-6 flex items-center gap-3">
@@ -23,8 +42,9 @@ export function Footer() {
               <Instagram className="h-4 w-4" />
             </a>
             <a
-              href="mailto:hello@allthingsbabies.com"
-              aria-label="Email"
+              href={mailtoHref}
+              aria-label={t("footer.emailAria")}
+              title={CONTACT_EMAIL}
               className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card text-foreground/70 transition hover:text-primary"
             >
               <Mail className="h-4 w-4" />
@@ -47,8 +67,17 @@ export function Footer() {
             {t("footer.contact")}
           </p>
           <ul className="mt-4 space-y-2 text-sm text-foreground/80">
-            <li>hello@allthingsbabies.com</li>
-            <li>+1 (555) 123-4567</li>
+            <li>
+              <a href={mailtoHref} className="hover:text-primary">
+                {CONTACT_EMAIL}
+              </a>
+            </li>
+            <li>
+              <a href="tel:+13236406640" className="hover:text-primary">
+                +1 (323) 640-6640
+              </a>
+            </li>
+            <li>Downtown Culver City, CA</li>
             <li><Link to="/contact" className="hover:text-primary">{t("nav.contact")}</Link></li>
           </ul>
         </div>

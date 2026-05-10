@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Award, Heart, Hand } from "lucide-react";
-import founder from "@/assets/founder.jpg";
-import handsImg from "@/assets/about-hands.jpg";
+import founder from "@/assets/founder.png";
+import certsPhoto from "@/assets/about-doula-campus.png";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -30,14 +30,14 @@ function About() {
       <section className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-20 md:grid-cols-2 md:py-28">
         <img
           src={founder}
-          alt="Founder portrait"
+          alt="Portrait of the founder in doula scrubs, smiling"
           width={1000}
           height={1250}
           className="aspect-[4/5] w-full rounded-[2rem] object-cover shadow-[var(--shadow-warm)]"
         />
         <div>
           <h1 className="font-serif text-5xl text-foreground md:text-6xl">{t("about.title")}</h1>
-          <p className="mt-6 text-lg leading-relaxed text-muted-foreground">{t("about.body")}</p>
+          <p className="mt-6 whitespace-pre-line text-lg leading-relaxed text-muted-foreground">{t("about.body")}</p>
         </div>
       </section>
 
@@ -74,8 +74,8 @@ function About() {
             </ul>
           </div>
           <img
-            src={handsImg}
-            alt=""
+            src={certsPhoto}
+            alt="Doula in scrubs smiling beside a hospital campus map"
             loading="lazy"
             width={1080}
             height={1500}

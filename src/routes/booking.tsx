@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { TFunction } from "i18next";
+import { toast } from "sonner";
 import { Check, ArrowRight, ArrowLeft, ShieldCheck, Video, CalendarDays } from "lucide-react";
-import founder from "@/assets/founder.jpg";
+import founder from "@/assets/founder.png";
 import d2 from "@/assets/doula-2.jpg";
 import d3 from "@/assets/doula-3.jpg";
 import d4 from "@/assets/doula-4.jpg";
@@ -22,26 +24,120 @@ export const Route = createFileRoute("/booking")({
 const PKGS = ["birth", "postpartum", "bereavement", "lactation"] as const;
 const DOULAS = [
   { id: "any", name: "Match me", img: null },
-  { id: "imani", name: "Imani Carter", img: founder },
+  { id: "raquel", name: "Raquel Manini", img: founder },
   { id: "sofia", name: "Sofia Rivera", img: d2 },
   { id: "elena", name: "Elena Conti", img: d3 },
   { id: "mei", name: "Mei Tanaka", img: d4 },
 ];
 
+const SUPPORT_ORDER = ["birth", "postpartum", "lactation", "bereavement", "combo", "other"] as const;
+const LANG_ORDER = ["english", "spanish", "portuguese", "other"] as const;
+
+const EMAIL_DOMAINS = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com", "live.com"] as const;
+
+function formatUSPhoneFromDigits(input: string): string {
+  let d = input.replace(/\D/g, "");
+  if (d.length === 11 && d.startsWith("1")) d = d.slice(1);
+  d = d.slice(0, 10);
+  if (d.length === 0) return "";
+  if (d.length <= 3) return `(${d}`;
+  if (d.length <= 6) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
+  return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
+}
+
+function usPhoneHasTenDigits(formatted: string): boolean {
+  return formatted.replace(/\D/g, "").length === 10;
+}
+
+function emailDomainPickVisible(value: string): boolean {
+  const parts = value.split("@");
+  if (parts.length < 2) return false;
+  const domain = parts.slice(1).join("@");
+  return !domain.includes(".");
+}
+
+/** US typed date → display string with slashes (digits only, max 8). */
+function formatUsDateTyped(digitsRaw: string): string {
+  const d = digitsRaw.replace(/\D/g, "").slice(0, 8);
+  if (d.length <= 2) return d;
+  if (d.length <= 4) return `${d.slice(0, 2)}/${d.slice(2)}`;
+  return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`;
+}
+
+function isoFromUsDigits8(d: string): string {
+  if (d.length !== 8) return "";
+  const mm = d.slice(0, 2);
+  const dd = d.slice(2, 4);
+  const yyyy = d.slice(4, 8);
+  const m = Number(mm);
+  const day = Number(dd);
+  const y = Number(yyyy);
+  if (m < 1 || m > 12 || day < 1 || day > 31 || y < 1900 || y > 2100) return "";
+  const dt = new Date(y, m - 1, day);
+  if (dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== day) return "";
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function isoToUsDisplay(iso: string): string {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return "";
+  const [y, m, d] = iso.split("-");
+  return `${m}/${d}/${y}`;
+}
+
+function formatUsZipDigits(digits: string): string {
+  const d = digits.replace(/\D/g, "").slice(0, 9);
+  if (d.length <= 5) return d;
+  return `${d.slice(0, 5)}-${d.slice(5)}`;
+}
+
+function zipUsIsValid(masked: string): boolean {
+  const n = masked.replace(/\D/g, "").length;
+  return n === 5 || n === 9;
+}
+
 type Form = {
   pkg: string;
   doula: string;
+  fullName: string;
+  email: string;
+  phone: string;
   dueDate: string;
   firstBaby: string;
   birthLocation: string;
-  provider: string;
-  partner: string;
-  address: string;
-  concerns: string;
+  hospitalProvider: string;
+  zipCode: string;
+  streetNumber: string;
+  zipCity: string;
+  zipState: string;
+  supportTypes: string[];
+  includeSupport: string;
+  supportName: string;
+  supportRelation: string;
+  preferredLanguage: string;
+  babyCount: string;
+  howHeard: string;
+  notesBeforeCall: string;
   platform: string;
   date: string;
   time: string;
 };
+
+function validateIntake(f: Form) {
+  return (
+    f.fullName.trim() !== "" &&
+    f.email.trim() !== "" &&
+    usPhoneHasTenDigits(f.phone) &&
+    f.dueDate !== "" &&
+    f.firstBaby !== "" &&
+    f.birthLocation !== "" &&
+    zipUsIsValid(f.zipCode) &&
+    f.streetNumber.trim() !== "" &&
+    f.supportTypes.length > 0 &&
+    f.preferredLanguage !== "" &&
+    f.babyCount !== "" &&
+    (f.includeSupport !== "yes" || (f.supportName.trim() !== "" && f.supportRelation.trim() !== ""))
+  );
+}
 
 function Booking() {
   const { t } = useTranslation();
@@ -50,21 +146,45 @@ function Booking() {
   const [form, setForm] = useState<Form>({
     pkg: "birth",
     doula: "any",
+    fullName: "",
+    email: "",
+    phone: "",
     dueDate: "",
-    firstBaby: "yes",
-    birthLocation: "hospital",
-    provider: "",
-    partner: "",
-    address: "",
-    concerns: "",
+    firstBaby: "",
+    birthLocation: "",
+    hospitalProvider: "",
+    zipCode: "",
+    streetNumber: "",
+    zipCity: "",
+    zipState: "",
+    supportTypes: [],
+    includeSupport: "",
+    supportName: "",
+    supportRelation: "",
+    preferredLanguage: "",
+    babyCount: "",
+    howHeard: "",
+    notesBeforeCall: "",
     platform: "Zoom",
     date: "",
     time: "",
   });
-  const update = <K extends keyof Form>(k: K, v: Form[K]) => setForm((f) => ({ ...f, [k]: v }));
+  const update = <K extends keyof Form>(k: K, v: Form[K]) => setForm((prev) => ({ ...prev, [k]: v }));
+
+  const handleZipPlace = useCallback((city: string, state: string) => {
+    setForm((prev) => ({ ...prev, zipCity: city, zipState: state }));
+  }, []);
 
   const stepKeys = ["package", "doula", "intake", "schedule", "payment"] as const;
   const platforms = t("booking.schedule.platforms", { returnObjects: true }) as string[];
+
+  const goNext = () => {
+    if (step === 2 && !validateIntake(form)) {
+      toast.error(t("booking.intake.fillRequired"));
+      return;
+    }
+    setStep((s) => s + 1);
+  };
 
   if (done) {
     return (
@@ -81,6 +201,13 @@ function Booking() {
     );
   }
 
+  const supportTypesSummary =
+    form.supportTypes.length > 0
+      ? SUPPORT_ORDER.filter((k) => form.supportTypes.includes(k))
+          .map((k) => t(`booking.intake.support.${k}`))
+          .join(" · ")
+      : "—";
+
   return (
     <div className="mx-auto max-w-4xl px-6 py-16 md:py-24">
       <div className="text-center">
@@ -88,12 +215,11 @@ function Booking() {
         <p className="mt-4 text-muted-foreground">{t("booking.subtitle")}</p>
       </div>
 
-      {/* Stepper */}
       <ol className="mx-auto mt-12 flex max-w-3xl items-center justify-between gap-2">
         {stepKeys.map((k, i) => (
           <li key={k} className="flex flex-1 items-center gap-2">
             <div
-              className={`grid h-8 w-8 flex-shrink-0 place-items-center rounded-full text-xs font-medium transition ${
+              className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-medium transition ${
                 i <= step ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
               }`}
             >
@@ -108,7 +234,6 @@ function Booking() {
       </ol>
 
       <div className="mt-12 rounded-[2rem] bg-card p-8 shadow-[var(--shadow-soft)] md:p-12">
-        {/* PACKAGE */}
         {step === 0 && (
           <div className="grid gap-4 sm:grid-cols-2">
             {PKGS.map((k) => {
@@ -131,7 +256,6 @@ function Booking() {
           </div>
         )}
 
-        {/* DOULA */}
         {step === 1 && (
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
             {DOULAS.map((d) => {
@@ -161,36 +285,186 @@ function Booking() {
           </div>
         )}
 
-        {/* INTAKE */}
         {step === 2 && (
-          <div className="grid gap-5 sm:grid-cols-2">
-            <BookField label={t("booking.intake.dueDate")} type="date" value={form.dueDate} onChange={(v) => update("dueDate", v)} />
-            <BookSelect label={t("booking.intake.firstBaby")} value={form.firstBaby} onChange={(v) => update("firstBaby", v)} options={[
-              { value: "yes", label: t("booking.intake.yes") },
-              { value: "no", label: t("booking.intake.no") },
-            ]} />
-            <BookSelect label={t("booking.intake.birthLocation")} value={form.birthLocation} onChange={(v) => update("birthLocation", v)} options={[
-              { value: "hospital", label: t("booking.intake.hospital") },
-              { value: "birthCenter", label: t("booking.intake.birthCenter") },
-              { value: "home", label: t("booking.intake.home") },
-              { value: "undecided", label: t("booking.intake.undecided") },
-            ]} />
-            <BookField label={t("booking.intake.provider")} value={form.provider} onChange={(v) => update("provider", v)} />
-            <BookField label={t("booking.intake.partner")} value={form.partner} onChange={(v) => update("partner", v)} />
-            <BookField label={t("booking.intake.address")} value={form.address} onChange={(v) => update("address", v)} />
-            <div className="sm:col-span-2">
-              <label className="text-xs uppercase tracking-widest text-foreground/60">{t("booking.intake.concerns")}</label>
+          <div className="space-y-8">
+            <div className="grid gap-5 sm:grid-cols-2">
+              <BookField label={`${t("booking.intake.fullName")} *`} value={form.fullName} onChange={(v) => update("fullName", v)} required />
+              <BookEmailField label={`${t("booking.intake.email")} *`} value={form.email} onChange={(v) => update("email", v)} required />
+              <BookPhoneField label={`${t("booking.intake.phone")} *`} value={form.phone} onChange={(v) => update("phone", v)} required />
+              <BookDateUsField label={`${t("booking.intake.dueDate")} *`} value={form.dueDate} onChange={(v) => update("dueDate", v)} placeholder={t("booking.intake.datePlaceholder")} required />
+            </div>
+
+            <BookRadioGroup
+              legend={`${t("booking.intake.firstBaby")} *`}
+              name="firstBaby"
+              value={form.firstBaby}
+              onChange={(v) => update("firstBaby", v)}
+              options={[
+                { value: "yes", label: t("booking.intake.yes") },
+                { value: "no", label: t("booking.intake.no") },
+              ]}
+            />
+
+            <BookRadioGroup
+              legend={`${t("booking.intake.birthLocation")} *`}
+              name="birthLocation"
+              value={form.birthLocation}
+              onChange={(v) => update("birthLocation", v)}
+              options={[
+                { value: "hospital", label: t("booking.intake.hospital") },
+                { value: "birthCenter", label: t("booking.intake.birthCenter") },
+                { value: "home", label: t("booking.intake.home") },
+              ]}
+            />
+
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <BookField
+                  label={`${t("booking.intake.hospitalProvider")} (${t("booking.intake.optional")})`}
+                  value={form.hospitalProvider}
+                  onChange={(v) => update("hospitalProvider", v)}
+                  hint={t("booking.intake.hospitalProviderHint")}
+                />
+              </div>
+              <BookZipUsField
+                label={`${t("booking.intake.zipCode")} *`}
+                value={form.zipCode}
+                onChange={(v) => update("zipCode", v)}
+                onPlaceFound={handleZipPlace}
+                city={form.zipCity}
+                stateAbbr={form.zipState}
+                placeholder={t("booking.intake.zipPlaceholder")}
+                required
+                t={t}
+              />
+              <BookField
+                label={`${t("booking.intake.streetNumber")} *`}
+                value={form.streetNumber}
+                onChange={(v) => update("streetNumber", v)}
+                placeholder={t("booking.intake.streetNumberPh")}
+                required
+              />
+            </div>
+
+            <BookSupportMultiPicker
+              label={`${t("booking.intake.supportType")} *`}
+              value={form.supportTypes}
+              onChange={(v) => update("supportTypes", v)}
+              t={t}
+            />
+
+            <div>
+              <p className="text-xs uppercase tracking-widest text-foreground/60">
+                {t("booking.intake.includeSupport")}{" "}
+                <span className="font-normal normal-case text-muted-foreground">({t("booking.intake.includeSupportHint")})</span>
+              </p>
+              <div className="mt-3 flex flex-wrap gap-3">
+                {(
+                  [
+                    { value: "yes", label: t("booking.intake.yes") },
+                    { value: "no", label: t("booking.intake.no") },
+                  ] as const
+                ).map((o) => (
+                  <label
+                    key={o.value}
+                    className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2.5 text-sm transition ${
+                      form.includeSupport === o.value ? "border-primary bg-primary/5 text-foreground" : "border-border bg-background text-foreground/80"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="includeSupport"
+                      value={o.value}
+                      checked={form.includeSupport === o.value}
+                      onChange={() => update("includeSupport", o.value)}
+                      className="accent-primary"
+                    />
+                    {o.label}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {form.includeSupport === "yes" && (
+              <div className="grid gap-5 sm:grid-cols-2">
+                <BookField
+                  label={`${t("booking.intake.supportName")} *`}
+                  value={form.supportName}
+                  onChange={(v) => update("supportName", v)}
+                  required
+                />
+                <BookField
+                  label={`${t("booking.intake.supportRelation")} *`}
+                  value={form.supportRelation}
+                  onChange={(v) => update("supportRelation", v)}
+                  placeholder={t("booking.intake.supportRelationPh")}
+                  required
+                />
+              </div>
+            )}
+
+            <BookSelect
+              label={`${t("booking.intake.preferredLanguage")} *`}
+              value={form.preferredLanguage}
+              onChange={(v) => update("preferredLanguage", v)}
+              options={[
+                { value: "", label: t("booking.intake.selectPlaceholder") },
+                ...LANG_ORDER.map((key) => ({ value: key, label: t(`booking.intake.lang.${key}`) })),
+              ]}
+              required
+            />
+
+            <div>
+              <p className="text-xs uppercase tracking-widest text-foreground/60">{`${t("booking.intake.babyCount")} *`}</p>
+              <div className="mt-3 flex flex-wrap gap-3">
+                {(
+                  [
+                    { value: "1", label: t("booking.intake.babyCount1") },
+                    { value: "2", label: t("booking.intake.babyCount2") },
+                    { value: "3plus", label: t("booking.intake.babyCount3plus") },
+                  ] as const
+                ).map((o) => (
+                  <label
+                    key={o.value}
+                    className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-5 py-2.5 text-sm transition ${
+                      form.babyCount === o.value ? "border-primary bg-primary/5 text-foreground" : "border-border bg-background text-foreground/80"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="babyCount"
+                      value={o.value}
+                      checked={form.babyCount === o.value}
+                      onChange={() => update("babyCount", o.value)}
+                      className="accent-primary"
+                    />
+                    {o.label}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <BookField
+              label={`${t("booking.intake.howHeard")} (${t("booking.intake.optional")})`}
+              value={form.howHeard}
+              onChange={(v) => update("howHeard", v)}
+            />
+
+            <div>
+              <label className="text-xs uppercase tracking-widest text-foreground/60">
+                {t("booking.intake.notesBeforeCall")}{" "}
+                <span className="font-normal normal-case text-muted-foreground">({t("booking.intake.optional")})</span>
+              </label>
               <textarea
                 rows={4}
-                value={form.concerns}
-                onChange={(e) => update("concerns", e.target.value)}
+                value={form.notesBeforeCall}
+                onChange={(e) => update("notesBeforeCall", e.target.value)}
                 className="mt-2 w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none"
               />
             </div>
           </div>
         )}
 
-        {/* SCHEDULE */}
         {step === 3 && (
           <div className="space-y-6">
             <p className="font-serif text-xl text-foreground">{t("booking.schedule.title")}</p>
@@ -205,19 +479,37 @@ function Booking() {
               <BookField label={t("booking.schedule.time")} type="time" value={form.time} onChange={(v) => update("time", v)} />
             </div>
             <div className="flex items-center gap-3 rounded-2xl bg-[var(--sage)]/15 p-4 text-sm text-foreground/80">
-              <Video className="h-5 w-5 text-[var(--sage-deep)]" />
-              We'll send you a {form.platform} link by email after confirmation.
+              <Video className="h-5 w-5 shrink-0 text-[var(--sage-deep)]" />
+              {t("booking.schedule.linkNote", { platform: form.platform })}
             </div>
           </div>
         )}
 
-        {/* PAYMENT */}
         {step === 4 && (
           <div className="space-y-6">
             <p className="font-serif text-2xl text-foreground">{t("booking.payment.summary")}</p>
             <dl className="space-y-3 rounded-2xl bg-background p-6">
               <Row label={t("booking.steps.package")} value={t(`services.items.${form.pkg}.name`)} />
               <Row label={t("booking.steps.doula")} value={form.doula === "any" ? t("booking.doulaAny") : DOULAS.find((d) => d.id === form.doula)?.name ?? "—"} />
+              <Row label={t("booking.intake.fullName")} value={form.fullName || "—"} />
+              <Row label={t("booking.intake.email")} value={form.email || "—"} />
+              <Row label={t("booking.intake.phone")} value={form.phone || "—"} />
+              <Row
+                label={t("booking.intake.dueDate")}
+                value={isoToUsDisplay(form.dueDate) || form.dueDate || "—"}
+              />
+              <Row label={t("booking.intake.streetNumber")} value={form.streetNumber || "—"} />
+              <Row
+                label={t("booking.intake.zipCode")}
+                value={
+                  form.zipCode
+                    ? form.zipCity && form.zipState
+                      ? `${form.zipCode} · ${form.zipCity}, ${form.zipState}`
+                      : form.zipCode
+                    : "—"
+                }
+              />
+              <Row label={t("booking.intake.supportType")} value={supportTypesSummary} />
               <Row
                 label={<span className="inline-flex items-center gap-1.5"><CalendarDays className="h-3.5 w-3.5" />{t("booking.steps.schedule")}</span>}
                 value={`${form.date || "—"} ${form.time}  ·  ${form.platform}`}
@@ -226,7 +518,7 @@ function Booking() {
               <Row label={<span className="font-medium text-foreground">{t("booking.payment.total")}</span>} value={<span className="font-serif text-2xl text-primary">{t(`services.items.${form.pkg}.price`)}</span>} />
             </dl>
             <div className="flex items-start gap-3 rounded-2xl border border-border bg-background p-4 text-sm text-muted-foreground">
-              <ShieldCheck className="mt-0.5 h-5 w-5 text-primary" />
+              <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
               <div>
                 <p className="text-foreground">{t("booking.payment.secure")}</p>
                 <p className="mt-1 text-xs">{t("booking.payment.terms")}</p>
@@ -235,7 +527,6 @@ function Booking() {
           </div>
         )}
 
-        {/* NAV */}
         <div className="mt-10 flex items-center justify-between">
           <button
             type="button"
@@ -247,19 +538,11 @@ function Booking() {
             {t("booking.back")}
           </button>
           {step < stepKeys.length - 1 ? (
-            <button
-              type="button"
-              onClick={() => setStep((s) => s + 1)}
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-medium text-primary-foreground hover:translate-y-[-1px]"
-            >
+            <button type="button" onClick={goNext} className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-medium text-primary-foreground hover:-translate-y-px">
               {t("booking.next")} <ArrowRight className="h-4 w-4" />
             </button>
           ) : (
-            <button
-              type="button"
-              onClick={() => setDone(true)}
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-medium text-primary-foreground hover:translate-y-[-1px]"
-            >
+            <button type="button" onClick={() => setDone(true)} className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-medium text-primary-foreground hover:-translate-y-px">
               {t("booking.finish")} <ShieldCheck className="h-4 w-4" />
             </button>
           )}
@@ -269,13 +552,319 @@ function Booking() {
   );
 }
 
-function BookField({ label, value, onChange, type = "text" }: { label: string; value: string; onChange: (v: string) => void; type?: string }) {
+function BookSupportMultiPicker({
+  label,
+  value,
+  onChange,
+  t,
+}: {
+  label: string;
+  value: string[];
+  onChange: (v: string[]) => void;
+  t: TFunction;
+}) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const [draft, setDraft] = useState<string[]>(value);
+
+  const open = () => {
+    setDraft([...value]);
+    dialogRef.current?.showModal();
+  };
+
+  const toggle = (key: string) => {
+    setDraft((d) => (d.includes(key) ? d.filter((x) => x !== key) : [...d, key]));
+  };
+
+  const commit = () => {
+    onChange(draft);
+    dialogRef.current?.close();
+  };
+
+  const summary =
+    value.length > 0
+      ? SUPPORT_ORDER.filter((k) => value.includes(k))
+          .map((k) => t(`booking.intake.support.${k}`))
+          .join(" · ")
+      : t("booking.intake.supportOpenPick");
+
+  return (
+    <div>
+      <label className="text-xs uppercase tracking-widest text-foreground/60">{label}</label>
+      <button
+        type="button"
+        onClick={open}
+        className={`mt-2 flex min-h-[3rem] w-full items-center rounded-2xl border border-border bg-background px-4 py-3 text-left text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${value.length === 0 ? "text-muted-foreground" : "text-foreground"}`}
+      >
+        <span className="line-clamp-3">{summary}</span>
+      </button>
+
+      <dialog
+        ref={dialogRef}
+        className="fixed left-1/2 top-1/2 z-50 w-[min(100%-2rem,28rem)] -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-border bg-card p-6 text-foreground shadow-lg [&::backdrop]:bg-black/50"
+      >
+        <p className="font-serif text-lg leading-snug">{t("booking.intake.supportDialogTitle")}</p>
+        <div className="mt-4 max-h-[min(60vh,22rem)] space-y-2 overflow-y-auto pr-1">
+          {SUPPORT_ORDER.map((key) => (
+            <label
+              key={key}
+              className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition ${
+                draft.includes(key) ? "border-primary bg-primary/5" : "border-border bg-background"
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={draft.includes(key)}
+                onChange={() => toggle(key)}
+                className="size-4 shrink-0 rounded border border-input accent-primary"
+              />
+              <span>{t(`booking.intake.support.${key}`)}</span>
+            </label>
+          ))}
+        </div>
+        <div className="mt-6 flex flex-wrap justify-end gap-2 border-t border-border pt-4">
+          <button
+            type="button"
+            className="rounded-full border border-border bg-background px-5 py-2.5 text-sm text-foreground transition hover:bg-muted"
+            onClick={() => dialogRef.current?.close()}
+          >
+            {t("booking.intake.supportCancel")}
+          </button>
+          <button type="button" className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90" onClick={commit}>
+            {t("booking.intake.supportConfirm")}
+          </button>
+        </div>
+      </dialog>
+    </div>
+  );
+}
+
+function BookDateUsField({
+  label,
+  value,
+  onChange,
+  required,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (iso: string) => void;
+  required?: boolean;
+  placeholder?: string;
+}) {
+  const [text, setText] = useState(() => isoToUsDisplay(value));
+
+  useEffect(() => {
+    setText(isoToUsDisplay(value));
+  }, [value]);
+
   return (
     <div>
       <label className="text-xs uppercase tracking-widest text-foreground/60">{label}</label>
       <input
+        type="text"
+        inputMode="numeric"
+        autoComplete="bday"
+        placeholder={placeholder}
+        value={text}
+        required={required}
+        maxLength={10}
+        onChange={(e) => {
+          const digits = e.target.value.replace(/\D/g, "").slice(0, 8);
+          const display = formatUsDateTyped(digits);
+          setText(display);
+          onChange(isoFromUsDigits8(digits));
+        }}
+        className="mt-2 w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm tabular-nums focus:border-primary focus:outline-none"
+      />
+    </div>
+  );
+}
+
+function BookZipUsField({
+  label,
+  value,
+  onChange,
+  onPlaceFound,
+  city,
+  stateAbbr,
+  placeholder,
+  required,
+  t,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  onPlaceFound: (city: string, stateAbbr: string) => void;
+  city: string;
+  stateAbbr: string;
+  placeholder?: string;
+  required?: boolean;
+  t: TFunction;
+}) {
+  const [lookup, setLookup] = useState<"idle" | "loading" | "none">("idle");
+
+  useEffect(() => {
+    const digits = value.replace(/\D/g, "");
+    if (digits.length < 5) {
+      setLookup("idle");
+      onPlaceFound("", "");
+      return;
+    }
+    const zip5 = digits.slice(0, 5);
+    const ac = new AbortController();
+    setLookup("loading");
+
+    const tmr = window.setTimeout(async () => {
+      try {
+        const r = await fetch(`https://api.zippopotam.us/us/${zip5}`, { signal: ac.signal });
+        if (!r.ok) throw new Error("n");
+        const data = (await r.json()) as {
+          places?: { "place name": string; "state abbreviation": string }[];
+        };
+        if (ac.signal.aborted) return;
+        const p = data.places?.[0];
+        if (!p) throw new Error("n");
+        onPlaceFound(p["place name"], p["state abbreviation"]);
+        setLookup("idle");
+      } catch {
+        if (ac.signal.aborted) return;
+        onPlaceFound("", "");
+        setLookup("none");
+      }
+    }, 450);
+
+    return () => {
+      ac.abort();
+      window.clearTimeout(tmr);
+    };
+  }, [value, onPlaceFound]);
+
+  const digits = value.replace(/\D/g, "");
+  const placeLine =
+    digits.length >= 5 && city && stateAbbr ? t("booking.intake.zipPlaceLine", { city, state: stateAbbr }) : null;
+  const loadLine = lookup === "loading" && digits.length >= 5 ? t("booking.intake.zipLookupLoading") : null;
+  const errLine = lookup === "none" ? t("booking.intake.zipLookupNone") : null;
+
+  return (
+    <div>
+      <label className="text-xs uppercase tracking-widest text-foreground/60">{label}</label>
+      <input
+        type="text"
+        inputMode="numeric"
+        autoComplete="postal-code"
+        placeholder={placeholder}
+        value={value}
+        required={required}
+        maxLength={10}
+        onChange={(e) => onChange(formatUsZipDigits(e.target.value))}
+        className="mt-2 w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm tabular-nums focus:border-primary focus:outline-none"
+      />
+      {(placeLine || errLine || loadLine) && (
+        <p className={`mt-1.5 text-xs ${errLine ? "text-destructive" : "text-muted-foreground"}`}>{placeLine || errLine || loadLine}</p>
+      )}
+    </div>
+  );
+}
+
+function BookPhoneField({
+  label,
+  value,
+  onChange,
+  required,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  required?: boolean;
+}) {
+  return (
+    <div>
+      <label className="text-xs uppercase tracking-widest text-foreground/60">{label}</label>
+      <input
+        type="tel"
+        inputMode="numeric"
+        autoComplete="tel-national"
+        placeholder="(555) 123-4567"
+        value={value}
+        required={required}
+        maxLength={14}
+        onChange={(e) => onChange(formatUSPhoneFromDigits(e.target.value))}
+        className="mt-2 w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm tabular-nums focus:border-primary focus:outline-none"
+      />
+    </div>
+  );
+}
+
+function BookEmailField({
+  label,
+  value,
+  onChange,
+  required,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  required?: boolean;
+}) {
+  const parts = value.split("@");
+  const localPart = parts[0] ?? "";
+  const showDomains = emailDomainPickVisible(value) && localPart.length > 0;
+
+  return (
+    <div>
+      <label className="text-xs uppercase tracking-widest text-foreground/60">{label}</label>
+      <input
+        type="email"
+        autoComplete="email"
+        value={value}
+        required={required}
+        onChange={(e) => onChange(e.target.value)}
+        className="mt-2 w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none"
+      />
+      {showDomains ? (
+        <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Email domain suggestions">
+          {EMAIL_DOMAINS.map((dom) => (
+            <button
+              key={dom}
+              type="button"
+              onClick={() => onChange(`${localPart}@${dom}`)}
+              className="rounded-full border border-border bg-muted/40 px-3 py-1.5 text-xs font-medium text-foreground/90 transition hover:border-primary hover:bg-primary/5"
+            >
+              @{dom}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function BookField({
+  label,
+  value,
+  onChange,
+  type = "text",
+  required,
+  hint,
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
+  required?: boolean;
+  hint?: string;
+  placeholder?: string;
+}) {
+  return (
+    <div>
+      <label className="text-xs uppercase tracking-widest text-foreground/60">{label}</label>
+      {hint ? <p className="mt-1 text-xs text-muted-foreground">{hint}</p> : null}
+      <input
         type={type}
         value={value}
+        placeholder={placeholder}
+        required={required}
         onChange={(e) => onChange(e.target.value)}
         className="mt-2 w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none"
       />
@@ -283,20 +872,68 @@ function BookField({ label, value, onChange, type = "text" }: { label: string; v
   );
 }
 
-function BookSelect({ label, value, onChange, options }: { label: string; value: string; onChange: (v: string) => void; options: { value: string; label: string }[] }) {
+function BookSelect({
+  label,
+  value,
+  onChange,
+  options,
+  required,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  required?: boolean;
+}) {
   return (
     <div>
       <label className="text-xs uppercase tracking-widest text-foreground/60">{label}</label>
       <select
         value={value}
+        required={required}
         onChange={(e) => onChange(e.target.value)}
         className="mt-2 w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none"
       >
         {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
+          <option key={o.value === "" ? "_placeholder" : o.value} value={o.value}>
+            {o.label}
+          </option>
         ))}
       </select>
     </div>
+  );
+}
+
+function BookRadioGroup({
+  legend,
+  name,
+  value,
+  onChange,
+  options,
+}: {
+  legend: string;
+  name: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <fieldset className="space-y-3">
+      <legend className="text-xs uppercase tracking-widest text-foreground/60">{legend}</legend>
+      <div className="flex flex-wrap gap-3">
+        {options.map((o) => (
+          <label
+            key={o.value}
+            className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2.5 text-sm transition ${
+              value === o.value ? "border-primary bg-primary/5 text-foreground" : "border-border bg-background text-foreground/80"
+            }`}
+          >
+            <input type="radio" name={name} value={o.value} checked={value === o.value} onChange={() => onChange(o.value)} className="accent-primary" />
+            {o.label}
+          </label>
+        ))}
+      </div>
+    </fieldset>
   );
 }
 
@@ -304,7 +941,7 @@ function Row({ label, value }: { label: React.ReactNode; value: React.ReactNode 
   return (
     <div className="flex items-center justify-between gap-4 text-sm">
       <dt className="text-muted-foreground">{label}</dt>
-      <dd className="text-right text-foreground">{value}</dd>
+      <dd className="max-w-[55%] text-right text-foreground">{value}</dd>
     </div>
   );
 }

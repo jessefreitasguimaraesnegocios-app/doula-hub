@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { Mail, Phone, Instagram, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Instagram, Send } from "lucide-react";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -28,13 +28,23 @@ function Contact() {
             <span className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
               <Mail className="h-4 w-4" />
             </span>
-            hello@allthingsbabies.com
+            <a href="mailto:Doula@AllThingsBabies.com" className="hover:text-primary">
+              Doula@AllThingsBabies.com
+            </a>
           </li>
           <li className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
               <Phone className="h-4 w-4" />
             </span>
-            +1 (555) 123-4567
+            <a href="tel:+13236406640" className="hover:text-primary">
+              +1 (323) 640-6640
+            </a>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
+              <MapPin className="h-4 w-4" />
+            </span>
+            Downtown Culver City, CA
           </li>
           <li className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">

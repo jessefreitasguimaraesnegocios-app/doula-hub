@@ -1,6 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import shopHero from "@/assets/shop-hero.jpg";
+import { useCart } from "@/context/cart-context";
+import { SHOP_PRODUCTS } from "@/data/shop-products";
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
@@ -15,17 +18,11 @@ export const Route = createFileRoute("/shop")({
   component: Shop,
 });
 
-const PRODUCTS = [
-  { name: "Organic Muslin Swaddle", price: "$28", tag: "Newborn" },
-  { name: "Postpartum Recovery Tea", price: "$18", tag: "Mama" },
-  { name: "Wooden Teether Ring", price: "$14", tag: "Baby" },
-  { name: "Belly Oil — Jasmine & Calendula", price: "$32", tag: "Pregnancy" },
-  { name: "Nursing Balm", price: "$22", tag: "Mama" },
-  { name: "Linen Birth Robe", price: "$78", tag: "Birth" },
-];
-
 function Shop() {
   const { t } = useTranslation();
+  const { addProduct } = useCart();
+  const router = useRouter();
+
   return (
     <div>
       <section className="relative h-[40vh] min-h-[300px] overflow-hidden">
@@ -39,12 +36,17 @@ function Shop() {
 
       <section className="mx-auto max-w-6xl px-6 py-20">
         <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
-          {PRODUCTS.map((p) => (
-            <article key={p.name} className="group">
+          {SHOP_PRODUCTS.map((p) => (
+            <article key={p.id} className="group">
               <div className="aspect-square overflow-hidden rounded-3xl bg-[oklch(0.92_0.025_75)]">
-                <div className="grid h-full w-full place-items-center font-serif text-6xl text-[var(--sand)]">
-                  {p.name.charAt(0)}
-                </div>
+                <img
+                  src={p.image}
+                  alt={p.name}
+                  loading="lazy"
+                  width={900}
+                  height={900}
+                  className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                />
               </div>
               <div className="mt-4 flex items-start justify-between gap-3">
                 <div>
@@ -53,7 +55,19 @@ function Shop() {
                 </div>
                 <p className="font-serif text-lg text-primary">{p.price}</p>
               </div>
-              <button className="mt-4 w-full rounded-full border border-border bg-card py-3 text-xs font-medium uppercase tracking-widest text-foreground/80 transition hover:bg-primary hover:text-primary-foreground">
+              <button
+                type="button"
+                className="mt-4 w-full rounded-full border border-border bg-card py-3 text-xs font-medium uppercase tracking-widest text-foreground/80 transition hover:bg-primary hover:text-primary-foreground"
+                onClick={() => {
+                  addProduct(p);
+                  toast.success(t("shop.added"), {
+                    action: {
+                      label: t("cart.title"),
+                      onClick: () => router.navigate({ to: "/cart" }),
+                    },
+                  });
+                }}
+              >
                 {t("shop.addToCart")}
               </button>
             </article>

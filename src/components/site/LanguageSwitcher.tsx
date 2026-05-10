@@ -31,7 +31,14 @@ export function LanguageSwitcher() {
         {LANGS.map((l) => (
           <DropdownMenuItem
             key={l.code}
-            onClick={() => i18n.changeLanguage(l.code)}
+            onClick={() => {
+              void i18n.changeLanguage(l.code);
+              try {
+                localStorage.setItem("i18nextLng", l.code);
+              } catch {
+                /* ignore */
+              }
+            }}
             className={l.code === current.code ? "font-medium text-primary" : ""}
           >
             {l.label}

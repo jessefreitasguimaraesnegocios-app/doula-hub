@@ -2,8 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, Heart, Leaf, Sparkles, Quote } from "lucide-react";
 import heroImg from "@/assets/hero-doula.jpg";
-import newbornImg from "@/assets/newborn.jpg";
-import handsImg from "@/assets/about-hands.jpg";
+import newbornImg from "@/assets/cta-newborn.png";
+import promiseImg from "@/assets/home-promise-support.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -81,8 +81,8 @@ function Home() {
       <section className="bg-[oklch(0.94_0.02_80)] py-24">
         <div className="mx-auto grid max-w-6xl gap-12 px-6 md:grid-cols-2 md:items-center">
           <img
-            src={handsImg}
-            alt="Doula's hands resting on a pregnant belly"
+            src={promiseImg}
+            alt="Doula comforting a pregnant person during labor in a hospital room"
             loading="lazy"
             width={1080}
             height={1500}
@@ -121,7 +121,7 @@ function Home() {
             <h2 className="font-serif text-4xl text-foreground md:text-5xl">{t("home.stepsTitle")}</h2>
           </div>
           <ol className="mt-16 grid gap-8 md:grid-cols-4">
-            {(["one", "two", "three", "four"] as const).map((k, i) => (
+            {(["one", "three", "two", "four"] as const).map((k, i) => (
               <li key={k} className="relative rounded-3xl bg-card p-8 shadow-[var(--shadow-soft)]">
                 <span className="font-serif text-5xl text-[var(--sage)]/60">0{i + 1}</span>
                 <p className="mt-3 font-serif text-xl text-foreground">{t(`home.steps.${k}.title`)}</p>
