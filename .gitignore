@@ -20,6 +20,9 @@ dist-ssr
 .wrangler/
 .dev.vars
 
+# Vercel (Nitro prebuilt output — generated locally or in CI)
+.vercel/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
