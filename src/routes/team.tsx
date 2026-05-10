@@ -2,14 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Video } from "lucide-react";
 import { toast } from "sonner";
+import { useSiteCms } from "@/hooks/use-site-cms";
+import { DEFAULT_TEAM_SCHEDULE_URL } from "@/lib/site-cms";
 import raquelTeam from "@/assets/team-imani.png";
 import d2 from "@/assets/doula-2.jpg";
 import d3 from "@/assets/doula-3.jpg";
 import d4 from "@/assets/doula-4.jpg";
 import teamHero from "@/assets/team-hero.png";
-
-/** Default Zoom Scheduler — override per member with `scheduleUrl` on static entries. */
-const DEFAULT_SCHEDULE_URL = "https://scheduler.zoom.us/jesse-freitas-p7edat/30-mins-with-jesse";
 
 const ZOOM_SCHEDULER_WINDOW_NAME = "atb-zoom-scheduler";
 
@@ -93,14 +92,16 @@ const TEAM: readonly (FounderMember | StaticMember)[] = [
   },
 ];
 
-function scheduleUrlFor(member: FounderMember | StaticMember): string {
+function scheduleUrlFor(member: FounderMember | StaticMember, cmsDefault: string): string {
   if (member.kind === "static" && member.scheduleUrl) return member.scheduleUrl;
   if (member.kind === "founder" && member.scheduleUrl) return member.scheduleUrl;
-  return DEFAULT_SCHEDULE_URL;
+  const fromCms = cmsDefault.trim();
+  return fromCms || DEFAULT_TEAM_SCHEDULE_URL;
 }
 
 function Team() {
   const { t } = useTranslation();
+  const cms = useSiteCms();
 
   return (
     <div>
@@ -167,7 +168,9 @@ function Team() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => openZoomSchedulerPopup(scheduleUrlFor(m), t("team.schedulePopupBlocked"))}
+                    onClick={() =>
+                      openZoomSchedulerPopup(scheduleUrlFor(m, cms.teamDefaultScheduleUrl), t("team.schedulePopupBlocked"))
+                    }
                     className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary bg-primary px-5 py-3.5 text-sm font-medium text-primary-foreground shadow-[var(--shadow-soft)] transition hover:bg-primary/90"
                   >
                     <Video className="h-4 w-4 shrink-0" aria-hidden />

@@ -2,12 +2,15 @@ import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Instagram, Mail, Heart } from "lucide-react";
 import logoMark from "@/assets/logo-mark.png";
+import { useSiteCms } from "@/hooks/use-site-cms";
 
-const CONTACT_EMAIL = "Doula@AllThingsBabies.com";
+const FALLBACK_EMAIL = "Doula@AllThingsBabies.com";
 
 export function Footer() {
   const { t } = useTranslation();
-  const mailtoHref = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(t("footer.emailSubject"))}`;
+  const cms = useSiteCms();
+  const contactEmail = cms.contactEmail.trim() || FALLBACK_EMAIL;
+  const mailtoHref = `mailto:${contactEmail}?subject=${encodeURIComponent(t("footer.emailSubject"))}`;
 
   return (
     <footer className="mt-24 border-t border-border/50 bg-[oklch(0.94_0.02_80)]">
@@ -33,7 +36,7 @@ export function Footer() {
           </p>
           <div className="mt-6 flex items-center gap-3">
             <a
-              href="https://www.instagram.com/allthingsbabiesllc/"
+              href={cms.instagramUrl.trim() || "https://www.instagram.com/allthingsbabiesllc/"}
               target="_blank"
               rel="noreferrer"
               aria-label="Instagram"
@@ -44,7 +47,7 @@ export function Footer() {
             <a
               href={mailtoHref}
               aria-label={t("footer.emailAria")}
-              title={CONTACT_EMAIL}
+              title={contactEmail}
               className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card text-foreground/70 transition hover:text-primary"
             >
               <Mail className="h-4 w-4" />
@@ -69,15 +72,15 @@ export function Footer() {
           <ul className="mt-4 space-y-2 text-sm text-foreground/80">
             <li>
               <a href={mailtoHref} className="hover:text-primary">
-                {CONTACT_EMAIL}
+                {contactEmail}
               </a>
             </li>
             <li>
-              <a href="tel:+13236406640" className="hover:text-primary">
-                +1 (323) 640-6640
+              <a href={`tel:${cms.contactPhoneHref.trim() || "+13236406640"}`} className="hover:text-primary">
+                {cms.contactPhoneDisplay.trim() || "+1 (323) 640-6640"}
               </a>
             </li>
-            <li>Downtown Culver City, CA</li>
+            <li>{cms.addressLine.trim() || "Downtown Culver City, CA"}</li>
             <li><Link to="/contact" className="hover:text-primary">{t("nav.contact")}</Link></li>
           </ul>
         </div>

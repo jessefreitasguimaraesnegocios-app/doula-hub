@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Mail, Phone, MapPin, Instagram, Send } from "lucide-react";
+import { useSiteCms } from "@/hooks/use-site-cms";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -17,6 +18,13 @@ export const Route = createFileRoute("/contact")({
 
 function Contact() {
   const { t } = useTranslation();
+  const cms = useSiteCms();
+  const email = cms.contactEmail.trim() || "Doula@AllThingsBabies.com";
+  const phoneHref = cms.contactPhoneHref.trim() || "+13236406640";
+  const phoneDisplay = cms.contactPhoneDisplay.trim() || "+1 (323) 640-6640";
+  const address = cms.addressLine.trim() || "Downtown Culver City, CA";
+  const igUrl = cms.instagramUrl.trim() || "https://www.instagram.com/allthingsbabiesllc/";
+  const igHandle = cms.instagramHandle.trim() || "@allthingsbabiesllc";
   const [sent, setSent] = useState(false);
   return (
     <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 md:grid-cols-2 md:py-28">
@@ -28,30 +36,30 @@ function Contact() {
             <span className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
               <Mail className="h-4 w-4" />
             </span>
-            <a href="mailto:Doula@AllThingsBabies.com" className="hover:text-primary">
-              Doula@AllThingsBabies.com
+            <a href={`mailto:${email}`} className="hover:text-primary">
+              {email}
             </a>
           </li>
           <li className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
               <Phone className="h-4 w-4" />
             </span>
-            <a href="tel:+13236406640" className="hover:text-primary">
-              +1 (323) 640-6640
+            <a href={`tel:${phoneHref}`} className="hover:text-primary">
+              {phoneDisplay}
             </a>
           </li>
           <li className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
               <MapPin className="h-4 w-4" />
             </span>
-            Downtown Culver City, CA
+            {address}
           </li>
           <li className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
               <Instagram className="h-4 w-4" />
             </span>
-            <a href="https://www.instagram.com/allthingsbabiesllc/" target="_blank" rel="noreferrer" className="hover:text-primary">
-              @allthingsbabiesllc
+            <a href={igUrl} target="_blank" rel="noreferrer" className="hover:text-primary">
+              {igHandle}
             </a>
           </li>
         </ul>

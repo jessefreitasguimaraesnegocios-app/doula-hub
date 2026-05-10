@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Check } from "lucide-react";
+import { useSiteCms } from "@/hooks/use-site-cms";
+import { servicePriceUsdOverride } from "@/lib/site-cms";
 
 export const Route = createFileRoute("/services")({
   head: () => ({
@@ -17,7 +19,16 @@ export const Route = createFileRoute("/services")({
 const KEYS = ["birth", "postpartum", "bereavement", "lactation"] as const;
 
 function Services() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const cms = useSiteCms();
+  const allowUsdOverride = i18n.language === "en" || i18n.language === "es";
+  const priceFor = (k: (typeof KEYS)[number]) => {
+    if (allowUsdOverride) {
+      const o = servicePriceUsdOverride(cms, k);
+      if (o) return o;
+    }
+    return t(`services.items.${k}.price`);
+  };
   return (
     <div>
       <section className="mx-auto max-w-4xl px-6 pt-20 pb-12 text-center md:pt-28">
@@ -46,7 +57,7 @@ function Services() {
                 )}
                 <h2 className="font-serif text-3xl">{t(`services.items.${k}.name`)}</h2>
                 <p className={`mt-4 font-serif text-4xl ${featured ? "text-[var(--cream)]" : "text-primary"}`}>
-                  {t(`services.items.${k}.price`)}
+                  {priceFor(k)}
                 </p>
                 <p className={`mt-3 text-sm leading-relaxed ${featured ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                   {t(`services.items.${k}.body`)}

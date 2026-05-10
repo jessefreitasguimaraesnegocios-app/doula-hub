@@ -8,6 +8,8 @@ import founder from "@/assets/founder.png";
 import d2 from "@/assets/doula-2.jpg";
 import d3 from "@/assets/doula-3.jpg";
 import d4 from "@/assets/doula-4.jpg";
+import { useSiteCms } from "@/hooks/use-site-cms";
+import { servicePriceUsdOverride } from "@/lib/site-cms";
 
 export const Route = createFileRoute("/booking")({
   head: () => ({
@@ -140,7 +142,16 @@ function validateIntake(f: Form) {
 }
 
 function Booking() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const cms = useSiteCms();
+  const allowUsdOverride = i18n.language === "en" || i18n.language === "es";
+  const pkgPriceDisplay = (pkg: string) => {
+    if (allowUsdOverride) {
+      const o = servicePriceUsdOverride(cms, pkg);
+      if (o) return o;
+    }
+    return t(`services.items.${pkg}.price`);
+  };
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
   const [form, setForm] = useState<Form>({
@@ -248,7 +259,7 @@ function Booking() {
                   }`}
                 >
                   <p className="font-serif text-xl text-foreground">{t(`services.items.${k}.name`)}</p>
-                  <p className="mt-1 font-serif text-2xl text-primary">{t(`services.items.${k}.price`)}</p>
+                  <p className="mt-1 font-serif text-2xl text-primary">{pkgPriceDisplay(k)}</p>
                   <p className="mt-2 text-sm text-muted-foreground">{t(`services.items.${k}.body`)}</p>
                 </button>
               );
@@ -515,7 +526,10 @@ function Booking() {
                 value={`${form.date || "—"} ${form.time}  ·  ${form.platform}`}
               />
               <div className="my-2 border-t border-border" />
-              <Row label={<span className="font-medium text-foreground">{t("booking.payment.total")}</span>} value={<span className="font-serif text-2xl text-primary">{t(`services.items.${form.pkg}.price`)}</span>} />
+              <Row
+                label={<span className="font-medium text-foreground">{t("booking.payment.total")}</span>}
+                value={<span className="font-serif text-2xl text-primary">{pkgPriceDisplay(form.pkg)}</span>}
+              />
             </dl>
             <div className="flex items-start gap-3 rounded-2xl border border-border bg-background p-4 text-sm text-muted-foreground">
               <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
