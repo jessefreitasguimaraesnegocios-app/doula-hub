@@ -88,6 +88,8 @@ const en = {
     subtitle: "A small, certified team — chosen for their warmth, skill, and commitment to your story.",
     specialties: "Specialties",
     languages: "Languages",
+    scheduleVideoCall: "Schedule a video call",
+    schedulePopupBlocked: "Pop-up was blocked. Allow pop-ups for this site and try again.",
     founder: {
       name: "Raquel Manini",
       role: "Founder & practice lead · Birth & postpartum doula",

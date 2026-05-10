@@ -90,6 +90,8 @@ const it: Translation = {
     subtitle: "Un piccolo team certificato — scelto per il calore e la dedizione.",
     specialties: "Specialità",
     languages: "Lingue",
+    scheduleVideoCall: "Prenota una videochiamata",
+    schedulePopupBlocked: "Il browser ha bloccato la finestra. Consenti i pop-up per questo sito e riprova.",
     founder: {
       name: "Raquel Manini",
       role: "Fondatrice e guida del team · Doula al parto e postpartum",
