@@ -61,13 +61,13 @@ const pt: Translation = {
     items: {
       birth: {
         name: "Pacote Doula de Parto",
-        price: "R$ 9.000",
+        price: "R$ 19.000",
         body: "Três visitas pré-natais, apoio contínuo no parto e duas visitas pós-parto.",
         features: ["Suporte ilimitado por mensagem e ligação", "Plano de parto", "Apoio contínuo no trabalho de parto", "Duas visitas pós-parto", "Orientação de amamentação"],
       },
       postpartum: {
         name: "Cuidado Pós-parto",
-        price: "R$ 220/h",
+        price: "R$ 465/h",
         body: "Cuidado diurno ou noturno durante o quarto trimestre.",
         features: ["Cuidados com o recém-nascido", "Apoio à amamentação", "Preparo de refeições leves", "Apoio emocional", "Cuidado com irmãos"],
       },
@@ -79,7 +79,7 @@ const pt: Translation = {
       },
       lactation: {
         name: "Visita de Lactação",
-        price: "R$ 850",
+        price: "R$ 950",
         body: "Apoio em casa ou online para amamentação tranquila.",
         features: ["Avaliação da pega", "Plano alimentar", "Orientação com bomba", "Acompanhamento"],
       },

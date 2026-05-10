@@ -61,13 +61,13 @@ const it: Translation = {
     items: {
       birth: {
         name: "Pacchetto Doula del Parto",
-        price: "€1.650",
+        price: "€3.500",
         body: "Tre visite prenatali, supporto continuo al parto e due visite postpartum.",
         features: ["Supporto illimitato via messaggio e chiamata", "Piano del parto", "Supporto continuo al travaglio", "Due visite postpartum", "Guida all'allattamento"],
       },
       postpartum: {
         name: "Cura Postpartum",
-        price: "€42/ora",
+        price: "€89/ora",
         body: "Cura diurna o notturna durante il quarto trimestre.",
         features: ["Cura del neonato", "Supporto allattamento", "Preparazione pasti leggeri", "Supporto emotivo", "Cura fratelli"],
       },
@@ -79,7 +79,7 @@ const it: Translation = {
       },
       lactation: {
         name: "Visita Allattamento",
-        price: "€160",
+        price: "€178",
         body: "Supporto a casa o online per un allattamento sereno.",
         features: ["Valutazione attacco", "Piano alimentare", "Guida tiralatte", "Follow-up"],
       },

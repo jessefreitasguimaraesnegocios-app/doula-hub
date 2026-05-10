@@ -59,13 +59,13 @@ const en = {
     items: {
       birth: {
         name: "Birth Doula Package",
-        price: "$1,800",
+        price: "$3,800",
         body: "Three prenatal visits, continuous birth support, and two postpartum visits.",
         features: ["Unlimited text & call support", "Birth plan creation", "Continuous labor support", "Two postpartum visits", "Lactation guidance"],
       },
       postpartum: {
         name: "Postpartum Care",
-        price: "$45/hr",
+        price: "$95/hr",
         body: "Daytime or overnight care during the fourth trimester.",
         features: ["Newborn care & soothing", "Lactation support", "Light meal prep", "Emotional support", "Sibling care"],
       },
@@ -77,7 +77,7 @@ const en = {
       },
       lactation: {
         name: "Lactation Visit",
-        price: "$175",
+        price: "$195",
         body: "In-home or virtual support to help feeding feel right.",
         features: ["Latch assessment", "Feeding plan", "Pump guidance", "Follow-up support"],
       },
