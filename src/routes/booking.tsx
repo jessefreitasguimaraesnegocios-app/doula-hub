@@ -391,7 +391,7 @@ function Booking() {
       : "—";
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-16 md:py-24">
+    <div className="relative isolate mx-auto max-w-4xl px-6 py-16 md:py-24">
       <div className="text-center">
         <h1 className="font-serif text-5xl text-foreground md:text-6xl">{t("booking.title")}</h1>
         <p className="mt-4 text-muted-foreground">{t("booking.subtitle")}</p>
@@ -417,7 +417,7 @@ function Booking() {
         ))}
       </ol>
 
-      <div className="mt-12 rounded-[2rem] bg-card p-8 shadow-(--shadow-soft) md:p-12">
+      <div className="relative isolate z-0 mt-12 rounded-[2rem] bg-card p-8 shadow-(--shadow-soft) md:p-12">
         {step === 0 && (
           <div className="grid gap-4 sm:grid-cols-2">
             {PKGS.map((k) => {
@@ -863,51 +863,53 @@ function BookSupportMultiPicker({
         <span className="line-clamp-3">{summary}</span>
       </button>
 
-      <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
-        <DialogContent className="max-h-[min(90vh,36rem)] w-[min(100vw-2rem,28rem)] max-w-[calc(100vw-2rem)] gap-0 overflow-hidden rounded-3xl border-border p-0 sm:rounded-3xl">
-          <DialogHeader className="space-y-0 px-6 pb-2 pt-6 text-left">
-            <DialogTitle className="font-serif text-lg font-normal leading-snug text-foreground">
-              {t("booking.intake.supportDialogTitle")}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="max-h-[min(60vh,22rem)] space-y-2 overflow-y-auto px-6 pb-2 pr-7">
-            {SUPPORT_ORDER.map((key) => (
-              <label
-                key={key}
-                className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition ${
-                  draft.includes(key)
-                    ? "border-primary bg-primary/5"
-                    : "border-border bg-background"
-                }`}
+      {pickerOpen ? (
+        <Dialog open onOpenChange={setPickerOpen}>
+          <DialogContent className="max-h-[min(90vh,36rem)] w-[min(100vw-2rem,28rem)] max-w-[calc(100vw-2rem)] gap-0 overflow-hidden rounded-3xl border-border p-0 sm:rounded-3xl">
+            <DialogHeader className="space-y-0 px-6 pb-2 pt-6 text-left">
+              <DialogTitle className="font-serif text-lg font-normal leading-snug text-foreground">
+                {t("booking.intake.supportDialogTitle")}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="max-h-[min(60vh,22rem)] space-y-2 overflow-y-auto px-6 pb-2 pr-7">
+              {SUPPORT_ORDER.map((key) => (
+                <label
+                  key={key}
+                  className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition ${
+                    draft.includes(key)
+                      ? "border-primary bg-primary/5"
+                      : "border-border bg-background"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={draft.includes(key)}
+                    onChange={() => toggle(key)}
+                    className="size-4 shrink-0 rounded border border-input accent-primary"
+                  />
+                  <span>{t(`booking.intake.support.${key}`)}</span>
+                </label>
+              ))}
+            </div>
+            <DialogFooter className="flex-row flex-wrap justify-end gap-2 border-t border-border px-6 py-4 sm:space-x-0">
+              <button
+                type="button"
+                className="rounded-full border border-border bg-background px-5 py-2.5 text-sm text-foreground transition hover:bg-muted"
+                onClick={() => setPickerOpen(false)}
               >
-                <input
-                  type="checkbox"
-                  checked={draft.includes(key)}
-                  onChange={() => toggle(key)}
-                  className="size-4 shrink-0 rounded border border-input accent-primary"
-                />
-                <span>{t(`booking.intake.support.${key}`)}</span>
-              </label>
-            ))}
-          </div>
-          <DialogFooter className="flex-row flex-wrap justify-end gap-2 border-t border-border px-6 py-4 sm:space-x-0">
-            <button
-              type="button"
-              className="rounded-full border border-border bg-background px-5 py-2.5 text-sm text-foreground transition hover:bg-muted"
-              onClick={() => setPickerOpen(false)}
-            >
-              {t("booking.intake.supportCancel")}
-            </button>
-            <button
-              type="button"
-              className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
-              onClick={commit}
-            >
-              {t("booking.intake.supportConfirm")}
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+                {t("booking.intake.supportCancel")}
+              </button>
+              <button
+                type="button"
+                className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
+                onClick={commit}
+              >
+                {t("booking.intake.supportConfirm")}
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      ) : null}
     </div>
   );
 }

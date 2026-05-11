@@ -140,12 +140,15 @@ function RootComponent() {
           <SiteCmsThemeSync />
           <div className="flex min-h-screen flex-col">
             <Header />
-            <main className="flex-1">
+            <main className="relative isolate flex-1">
               <Outlet />
             </main>
             <Footer />
           </div>
-          <Toaster />
+          {/* Sonner usa z-index muito alto; sem isto o contentor pode roubar cliques quando não há toasts. */}
+          <div className="pointer-events-none">
+            <Toaster />
+          </div>
         </CartProvider>
       </I18nextProvider>
     </QueryClientProvider>
