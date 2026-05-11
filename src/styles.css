@@ -176,4 +176,17 @@
     display: none !important;
     pointer-events: none !important;
   }
+
+  /*
+   * Sonner: runtime CSS fixes `[data-sonner-toaster]` with a huge z-index. The host `<section>`
+   * can still sit above the page and intercept clicks (esp. production / Safari). Click-through
+   * on the section; re-enable only on the actual toaster `<ol>`.
+   */
+  section[aria-label*="Notifications"] {
+    pointer-events: none !important;
+  }
+
+  section[aria-label*="Notifications"] ol[data-sonner-toaster] {
+    pointer-events: auto !important;
+  }
 }

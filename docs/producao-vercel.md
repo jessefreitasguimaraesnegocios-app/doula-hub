@@ -75,6 +75,11 @@ Na Vercel: **Project** → **Settings** → **Environment Variables**.
 1. Abre a URL de **Production** e testa `/`, `/booking`, `/contact`, `/admin` (login Supabase).
 2. Se algo falhar só em produção: **Deployments** → abre o deploy → **Building** / **Runtime Logs**; no browser **F12 → Consola e Rede**.
 
+### Se o site em produção parece “antigo” (botões sem efeito, estilo velho)
+
+1. Na Vercel: **Deployments** → no último deploy de Production → **⋯** → **Redeploy** (marca “Use existing Build Cache” como **desligado** se quiseres forçar build limpo).
+2. No browser: **hard refresh** (`Ctrl+Shift+R`) ou janela anónima — o HTML dos assets usa hashes longos em cache; por vezes fica um mix de ficheiros antigos e novos.
+
 ---
 
 ## Referência rápida local
