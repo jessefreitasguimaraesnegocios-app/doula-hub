@@ -86,10 +86,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "All Things Babies — Doula care for every kind of family" },
-      { name: "description", content: "Compassionate doula care for pregnancy, birth, and the postpartum journey. Certified, inclusive, evidence-based." },
+      {
+        name: "description",
+        content:
+          "Compassionate doula care for pregnancy, birth, and the postpartum journey. Certified, inclusive, evidence-based.",
+      },
       { name: "author", content: "All Things Babies" },
       { property: "og:title", content: "All Things Babies — Doula care, with heart" },
-      { property: "og:description", content: "Continuous doula support through pregnancy, birth, and beyond." },
+      {
+        property: "og:description",
+        content: "Continuous doula support through pregnancy, birth, and beyond.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@allthingsbabies" },

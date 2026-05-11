@@ -4,7 +4,16 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { ArrowLeft, Calendar, ChevronDown, Download, LogOut, Mail, Save, Upload } from "lucide-react";
+import {
+  ArrowLeft,
+  Calendar,
+  ChevronDown,
+  Download,
+  LogOut,
+  Mail,
+  Save,
+  Upload,
+} from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -142,11 +151,7 @@ function DoulaSupabaseTab({ enabled }: { enabled: boolean }) {
     return <p className="text-sm text-muted-foreground">{t("admin.doulasDb.loading")}</p>;
   }
   if (!rows?.length) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        {t("admin.doulasDb.empty")}
-      </p>
-    );
+    return <p className="text-sm text-muted-foreground">{t("admin.doulasDb.empty")}</p>;
   }
 
   return (
@@ -162,8 +167,10 @@ function Admin() {
   const { t } = useTranslation();
   const supabaseOk = isSupabaseConfigured();
   const envPassword = import.meta.env.VITE_ADMIN_PASSWORD as string | undefined;
-  const [legacyUnlocked, setLegacyUnlocked] = useState(
-    () => (typeof sessionStorage !== "undefined" ? sessionStorage.getItem(ADMIN_SESSION_KEY) === "1" : false),
+  const [legacyUnlocked, setLegacyUnlocked] = useState(() =>
+    typeof sessionStorage !== "undefined"
+      ? sessionStorage.getItem(ADMIN_SESSION_KEY) === "1"
+      : false,
   );
   const [session, setSession] = useState<Session | null>(null);
   const [password, setPassword] = useState("");
@@ -273,30 +280,31 @@ function Admin() {
     toast.success(t("admin.toast.exportDownloaded"));
   }, [draft, t]);
 
-  const onImportFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const text = String(reader.result ?? "");
-      const parsed = parseSiteCmsJson(text);
-      setDraft(parsed);
-      setSiteCmsToStorage(parsed);
-      applySiteCmsTheme(parsed);
-      toast.success(t("admin.toast.importLoaded"));
-    };
-    reader.readAsText(file);
-  }, [t]);
+  const onImportFile = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      e.target.value = "";
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const text = String(reader.result ?? "");
+        const parsed = parseSiteCmsJson(text);
+        setDraft(parsed);
+        setSiteCmsToStorage(parsed);
+        applySiteCmsTheme(parsed);
+        toast.success(t("admin.toast.importLoaded"));
+      };
+      reader.readAsText(file);
+    },
+    [t],
+  );
 
   if (!unlocked) {
     if (supabaseOk) {
       return (
         <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-6 py-20">
           <h1 className="font-serif text-3xl text-foreground">{t("admin.login.title")}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {t("admin.login.supabaseIntro")}
-          </p>
+          <p className="mt-2 text-sm text-muted-foreground">{t("admin.login.supabaseIntro")}</p>
           <div className="mt-8 space-y-2">
             <Label htmlFor="admin-email">{t("admin.login.email")}</Label>
             <input
@@ -327,7 +335,10 @@ function Admin() {
           >
             {t("admin.login.submit")}
           </button>
-          <Link to="/" className="mt-8 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+          <Link
+            to="/"
+            className="mt-8 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          >
             <ArrowLeft className="h-4 w-4" /> {t("admin.login.backToSite")}
           </Link>
         </div>
@@ -335,11 +346,9 @@ function Admin() {
     }
 
     return (
-        <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-6 py-20">
-          <h1 className="font-serif text-3xl text-foreground">{t("admin.login.title")}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {t("admin.login.legacyIntro")}
-          </p>
+      <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-6 py-20">
+        <h1 className="font-serif text-3xl text-foreground">{t("admin.login.title")}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t("admin.login.legacyIntro")}</p>
         <div className="mt-8 space-y-2">
           <Label htmlFor="admin-pw">{t("admin.login.password")}</Label>
           <input
@@ -359,7 +368,10 @@ function Admin() {
         >
           {t("admin.login.submit")}
         </button>
-        <Link to="/" className="mt-8 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+        <Link
+          to="/"
+          className="mt-8 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        >
           <ArrowLeft className="h-4 w-4" /> {t("admin.login.backToSite")}
         </Link>
       </div>
@@ -375,8 +387,10 @@ function Admin() {
               <h1 className="font-serif text-2xl text-foreground">{t("admin.header.title")}</h1>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 {t("admin.header.intro")}{" "}
-                <strong className="text-foreground">{t("admin.header.introSave")}</strong>. {t("admin.header.introThen")}{" "}
-                <strong className="text-foreground">{t("admin.header.introView")}</strong> {t("admin.header.introEnd")}
+                <strong className="text-foreground">{t("admin.header.introSave")}</strong>.{" "}
+                {t("admin.header.introThen")}{" "}
+                <strong className="text-foreground">{t("admin.header.introView")}</strong>{" "}
+                {t("admin.header.introEnd")}
               </p>
               <p className="mt-2 text-xs text-muted-foreground">
                 {supabaseOk && session
@@ -434,7 +448,13 @@ function Admin() {
                 </button>
               </div>
             </div>
-            <input ref={importRef} type="file" accept="application/json,.json" className="hidden" onChange={onImportFile} />
+            <input
+              ref={importRef}
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              onChange={onImportFile}
+            />
           </details>
         </div>
       </header>
@@ -449,7 +469,9 @@ function Admin() {
             <TabsTrigger value="prices">{t("admin.tabs.prices")}</TabsTrigger>
             <TabsTrigger value="team">{t("admin.tabs.team")}</TabsTrigger>
             <TabsTrigger value="shop">{t("admin.tabs.shop")}</TabsTrigger>
-            {supabaseOk ? <TabsTrigger value="doulas-db">{t("admin.tabs.teamDb")}</TabsTrigger> : null}
+            {supabaseOk ? (
+              <TabsTrigger value="doulas-db">{t("admin.tabs.teamDb")}</TabsTrigger>
+            ) : null}
             {supabaseOk ? (
               <TabsTrigger value="bookings" className="gap-1.5">
                 <Calendar className="h-3.5 w-3.5" /> {t("admin.tabs.bookings")}
@@ -461,11 +483,12 @@ function Admin() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="photos" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <TabsContent
+            value="photos"
+            className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+          >
             <h2 className="font-serif text-xl">{t("admin.photos.title")}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {t("admin.photos.subtitle")}
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">{t("admin.photos.subtitle")}</p>
             <div className="mt-6">
               <AdminSitePhotosPanel
                 siteImages={draft.siteImages}
@@ -475,7 +498,10 @@ function Admin() {
             </div>
           </TabsContent>
 
-          <TabsContent value="contracted" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <TabsContent
+            value="contracted"
+            className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+          >
             <h2 className="font-serif text-xl">{t("admin.tabs.contracted")}</h2>
             <div className="mt-6">
               <AdminContractedDoulasPanel
@@ -486,7 +512,10 @@ function Admin() {
             </div>
           </TabsContent>
 
-          <TabsContent value="contacts" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <TabsContent
+            value="contacts"
+            className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+          >
             <h2 className="font-serif text-xl">{t("admin.contacts.title")}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{t("admin.contacts.subtitle")}</p>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -542,7 +571,10 @@ function Admin() {
             </div>
           </TabsContent>
 
-          <TabsContent value="theme" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <TabsContent
+            value="theme"
+            className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+          >
             <h2 className="font-serif text-xl">{t("admin.themeTab.title")}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{t("admin.themeTab.subtitle")}</p>
             <div className="mt-6">
@@ -553,11 +585,12 @@ function Admin() {
             </div>
           </TabsContent>
 
-          <TabsContent value="prices" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <TabsContent
+            value="prices"
+            className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+          >
             <h2 className="font-serif text-xl">{t("admin.prices.title")}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {t("admin.prices.subtitle")}
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">{t("admin.prices.subtitle")}</p>
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
                 <Label>{t("admin.prices.birth")}</Label>
@@ -601,30 +634,32 @@ function Admin() {
             </div>
           </TabsContent>
 
-          <TabsContent value="team" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <TabsContent
+            value="team"
+            className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+          >
             <h2 className="font-serif text-xl">{t("admin.team.title")}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {t("admin.team.subtitle")}
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">{t("admin.team.subtitle")}</p>
             <div className="mt-6 space-y-2">
               <Label>{t("admin.team.urlLabel")}</Label>
               <input
                 value={draft.teamDefaultScheduleUrl}
-                onChange={(e) => setDraft((d) => ({ ...d, teamDefaultScheduleUrl: e.target.value }))}
+                onChange={(e) =>
+                  setDraft((d) => ({ ...d, teamDefaultScheduleUrl: e.target.value }))
+                }
                 className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
                 placeholder={DEFAULT_TEAM_SCHEDULE_URL}
               />
             </div>
-            <p className="mt-6 text-sm text-muted-foreground">
-              {t("admin.team.footerNote")}
-            </p>
+            <p className="mt-6 text-sm text-muted-foreground">{t("admin.team.footerNote")}</p>
           </TabsContent>
 
-          <TabsContent value="shop" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <TabsContent
+            value="shop"
+            className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+          >
             <h2 className="font-serif text-xl">{t("admin.shop.title")}</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {t("admin.shop.intro")}
-            </p>
+            <p className="mt-2 text-sm text-muted-foreground">{t("admin.shop.intro")}</p>
 
             <div className="mt-8 rounded-2xl border border-border bg-muted/20 p-5">
               <div className="flex flex-wrap items-center justify-between gap-4">
@@ -635,7 +670,10 @@ function Admin() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <Label htmlFor="shop-coming-soon-switch" className="text-sm text-muted-foreground">
+                  <Label
+                    htmlFor="shop-coming-soon-switch"
+                    className="text-sm text-muted-foreground"
+                  >
                     {t("admin.shop.showNotice")}
                   </Label>
                   <Switch
@@ -663,7 +701,9 @@ function Admin() {
                   id="shop-coming-soon-msg"
                   rows={5}
                   value={draft.shopComingSoonMessage}
-                  onChange={(e) => setDraft((d) => ({ ...d, shopComingSoonMessage: e.target.value }))}
+                  onChange={(e) =>
+                    setDraft((d) => ({ ...d, shopComingSoonMessage: e.target.value }))
+                  }
                   className="w-full resize-y rounded-xl border border-border bg-background px-3 py-2 text-sm leading-relaxed"
                   placeholder={t("admin.shop.customMessagePh")}
                 />
@@ -672,11 +712,12 @@ function Admin() {
           </TabsContent>
 
           {supabaseOk ? (
-            <TabsContent value="doulas-db" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <TabsContent
+              value="doulas-db"
+              className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+            >
               <h2 className="font-serif text-xl">{t("admin.doulasDb.title")}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {t("admin.doulasDb.subtitle")}
-              </p>
+              <p className="mt-1 text-sm text-muted-foreground">{t("admin.doulasDb.subtitle")}</p>
               <div className="mt-6">
                 <DoulaSupabaseTab enabled={Boolean(session)} />
               </div>
@@ -684,7 +725,10 @@ function Admin() {
           ) : null}
 
           {supabaseOk ? (
-            <TabsContent value="bookings" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <TabsContent
+              value="bookings"
+              className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+            >
               <h2 className="font-serif text-xl">{t("admin.bookings.title")}</h2>
               <p className="mt-1 text-sm text-muted-foreground">{t("admin.bookings.subtitle")}</p>
               <div className="mt-6">
@@ -693,21 +737,21 @@ function Admin() {
             </TabsContent>
           ) : null}
 
-          <TabsContent value="stripe" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <TabsContent
+            value="stripe"
+            className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+          >
             <h2 className="font-serif text-xl">{t("admin.stripe.title")}</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {t("admin.stripe.p1")}
-            </p>
-            <p className="mt-3 text-sm text-muted-foreground">
-              {t("admin.stripe.p2")}
-            </p>
+            <p className="mt-2 text-sm text-muted-foreground">{t("admin.stripe.p1")}</p>
+            <p className="mt-3 text-sm text-muted-foreground">{t("admin.stripe.p2")}</p>
           </TabsContent>
 
-          <TabsContent value="email" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <TabsContent
+            value="email"
+            className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+          >
             <h2 className="font-serif text-xl">{t("admin.email.title")}</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {t("admin.email.intro")}
-            </p>
+            <p className="mt-2 text-sm text-muted-foreground">{t("admin.email.intro")}</p>
 
             <div className="mt-8 space-y-6 rounded-2xl border border-border bg-muted/15 p-6 text-sm leading-relaxed text-foreground/90">
               <div>
@@ -744,31 +788,35 @@ function Admin() {
                 <h3 className="font-medium text-foreground">{t("admin.email.step3Title")}</h3>
                 <ul className="mt-2 list-inside list-disc space-y-1 font-mono text-xs text-muted-foreground">
                   <li>
-                    <code className="text-foreground">SMTP_USER</code> — {t("admin.email.step3SmtpUser")}
+                    <code className="text-foreground">SMTP_USER</code> —{" "}
+                    {t("admin.email.step3SmtpUser")}
                   </li>
                   <li>
-                    <code className="text-foreground">SMTP_PASS</code> — {t("admin.email.step3SmtpPass")}
+                    <code className="text-foreground">SMTP_PASS</code> —{" "}
+                    {t("admin.email.step3SmtpPass")}
                   </li>
                   <li>
-                    <code className="text-foreground">SMTP_ACTION_SECRET</code> — {t("admin.email.step3ActionSecret")}
+                    <code className="text-foreground">SMTP_ACTION_SECRET</code> —{" "}
+                    {t("admin.email.step3ActionSecret")}
                   </li>
                   <li>
-                    <code className="text-foreground">SMTP_FROM_NAME</code> — {t("admin.email.step3FromName")}
+                    <code className="text-foreground">SMTP_FROM_NAME</code> —{" "}
+                    {t("admin.email.step3FromName")}
                   </li>
                   <li>
-                    <code className="text-foreground">SMTP_NOTIFY_TO</code> — {t("admin.email.step3NotifyTo")}
+                    <code className="text-foreground">SMTP_NOTIFY_TO</code> —{" "}
+                    {t("admin.email.step3NotifyTo")}
                   </li>
                   <li>
                     <code className="text-foreground">SMTP_HOST</code> / <code>SMTP_PORT</code> /{" "}
                     <code>SMTP_SECURE</code> — {t("admin.email.step3HostPort")}
                   </li>
                   <li>
-                    <code className="text-foreground">DISABLE_SMTP_SENDS=1</code> — {t("admin.email.step3Disable")}
+                    <code className="text-foreground">DISABLE_SMTP_SENDS=1</code> —{" "}
+                    {t("admin.email.step3Disable")}
                   </li>
                 </ul>
-                <p className="mt-3 text-xs text-muted-foreground">
-                  {t("admin.email.step3Foot")}
-                </p>
+                <p className="mt-3 text-xs text-muted-foreground">{t("admin.email.step3Foot")}</p>
               </div>
             </div>
 
@@ -783,9 +831,7 @@ function Admin() {
                   className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
                   placeholder={t("admin.email.fromNamePh")}
                 />
-                <p className="text-xs text-muted-foreground">
-                  {t("admin.email.fromNameHint")}
-                </p>
+                <p className="text-xs text-muted-foreground">{t("admin.email.fromNameHint")}</p>
               </div>
               <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
                 <div className="flex items-center gap-2">
@@ -813,9 +859,7 @@ function Admin() {
 
             <div className="mt-8 rounded-2xl border border-border bg-card p-5 shadow-sm">
               <h3 className="font-medium text-foreground">{t("admin.email.testTitle")}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {t("admin.email.testIntro")}
-              </p>
+              <p className="mt-1 text-sm text-muted-foreground">{t("admin.email.testIntro")}</p>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2 sm:col-span-2">
                   <Label htmlFor="email-test-to">{t("admin.email.testTo")}</Label>

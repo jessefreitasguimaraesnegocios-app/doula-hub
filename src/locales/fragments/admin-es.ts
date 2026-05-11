@@ -38,7 +38,8 @@ const admin: AdminLocale = {
     introThen: "Luego abre",
     introView: "Ver el sitio",
     introEnd: "para ver cómo quedó.",
-    footnoteSupabase: "Con tu sesión, Guardar también envía todo a internet (además de este equipo).",
+    footnoteSupabase:
+      "Con tu sesión, Guardar también envía todo a internet (además de este equipo).",
     footnoteLocal: "Sin sesión en internet, Guardar mantiene los cambios solo en este equipo.",
     save: "Guardar cambios",
     viewSite: "Ver el sitio",
@@ -126,9 +127,18 @@ const admin: AdminLocale = {
         title: "Equipo y reserva — foto de la fundadora",
         hint: "Tarjeta de la fundadora y paso “quién” en la reserva.",
       },
-      team_member_sofia: { title: "Equipo y reserva — Sofia", hint: "Tarjeta y elección en la reserva." },
-      team_member_elena: { title: "Equipo y reserva — Elena", hint: "Tarjeta y elección en la reserva." },
-      team_member_mei: { title: "Equipo y reserva — Mei", hint: "Tarjeta y elección en la reserva." },
+      team_member_sofia: {
+        title: "Equipo y reserva — Sofia",
+        hint: "Tarjeta y elección en la reserva.",
+      },
+      team_member_elena: {
+        title: "Equipo y reserva — Elena",
+        hint: "Tarjeta y elección en la reserva.",
+      },
+      team_member_mei: {
+        title: "Equipo y reserva — Mei",
+        hint: "Tarjeta y elección en la reserva.",
+      },
       shop_hero: { title: "Tienda — franja superior", hint: "Franja arriba en Tienda." },
       footer_logo: { title: "Pie — logotipo", hint: "Icono pequeño junto al nombre en el pie." },
     },
@@ -241,7 +251,8 @@ const admin: AdminLocale = {
   },
   doulasDb: {
     title: "Equipo (fotos y Stripe)",
-    subtitle: "Por persona: puedes subir una foto y, si tu técnico lo pidió, pegar el ID de cuenta Stripe.",
+    subtitle:
+      "Por persona: puedes subir una foto y, si tu técnico lo pidió, pegar el ID de cuenta Stripe.",
     loginPrompt: "Inicia sesión con correo y contraseña para ver el equipo aquí.",
     loading: "Cargando…",
     empty: "Aún no hay nadie en la base. Pide a tu técnico que añada el equipo.",
@@ -271,9 +282,11 @@ const admin: AdminLocale = {
     step3Title: "3. Variables en el servidor (Vercel o .env local)",
     step3SmtpUser: "Correo Gmail (ej.: nombre@gmail.com). Nombre alternativo: EMAIL_USER.",
     step3SmtpPass: "Contraseña de aplicación. Alternativa: EMAIL_PASS.",
-    step3ActionSecret: "Contraseña que eliges solo para desbloquear la prueba de abajo (no la de Gmail).",
+    step3ActionSecret:
+      "Contraseña que eliges solo para desbloquear la prueba de abajo (no la de Gmail).",
     step3FromName: "Nombre del remitente (opcional).",
-    step3NotifyTo: "A dónde van los mensajes del formulario (opcional; si vacío, igual que SMTP_USER).",
+    step3NotifyTo:
+      "A dónde van los mensajes del formulario (opcional; si vacío, igual que SMTP_USER).",
     step3HostPort:
       "SMTP_HOST (opcional, por defecto smtp.gmail.com), SMTP_PORT (587), SMTP_SECURE (true solo si el host exige SSL en puerto dedicado).",
     step3Disable: "DISABLE_SMTP_SENDS=1 — desactiva todos los envíos en emergencia.",

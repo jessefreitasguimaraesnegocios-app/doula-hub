@@ -24,7 +24,9 @@ export function langFromCookieHeader(cookie: string | null | undefined): Support
 }
 
 /** First language tag in Accept-Language that we support (base 2-letter code). */
-export function langFromAcceptLanguageHeader(header: string | null | undefined): SupportedLang | null {
+export function langFromAcceptLanguageHeader(
+  header: string | null | undefined,
+): SupportedLang | null {
   if (!header?.trim()) return null;
   const parts = header.split(",");
   for (const part of parts) {

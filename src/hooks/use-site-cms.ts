@@ -1,5 +1,10 @@
 import { useMemo, useSyncExternalStore } from "react";
-import { SITE_CMS_EVENT, SITE_CMS_STORAGE_KEY, parseSiteCmsJson, type SiteCmsV1 } from "@/lib/site-cms";
+import {
+  SITE_CMS_EVENT,
+  SITE_CMS_STORAGE_KEY,
+  parseSiteCmsJson,
+  type SiteCmsV1,
+} from "@/lib/site-cms";
 
 function subscribe(onChange: () => void) {
   if (typeof window === "undefined") return () => {};

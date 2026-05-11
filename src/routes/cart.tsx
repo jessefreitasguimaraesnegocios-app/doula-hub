@@ -52,10 +52,18 @@ function CartPage() {
                 className="flex gap-4 rounded-3xl border border-border bg-card p-4 shadow-(--shadow-soft) sm:gap-6 sm:p-5"
               >
                 <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-muted sm:h-28 sm:w-28">
-                  <img src={line.imageSrc} alt="" className="h-full w-full object-cover" width={112} height={112} />
+                  <img
+                    src={line.imageSrc}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    width={112}
+                    height={112}
+                  />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{line.tag}</p>
+                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                    {line.tag}
+                  </p>
                   <p className="mt-0.5 font-serif text-lg text-foreground">{line.name}</p>
                   <p className="mt-1 text-sm text-primary">{line.priceLabel}</p>
                   <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -68,7 +76,9 @@ function CartPage() {
                       >
                         <Minus className="h-4 w-4" />
                       </button>
-                      <span className="min-w-[2ch] text-center text-sm font-medium tabular-nums">{line.qty}</span>
+                      <span className="min-w-[2ch] text-center text-sm font-medium tabular-nums">
+                        {line.qty}
+                      </span>
                       <button
                         type="button"
                         aria-label={t("cart.increaseQty")}
@@ -94,10 +104,16 @@ function CartPage() {
 
           <div className="mt-10 rounded-3xl border border-border bg-[oklch(0.94_0.02_80)] p-6">
             <div className="flex items-center justify-between text-foreground">
-              <span className="text-sm font-medium uppercase tracking-widest text-foreground/70">{t("cart.subtotal")}</span>
-              <span className="font-serif text-2xl">{formatMoney(subtotalCents, i18n.language)}</span>
+              <span className="text-sm font-medium uppercase tracking-widest text-foreground/70">
+                {t("cart.subtotal")}
+              </span>
+              <span className="font-serif text-2xl">
+                {formatMoney(subtotalCents, i18n.language)}
+              </span>
             </div>
-            <p className="mt-4 text-xs leading-relaxed text-muted-foreground">{t("cart.checkoutNote")}</p>
+            <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
+              {t("cart.checkoutNote")}
+            </p>
             <button
               type="button"
               disabled

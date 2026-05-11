@@ -11,7 +11,11 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "All Things Babies — Doula care for every kind of family" },
-      { name: "description", content: "Compassionate, evidence-based doula support through pregnancy, birth, and postpartum." },
+      {
+        name: "description",
+        content:
+          "Compassionate, evidence-based doula support through pregnancy, birth, and postpartum.",
+      },
       { property: "og:title", content: "All Things Babies — Doula care, with heart" },
       { property: "og:description", content: "You were never meant to do this alone." },
       { property: "og:image", content: heroImg },
@@ -108,7 +112,9 @@ function Home() {
             <div className="absolute -bottom-6 -left-6 hidden rounded-2xl bg-card p-5 shadow-(--shadow-soft) sm:block">
               <p className="text-3xl font-serif text-primary">10+</p>
               <p className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">
-                Years caring<br />for families
+                Years caring
+                <br />
+                for families
               </p>
             </div>
           </div>
@@ -149,14 +155,20 @@ function Home() {
       <section className="py-24">
         <div className="mx-auto max-w-6xl px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="font-serif text-4xl text-foreground md:text-5xl">{t("home.stepsTitle")}</h2>
+            <h2 className="font-serif text-4xl text-foreground md:text-5xl">
+              {t("home.stepsTitle")}
+            </h2>
           </div>
           <ol className="mt-16 grid gap-8 md:grid-cols-4">
             {(["one", "three", "two", "four"] as const).map((k, i) => (
               <li key={k} className="relative rounded-3xl bg-card p-8 shadow-(--shadow-soft)">
                 <span className="font-serif text-5xl text-sage/60">0{i + 1}</span>
-                <p className="mt-3 font-serif text-xl text-foreground">{t(`home.steps.${k}.title`)}</p>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(`home.steps.${k}.body`)}</p>
+                <p className="mt-3 font-serif text-xl text-foreground">
+                  {t(`home.steps.${k}.title`)}
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {t(`home.steps.${k}.body`)}
+                </p>
               </li>
             ))}
           </ol>
@@ -171,14 +183,27 @@ function Home() {
           </h2>
           <div className="mt-14 grid gap-8 md:grid-cols-3">
             {[
-              { name: "Maya & Jordan", body: "Having our doula by our side made the entire birth experience feel sacred. We felt seen, heard, and held." },
-              { name: "Sofia R.", body: "The postpartum care saved my mental health. Warm meals, patient guidance, and gentle hands." },
-              { name: "Amara T.", body: "From our first call I felt safe. She advocated for me when I couldn't find my own words." },
+              {
+                name: "Maya & Jordan",
+                body: "Having our doula by our side made the entire birth experience feel sacred. We felt seen, heard, and held.",
+              },
+              {
+                name: "Sofia R.",
+                body: "The postpartum care saved my mental health. Warm meals, patient guidance, and gentle hands.",
+              },
+              {
+                name: "Amara T.",
+                body: "From our first call I felt safe. She advocated for me when I couldn't find my own words.",
+              },
             ].map((tt) => (
               <figure key={tt.name} className="rounded-3xl bg-card p-8 shadow-(--shadow-soft)">
                 <Quote className="h-6 w-6 text-clay" />
-                <blockquote className="mt-4 text-base leading-relaxed text-foreground/80">"{tt.body}"</blockquote>
-                <figcaption className="mt-6 text-sm font-medium text-muted-foreground">— {tt.name}</figcaption>
+                <blockquote className="mt-4 text-base leading-relaxed text-foreground/80">
+                  "{tt.body}"
+                </blockquote>
+                <figcaption className="mt-6 text-sm font-medium text-muted-foreground">
+                  — {tt.name}
+                </figcaption>
               </figure>
             ))}
           </div>

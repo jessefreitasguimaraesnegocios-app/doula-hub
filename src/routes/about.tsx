@@ -87,21 +87,29 @@ function About() {
         <AboutFounderMedia cms={cms} />
         <div>
           <h1 className="font-serif text-5xl text-foreground md:text-6xl">{t("about.title")}</h1>
-          <p className="mt-6 whitespace-pre-line text-lg leading-relaxed text-muted-foreground">{t("about.body")}</p>
+          <p className="mt-6 whitespace-pre-line text-lg leading-relaxed text-muted-foreground">
+            {t("about.body")}
+          </p>
         </div>
       </section>
 
       <section className="bg-[oklch(0.94_0.02_80)] py-20">
         <div className="mx-auto max-w-6xl px-6">
-          <h2 className="font-serif text-4xl text-foreground md:text-5xl">{t("about.valuesTitle")}</h2>
+          <h2 className="font-serif text-4xl text-foreground md:text-5xl">
+            {t("about.valuesTitle")}
+          </h2>
           <div className="mt-12 grid gap-8 md:grid-cols-3">
             {values.map(({ key, icon: Icon }) => (
               <div key={key} className="rounded-3xl bg-card p-8 shadow-(--shadow-soft)">
                 <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary">
                   <Icon className="h-5 w-5" />
                 </div>
-                <p className="mt-4 font-serif text-xl text-foreground">{t(`about.values.${key}.title`)}</p>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(`about.values.${key}.body`)}</p>
+                <p className="mt-4 font-serif text-xl text-foreground">
+                  {t(`about.values.${key}.title`)}
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {t(`about.values.${key}.body`)}
+                </p>
               </div>
             ))}
           </div>
@@ -111,7 +119,9 @@ function About() {
       <section className="py-20">
         <div className="mx-auto grid max-w-6xl gap-12 px-6 md:grid-cols-2 md:items-center">
           <div>
-            <h2 className="font-serif text-4xl text-foreground md:text-5xl">{t("about.certsTitle")}</h2>
+            <h2 className="font-serif text-4xl text-foreground md:text-5xl">
+              {t("about.certsTitle")}
+            </h2>
             <ul className="mt-8 space-y-4">
               {certs.map((c) => (
                 <li key={c} className="flex items-center gap-3 text-foreground/90">

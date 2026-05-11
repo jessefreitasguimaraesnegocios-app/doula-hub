@@ -24,28 +24,45 @@ const es: Translation = {
     promiseBody:
       "Toda familia merece una presencia tranquila y experta. Escuchamos primero, planeamos juntas y caminamos contigo — en casa, en el hospital y en las horas tranquilas después.",
     pillars: {
-      one: { title: "Apoyo continuo", body: "Del embarazo al posparto — una persona de confianza que conoce tu historia." },
-      two: { title: "Basado en evidencia", body: "Doulas certificadas con las mejores prácticas actuales." },
-      three: { title: "Inclusivo y afirmativo", body: "Cuidado para toda familia, todo parto, toda historia — sin juicio." },
+      one: {
+        title: "Apoyo continuo",
+        body: "Del embarazo al posparto — una persona de confianza que conoce tu historia.",
+      },
+      two: {
+        title: "Basado en evidencia",
+        body: "Doulas certificadas con las mejores prácticas actuales.",
+      },
+      three: {
+        title: "Inclusivo y afirmativo",
+        body: "Cuidado para toda familia, todo parto, toda historia — sin juicio.",
+      },
     },
     stepsTitle: "Cómo funciona",
     steps: {
-      one: { title: "Consulta gratuita", body: "Una videollamada cálida de 30 minutos para conocernos." },
+      one: {
+        title: "Consulta gratuita",
+        body: "Una videollamada cálida de 30 minutos para conocernos.",
+      },
       two: { title: "Elige tu paquete", body: "Elige el apoyo que se adapta a tu familia." },
-      three: { title: "Encuentra tu doula", body: "Te conectamos con la doula que se siente correcta." },
+      three: {
+        title: "Encuentra tu doula",
+        body: "Te conectamos con la doula que se siente correcta.",
+      },
       four: { title: "Estamos contigo", body: "Del embarazo al posparto, en cada paso." },
     },
     testimonialsTitle: "Historias de familias que cuidamos",
   },
   about: {
     title: "Hola, soy Raquel Manini.",
-    body:
-      "Soy Raquel Manini, fundadora de All Things Babies. Creo que toda persona gestante merece una compañía calmada e informada — y lidero un pequeño equipo de doulas certificadas que comparten esa visión: tú eres la experta de tu cuerpo.\n\nTengo 9 años de experiencia como doula de parto y 11 como doula posparto. Estoy certificada por ProDoula en parto y en cuidados posparto y del bebé, con formación en Doulas By The Bay (septiembre de 2019). Práctica individual, con alrededor de 1 a 4 partos y 1 a 4 familias posparto al mes.\n\nAcompaño partos en hospitales, centros de parto y en casa — también ofrezco doula virtual y remota.\n\nEntre los cuidados complementarios están acupresión, aromaterapia, educación para el parto y porteo, primeros auxilios y RCP, lactancia, apoyo en pérdidas, natimuertos y aborto espontáneo, posparto nocturno, gemelos y múltiples, consultoría del sueño, masaje pre/posnatal, fotografía de nacimiento, maternidad y recién nacido y apoyo a familias militares — siempre adaptado a tu familia.",
+    body: "Soy Raquel Manini, fundadora de All Things Babies. Creo que toda persona gestante merece una compañía calmada e informada — y lidero un pequeño equipo de doulas certificadas que comparten esa visión: tú eres la experta de tu cuerpo.\n\nTengo 9 años de experiencia como doula de parto y 11 como doula posparto. Estoy certificada por ProDoula en parto y en cuidados posparto y del bebé, con formación en Doulas By The Bay (septiembre de 2019). Práctica individual, con alrededor de 1 a 4 partos y 1 a 4 familias posparto al mes.\n\nAcompaño partos en hospitales, centros de parto y en casa — también ofrezco doula virtual y remota.\n\nEntre los cuidados complementarios están acupresión, aromaterapia, educación para el parto y porteo, primeros auxilios y RCP, lactancia, apoyo en pérdidas, natimuertos y aborto espontáneo, posparto nocturno, gemelos y múltiples, consultoría del sueño, masaje pre/posnatal, fotografía de nacimiento, maternidad y recién nacido y apoyo a familias militares — siempre adaptado a tu familia.",
     valuesTitle: "En qué creemos",
     values: {
       one: { title: "Presencia, no actuación", body: "No tenemos prisa. Estamos contigo." },
       two: { title: "Elección informada", body: "El conocimiento es poder. Damos los dos." },
-      three: { title: "Sabiduría del cuerpo", body: "Tu instinto es real. Te ayudamos a confiar en él." },
+      three: {
+        title: "Sabiduría del cuerpo",
+        body: "Tu instinto es real. Te ayudamos a confiar en él.",
+      },
     },
     certsTitle: "Certificaciones y formación",
     certs: [
@@ -57,20 +74,33 @@ const es: Translation = {
   },
   services: {
     title: "Cuidado que te encuentra donde estás",
-    subtitle: "Elige el paquete que se adapta a tu familia. Combinaciones personalizadas son bienvenidas.",
+    subtitle:
+      "Elige el paquete que se adapta a tu familia. Combinaciones personalizadas son bienvenidas.",
     bookCta: "Reservar este paquete",
     items: {
       birth: {
         name: "Paquete Doula de Parto",
         price: "$3,800",
         body: "Tres visitas prenatales, apoyo continuo en el parto y dos visitas posparto.",
-        features: ["Soporte ilimitado por mensaje y llamada", "Plan de parto", "Apoyo continuo en el trabajo de parto", "Dos visitas posparto", "Orientación de lactancia"],
+        features: [
+          "Soporte ilimitado por mensaje y llamada",
+          "Plan de parto",
+          "Apoyo continuo en el trabajo de parto",
+          "Dos visitas posparto",
+          "Orientación de lactancia",
+        ],
       },
       postpartum: {
         name: "Cuidado Posparto",
         price: "$95/h",
         body: "Cuidado de día o noche durante el cuarto trimestre.",
-        features: ["Cuidado del recién nacido", "Apoyo a la lactancia", "Preparación de comidas ligeras", "Apoyo emocional", "Cuidado de hermanos"],
+        features: [
+          "Cuidado del recién nacido",
+          "Apoyo a la lactancia",
+          "Preparación de comidas ligeras",
+          "Apoyo emocional",
+          "Cuidado de hermanos",
+        ],
       },
       bereavement: {
         name: "Doula de Duelo",
@@ -82,7 +112,12 @@ const es: Translation = {
         name: "Visita de Lactancia",
         price: "$195",
         body: "Apoyo en casa o virtual para que la lactancia se sienta bien.",
-        features: ["Evaluación del agarre", "Plan de alimentación", "Orientación con extractor", "Seguimiento"],
+        features: [
+          "Evaluación del agarre",
+          "Plan de alimentación",
+          "Orientación con extractor",
+          "Seguimiento",
+        ],
       },
     },
   },
@@ -92,8 +127,10 @@ const es: Translation = {
     specialties: "Especialidades",
     languages: "Idiomas",
     scheduleVideoCall: "Programar videollamada",
-    schedulePopupBlocked: "El navegador bloqueó la ventana. Permite ventanas emergentes para este sitio e inténtalo de nuevo.",
-    scheduleUrlMissing: "Aún no hay enlace del agendador. Añade la URL de la videollamada en los ajustes del sitio (admin) o inténtalo más tarde.",
+    schedulePopupBlocked:
+      "El navegador bloqueó la ventana. Permite ventanas emergentes para este sitio e inténtalo de nuevo.",
+    scheduleUrlMissing:
+      "Aún no hay enlace del agendador. Añade la URL de la videollamada en los ajustes del sitio (admin) o inténtalo más tarde.",
     contractedRole: "Doula del equipo",
     contractedBioFallback: "Integrante de nuestro círculo de apoyo.",
     founder: {
@@ -155,7 +192,8 @@ const es: Translation = {
     doulaAny: "Encuéntrame la doula ideal",
     intake: {
       fillRequired: "Completa todos los campos obligatorios.",
-      fillRequiredDetail: "Falta: {{fields}}. (Teléfono: 10 dígitos formato EE.UU.; fecha: MM/DD/AAAA completa.)",
+      fillRequiredDetail:
+        "Falta: {{fields}}. (Teléfono: 10 dígitos formato EE.UU.; fecha: MM/DD/AAAA completa.)",
       fullName: "Nombre y apellido",
       email: "Correo electrónico",
       phone: "Número de teléfono",
@@ -228,7 +266,8 @@ const es: Translation = {
       success: "Reserva confirmada",
       successBody: "Un email de confirmación va en camino con tu certificado y enlace de consulta.",
       saveFailed: "No pudimos completar la reserva: {{detail}}",
-      saveFailedGeneric: "Algo salió mal al completar la reserva. Inténtalo de nuevo o contáctanos.",
+      saveFailedGeneric:
+        "Algo salió mal al completar la reserva. Inténtalo de nuevo o contáctanos.",
       googleSyncWarn: "No se pudo actualizar Google Calendar: {{detail}}",
       emailSyncWarn: "No se pudo enviar el correo de confirmación: {{detail}}",
     },

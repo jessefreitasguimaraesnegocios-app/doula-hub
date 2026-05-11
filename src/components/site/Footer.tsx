@@ -61,10 +61,26 @@ export function Footer() {
             {t("footer.quick")}
           </p>
           <ul className="mt-4 space-y-2 text-sm text-foreground/80">
-            <li><Link to="/about" className="hover:text-primary">{t("nav.about")}</Link></li>
-            <li><Link to="/services" className="hover:text-primary">{t("nav.services")}</Link></li>
-            <li><Link to="/team" className="hover:text-primary">{t("nav.team")}</Link></li>
-            <li><Link to="/shop" className="hover:text-primary">{t("nav.shop")}</Link></li>
+            <li>
+              <Link to="/about" className="hover:text-primary">
+                {t("nav.about")}
+              </Link>
+            </li>
+            <li>
+              <Link to="/services" className="hover:text-primary">
+                {t("nav.services")}
+              </Link>
+            </li>
+            <li>
+              <Link to="/team" className="hover:text-primary">
+                {t("nav.team")}
+              </Link>
+            </li>
+            <li>
+              <Link to="/shop" className="hover:text-primary">
+                {t("nav.shop")}
+              </Link>
+            </li>
           </ul>
         </div>
         <div>
@@ -78,18 +94,27 @@ export function Footer() {
               </a>
             </li>
             <li>
-              <a href={`tel:${cms.contactPhoneHref.trim() || "+13236406640"}`} className="hover:text-primary">
+              <a
+                href={`tel:${cms.contactPhoneHref.trim() || "+13236406640"}`}
+                className="hover:text-primary"
+              >
                 {cms.contactPhoneDisplay.trim() || "+1 (323) 640-6640"}
               </a>
             </li>
             <li>{cms.addressLine.trim() || "Downtown Culver City, CA"}</li>
-            <li><Link to="/contact" className="hover:text-primary">{t("nav.contact")}</Link></li>
+            <li>
+              <Link to="/contact" className="hover:text-primary">
+                {t("nav.contact")}
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
       <div className="border-t border-border/50">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-6 py-6 text-xs text-muted-foreground sm:flex-row">
-          <p>© {new Date().getFullYear()} {t("brand")}. {t("footer.rights")}</p>
+          <p>
+            © {new Date().getFullYear()} {t("brand")}. {t("footer.rights")}
+          </p>
           <p className="inline-flex items-center gap-1.5">
             Made with <Heart className="h-3 w-3 fill-clay text-clay" /> for growing families
           </p>

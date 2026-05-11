@@ -23,14 +23,29 @@ const en = {
     promiseBody:
       "Every family deserves a calm, knowledgeable presence by their side. We listen first, plan together, and walk with you — at home, at the hospital, and in the quiet hours after.",
     pillars: {
-      one: { title: "Continuous support", body: "From pregnancy through postpartum — one trusted person who knows your story." },
-      two: { title: "Evidence-based", body: "Certified doulas trained in current best practices for birth and recovery." },
-      three: { title: "Inclusive & affirming", body: "Care for every family, every birth, every story — without judgment." },
+      one: {
+        title: "Continuous support",
+        body: "From pregnancy through postpartum — one trusted person who knows your story.",
+      },
+      two: {
+        title: "Evidence-based",
+        body: "Certified doulas trained in current best practices for birth and recovery.",
+      },
+      three: {
+        title: "Inclusive & affirming",
+        body: "Care for every family, every birth, every story — without judgment.",
+      },
     },
     stepsTitle: "How it works",
     steps: {
-      one: { title: "Free consultation", body: "A warm 30-minute video call to get to know each other." },
-      two: { title: "Choose your package", body: "Pick the support that fits your family and birth plan." },
+      one: {
+        title: "Free consultation",
+        body: "A warm 30-minute video call to get to know each other.",
+      },
+      two: {
+        title: "Choose your package",
+        body: "Pick the support that fits your family and birth plan.",
+      },
       three: { title: "Match your doula", body: "We pair you with the doula who feels right." },
       four: { title: "We're with you", body: "From pregnancy through postpartum, every step." },
     },
@@ -38,11 +53,13 @@ const en = {
   },
   about: {
     title: "Hi, I'm Raquel Manini.",
-    body:
-      "I'm Raquel Manini, founder of All Things Babies. I believe every birthing person deserves a calm, informed companion—and I lead a small team of certified doulas who share that belief: you are the expert of your body.\n\nI have 9 years of experience as a birth doula and 11 as a postpartum doula. I'm ProDoula-certified in birth and in postpartum & infant care, with training from Doulas By The Bay (September 2019). I practice solo, typically supporting about 1–4 births and 1–4 postpartum families each month.\n\nI attend hospital, birth center, and home births—including virtual and remote doula support.\n\nComplementary care can include acupressure, aromatherapy, childbirth and babywearing education, first aid and CPR, lactation support, loss and stillbirth care, overnight postpartum, twins and multiples, sleep consulting, pre/postnatal massage, birth and newborn photography, and support for military families—always tailored to your story.",
+    body: "I'm Raquel Manini, founder of All Things Babies. I believe every birthing person deserves a calm, informed companion—and I lead a small team of certified doulas who share that belief: you are the expert of your body.\n\nI have 9 years of experience as a birth doula and 11 as a postpartum doula. I'm ProDoula-certified in birth and in postpartum & infant care, with training from Doulas By The Bay (September 2019). I practice solo, typically supporting about 1–4 births and 1–4 postpartum families each month.\n\nI attend hospital, birth center, and home births—including virtual and remote doula support.\n\nComplementary care can include acupressure, aromatherapy, childbirth and babywearing education, first aid and CPR, lactation support, loss and stillbirth care, overnight postpartum, twins and multiples, sleep consulting, pre/postnatal massage, birth and newborn photography, and support for military families—always tailored to your story.",
     valuesTitle: "What we believe",
     values: {
-      one: { title: "Presence over performance", body: "We don't rush. We don't manage. We're with you." },
+      one: {
+        title: "Presence over performance",
+        body: "We don't rush. We don't manage. We're with you.",
+      },
       two: { title: "Informed choice", body: "Knowledge is power. We give you both." },
       three: { title: "Body wisdom", body: "Your instincts are real. We help you trust them." },
     },
@@ -63,13 +80,25 @@ const en = {
         name: "Birth Doula Package",
         price: "$3,800",
         body: "Three prenatal visits, continuous birth support, and two postpartum visits.",
-        features: ["Unlimited text & call support", "Birth plan creation", "Continuous labor support", "Two postpartum visits", "Lactation guidance"],
+        features: [
+          "Unlimited text & call support",
+          "Birth plan creation",
+          "Continuous labor support",
+          "Two postpartum visits",
+          "Lactation guidance",
+        ],
       },
       postpartum: {
         name: "Postpartum Care",
         price: "$95/hr",
         body: "Daytime or overnight care during the fourth trimester.",
-        features: ["Newborn care & soothing", "Lactation support", "Light meal prep", "Emotional support", "Sibling care"],
+        features: [
+          "Newborn care & soothing",
+          "Lactation support",
+          "Light meal prep",
+          "Emotional support",
+          "Sibling care",
+        ],
       },
       bereavement: {
         name: "Bereavement Doula",
@@ -87,12 +116,14 @@ const en = {
   },
   team: {
     title: "The hands that hold you",
-    subtitle: "A small, certified team — chosen for their warmth, skill, and commitment to your story.",
+    subtitle:
+      "A small, certified team — chosen for their warmth, skill, and commitment to your story.",
     specialties: "Specialties",
     languages: "Languages",
     scheduleVideoCall: "Schedule a video call",
     schedulePopupBlocked: "Pop-up was blocked. Allow pop-ups for this site and try again.",
-    scheduleUrlMissing: "No scheduler link is set yet. Add the video call URL in site settings (admin) or try again later.",
+    scheduleUrlMissing:
+      "No scheduler link is set yet. Add the video call URL in site settings (admin) or try again later.",
     contractedRole: "Doula — our team",
     contractedBioFallback: "A valued member of our doula circle.",
     founder: {
@@ -154,7 +185,8 @@ const en = {
     doulaAny: "Match me with the right doula",
     intake: {
       fillRequired: "Please fill in all required fields.",
-      fillRequiredDetail: "Still missing: {{fields}}. (Phone: 10 digits US format; due date: full MM/DD/YYYY.)",
+      fillRequiredDetail:
+        "Still missing: {{fields}}. (Phone: 10 digits US format; due date: full MM/DD/YYYY.)",
       fullName: "First & last name",
       email: "Email address",
       phone: "Phone number",
@@ -225,9 +257,11 @@ const en = {
       secure: "Secure payment via Stripe",
       terms: "By confirming, you agree to our terms and cancellation policy.",
       success: "Booking confirmed",
-      successBody: "A confirmation email is on its way with your certificate and consultation link.",
+      successBody:
+        "A confirmation email is on its way with your certificate and consultation link.",
       saveFailed: "We could not complete your booking: {{detail}}",
-      saveFailedGeneric: "Something went wrong while completing your booking. Please try again or contact us.",
+      saveFailedGeneric:
+        "Something went wrong while completing your booking. Please try again or contact us.",
       googleSyncWarn: "Google Calendar could not be updated: {{detail}}",
       emailSyncWarn: "The confirmation email could not be sent: {{detail}}",
     },

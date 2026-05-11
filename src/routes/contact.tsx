@@ -103,7 +103,13 @@ function Contact() {
         }}
         className="space-y-5 rounded-3xl bg-card p-8 shadow-(--shadow-soft)"
       >
-        <Field label={t("contact.name")} name="name" required value={name} onChange={(e) => setName(e.target.value)} />
+        <Field
+          label={t("contact.name")}
+          name="name"
+          required
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
         <Field
           label={t("contact.email")}
           name="email"
@@ -112,9 +118,16 @@ function Contact() {
           value={formEmail}
           onChange={(e) => setFormEmail(e.target.value)}
         />
-        <Field label={t("contact.phone")} name="phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
+        <Field
+          label={t("contact.phone")}
+          name="phone"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
         <div>
-          <label className="text-xs uppercase tracking-widest text-foreground/60">{t("contact.message")}</label>
+          <label className="text-xs uppercase tracking-widest text-foreground/60">
+            {t("contact.message")}
+          </label>
           <textarea
             required
             rows={5}
@@ -136,7 +149,10 @@ function Contact() {
   );
 }
 
-function Field({ label, ...props }: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
+function Field({
+  label,
+  ...props
+}: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <div>
       <label className="text-xs uppercase tracking-widest text-foreground/60">{label}</label>

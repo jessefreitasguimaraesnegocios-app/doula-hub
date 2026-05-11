@@ -33,7 +33,11 @@ const PALETTES: Record<ThemeTone, PalettePreset[]> = {
     { id: "p-mint", primary: "oklch(0.9 0.05 165)", primaryForeground: "oklch(0.2 0.03 165)" },
   ],
   neutral: [
-    { id: "n-graphite", primary: "oklch(0.38 0.02 260)", primaryForeground: "oklch(0.97 0.005 260)" },
+    {
+      id: "n-graphite",
+      primary: "oklch(0.38 0.02 260)",
+      primaryForeground: "oklch(0.97 0.005 260)",
+    },
     { id: "n-warm", primary: "oklch(0.52 0.02 75)", primaryForeground: "oklch(0.98 0.01 85)" },
     { id: "n-cool", primary: "oklch(0.48 0.02 250)", primaryForeground: "oklch(0.98 0.005 250)" },
     { id: "n-soft", primary: "oklch(0.28 0.02 270)", primaryForeground: "oklch(0.97 0.01 270)" },
@@ -100,7 +104,10 @@ function normalizeCssColor(s: string): string {
 }
 
 function presetMatchesDraft(p: PalettePreset, primary: string, primaryFg: string): boolean {
-  return normalizeCssColor(primary) === normalizeCssColor(p.primary) && normalizeCssColor(primaryFg) === normalizeCssColor(p.primaryForeground);
+  return (
+    normalizeCssColor(primary) === normalizeCssColor(p.primary) &&
+    normalizeCssColor(primaryFg) === normalizeCssColor(p.primaryForeground)
+  );
 }
 
 type ForegroundSwatch = { id: string; css: string };
@@ -194,7 +201,9 @@ export function AdminThemePanel({ theme, onThemeChange }: AdminThemePanelProps) 
             {t("admin.themePanel.resetColors")}
           </Button>
           {isProjectDefault ? (
-            <span className="text-xs text-muted-foreground">{t("admin.themePanel.usingDefaults")}</span>
+            <span className="text-xs text-muted-foreground">
+              {t("admin.themePanel.usingDefaults")}
+            </span>
           ) : null}
         </div>
       </div>
@@ -225,7 +234,9 @@ export function AdminThemePanel({ theme, onThemeChange }: AdminThemePanelProps) 
                     />
                   ))}
                 </div>
-                <span className="text-xs font-semibold text-foreground">{t(`admin.theme.tone.${toneKey}`)}</span>
+                <span className="text-xs font-semibold text-foreground">
+                  {t(`admin.theme.tone.${toneKey}`)}
+                </span>
               </button>
             );
           })}
@@ -265,7 +276,9 @@ export function AdminThemePanel({ theme, onThemeChange }: AdminThemePanelProps) 
         <p className="mt-1 text-xs text-muted-foreground">{t("admin.themePanel.customHint")}</p>
         <div className="mt-4 flex flex-wrap items-end gap-4">
           <div className="space-y-2">
-            <Label className="text-xs text-muted-foreground">{t("admin.themePanel.primaryLabel")}</Label>
+            <Label className="text-xs text-muted-foreground">
+              {t("admin.themePanel.primaryLabel")}
+            </Label>
             <input
               type="color"
               value={customHex}
@@ -305,7 +318,8 @@ export function AdminThemePanel({ theme, onThemeChange }: AdminThemePanelProps) 
                   onClick={() => applyForegroundOnly(s.css)}
                   className={cn(
                     "flex flex-col items-center gap-1.5 rounded-xl border border-border bg-card p-2 transition hover:border-primary/60",
-                    active && "border-primary ring-2 ring-primary/25 ring-offset-2 ring-offset-card",
+                    active &&
+                      "border-primary ring-2 ring-primary/25 ring-offset-2 ring-offset-card",
                   )}
                 >
                   <div
@@ -313,13 +327,17 @@ export function AdminThemePanel({ theme, onThemeChange }: AdminThemePanelProps) 
                     style={{ backgroundColor: s.css }}
                     title={fgLabel}
                   />
-                  <span className="line-clamp-2 text-center text-[10px] font-medium leading-tight text-foreground">{fgLabel}</span>
+                  <span className="line-clamp-2 text-center text-[10px] font-medium leading-tight text-foreground">
+                    {fgLabel}
+                  </span>
                 </button>
               );
             })}
           </div>
           <div className="flex shrink-0 flex-col justify-end gap-2 rounded-xl border border-border bg-background p-3">
-            <Label className="text-xs text-muted-foreground">{t("admin.themePanel.fgCustomLabel")}</Label>
+            <Label className="text-xs text-muted-foreground">
+              {t("admin.themePanel.fgCustomLabel")}
+            </Label>
             <input
               type="color"
               value={customFgHex}

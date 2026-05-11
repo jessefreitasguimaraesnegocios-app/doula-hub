@@ -35,7 +35,13 @@ export function AdminBookingsPanel({ enabled }: { enabled: boolean }) {
     return (
       <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-4 text-sm">
         <p>{t("admin.bookings.loadError")}</p>
-        <Button type="button" variant="outline" size="sm" className="mt-3 rounded-full" onClick={() => void refetch()}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="mt-3 rounded-full"
+          onClick={() => void refetch()}
+        >
           {t("admin.bookings.retry")}
         </Button>
       </div>
@@ -73,7 +79,9 @@ export function AdminBookingsPanel({ enabled }: { enabled: boolean }) {
                   {formatWhen(row)}
                 </Badge>
                 {googleOk ? (
-                  <Badge className="bg-emerald-600/90 hover:bg-emerald-600">{t("admin.bookings.googleOk")}</Badge>
+                  <Badge className="bg-emerald-600/90 hover:bg-emerald-600">
+                    {t("admin.bookings.googleOk")}
+                  </Badge>
                 ) : row.google_sync_error ? (
                   <Badge variant="destructive">{t("admin.bookings.googleFail")}</Badge>
                 ) : (
@@ -126,7 +134,9 @@ export function AdminBookingsPanel({ enabled }: { enabled: boolean }) {
             {row.google_sync_error ? (
               <p className="mt-2 text-xs text-destructive">{row.google_sync_error}</p>
             ) : null}
-            {row.email_error ? <p className="mt-1 text-xs text-destructive">{row.email_error}</p> : null}
+            {row.email_error ? (
+              <p className="mt-1 text-xs text-destructive">{row.email_error}</p>
+            ) : null}
             {expanded ? (
               <pre className="mt-3 max-h-64 overflow-auto rounded-xl border border-border bg-muted/40 p-3 text-[11px] leading-relaxed">
                 {JSON.stringify(row.intake, null, 2)}

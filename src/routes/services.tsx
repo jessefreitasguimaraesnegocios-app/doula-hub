@@ -8,7 +8,10 @@ export const Route = createFileRoute("/services")({
   head: () => ({
     meta: [
       { title: "Services & Packages — All Things Babies" },
-      { name: "description", content: "Birth doula, postpartum care, lactation, and bereavement support packages." },
+      {
+        name: "description",
+        content: "Birth doula, postpartum care, lactation, and bereavement support packages.",
+      },
       { property: "og:title", content: "Services — All Things Babies" },
       { property: "og:description", content: "Care that meets you where you are." },
     ],
@@ -56,16 +59,22 @@ function Services() {
                   </span>
                 )}
                 <h2 className="font-serif text-3xl">{t(`services.items.${k}.name`)}</h2>
-                <p className={`mt-4 font-serif text-4xl ${featured ? "text-cream" : "text-primary"}`}>
+                <p
+                  className={`mt-4 font-serif text-4xl ${featured ? "text-cream" : "text-primary"}`}
+                >
                   {priceFor(k)}
                 </p>
-                <p className={`mt-3 text-sm leading-relaxed ${featured ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                <p
+                  className={`mt-3 text-sm leading-relaxed ${featured ? "text-primary-foreground/80" : "text-muted-foreground"}`}
+                >
                   {t(`services.items.${k}.body`)}
                 </p>
                 <ul className="mt-6 space-y-3 text-sm">
                   {features.map((f) => (
                     <li key={f} className="flex items-start gap-2">
-                      <Check className={`mt-0.5 h-4 w-4 shrink-0 ${featured ? "text-cream" : "text-sage-deep"}`} />
+                      <Check
+                        className={`mt-0.5 h-4 w-4 shrink-0 ${featured ? "text-cream" : "text-sage-deep"}`}
+                      />
                       <span>{f}</span>
                     </li>
                   ))}

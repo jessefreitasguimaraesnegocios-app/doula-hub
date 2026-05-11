@@ -145,23 +145,35 @@ function mergePartial(base: SiteCmsV1, partial: unknown): SiteCmsV1 {
   const si = p.siteImages;
   const siteImages: Partial<Record<SiteImageKey, string>> = {
     ...base.siteImages,
-    ...(si && typeof si === "object" && !Array.isArray(si) ? (si as Partial<Record<SiteImageKey, string>>) : {}),
+    ...(si && typeof si === "object" && !Array.isArray(si)
+      ? (si as Partial<Record<SiteImageKey, string>>)
+      : {}),
   };
   const cd = p.contractedDoulas;
   const contractedDoulas: ContractedDoula[] = Array.isArray(cd)
-    ? (cd as unknown[]).map((x) => normalizeContractedDoula(x)).filter((x): x is ContractedDoula => x !== null)
+    ? (cd as unknown[])
+        .map((x) => normalizeContractedDoula(x))
+        .filter((x): x is ContractedDoula => x !== null)
     : base.contractedDoulas;
   const shopComingSoonEnabled =
-    typeof p.shopComingSoonEnabled === "boolean" ? p.shopComingSoonEnabled : base.shopComingSoonEnabled;
+    typeof p.shopComingSoonEnabled === "boolean"
+      ? p.shopComingSoonEnabled
+      : base.shopComingSoonEnabled;
   const shopComingSoonTitle =
     typeof p.shopComingSoonTitle === "string" ? p.shopComingSoonTitle : base.shopComingSoonTitle;
   const shopComingSoonMessage =
-    typeof p.shopComingSoonMessage === "string" ? p.shopComingSoonMessage : base.shopComingSoonMessage;
+    typeof p.shopComingSoonMessage === "string"
+      ? p.shopComingSoonMessage
+      : base.shopComingSoonMessage;
   const emailFromName = typeof p.emailFromName === "string" ? p.emailFromName : base.emailFromName;
   const emailAutomationBooking =
-    typeof p.emailAutomationBooking === "boolean" ? p.emailAutomationBooking : base.emailAutomationBooking;
+    typeof p.emailAutomationBooking === "boolean"
+      ? p.emailAutomationBooking
+      : base.emailAutomationBooking;
   const emailAutomationContact =
-    typeof p.emailAutomationContact === "boolean" ? p.emailAutomationContact : base.emailAutomationContact;
+    typeof p.emailAutomationContact === "boolean"
+      ? p.emailAutomationContact
+      : base.emailAutomationContact;
   return {
     ...base,
     ...p,
@@ -234,6 +246,7 @@ export function applySiteCmsTheme(cms: SiteCmsV1) {
   const { primary, primaryForeground } = cms.theme;
   if (primary.trim()) root.style.setProperty("--primary", primary.trim());
   else root.style.removeProperty("--primary");
-  if (primaryForeground.trim()) root.style.setProperty("--primary-foreground", primaryForeground.trim());
+  if (primaryForeground.trim())
+    root.style.setProperty("--primary-foreground", primaryForeground.trim());
   else root.style.removeProperty("--primary-foreground");
 }

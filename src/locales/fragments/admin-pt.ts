@@ -38,7 +38,8 @@ const admin: AdminLocale = {
     introThen: "Depois abra",
     introView: "Ver o site",
     introEnd: "para ver como ficou.",
-    footnoteSupabase: "Com a sua sessão, Salvar também envia tudo para a internet (além deste computador).",
+    footnoteSupabase:
+      "Com a sua sessão, Salvar também envia tudo para a internet (além deste computador).",
     footnoteLocal: "Sem sessão na internet, Salvar mantém as alterações só neste computador.",
     save: "Salvar alterações",
     viewSite: "Ver o site",
@@ -67,7 +68,8 @@ const admin: AdminLocale = {
     title: "Marcações de consulta (mini CRM)",
     subtitle:
       "Cada marcação concluída no site aparece aqui quando o servidor tem SUPABASE_SERVICE_ROLE_KEY. Google Agenda + Meet são criados automaticamente se as variáveis Google estiverem definidas (ver documentação do projeto). O e-mail de confirmação para a cliente continua a usar SMTP quando está ligado em Salvar alterações.",
-    empty: "Ainda não há marcações — ou o Supabase não está configurado / falta a chave service role no servidor.",
+    empty:
+      "Ainda não há marcações — ou o Supabase não está configurado / falta a chave service role no servidor.",
     loadError: "Não foi possível carregar as marcações.",
     colWhen: "Quando",
     colClient: "Cliente",
@@ -126,8 +128,14 @@ const admin: AdminLocale = {
         title: "Equipe e marcação — foto da fundadora",
         hint: "Cartão da fundadora e passo “quem” na marcação.",
       },
-      team_member_sofia: { title: "Equipe e marcação — Sofia", hint: "Cartão e escolha na marcação." },
-      team_member_elena: { title: "Equipe e marcação — Elena", hint: "Cartão e escolha na marcação." },
+      team_member_sofia: {
+        title: "Equipe e marcação — Sofia",
+        hint: "Cartão e escolha na marcação.",
+      },
+      team_member_elena: {
+        title: "Equipe e marcação — Elena",
+        hint: "Cartão e escolha na marcação.",
+      },
       team_member_mei: { title: "Equipe e marcação — Mei", hint: "Cartão e escolha na marcação." },
       shop_hero: { title: "Loja — faixa do topo", hint: "Faixa no topo da página Loja." },
       footer_logo: { title: "Rodapé — logotipo", hint: "Ícone pequeno ao lado do nome no rodapé." },
@@ -161,7 +169,8 @@ const admin: AdminLocale = {
     primaryLabel: "Cor principal dos botões",
     sampleButton: "Exemplo de botão",
     fgSection: "Cor da letra em cima dos botões",
-    fgHint: "Só muda a letra (contraste na cor escolhida). Toque numa amostra ou use o quadrado à direita.",
+    fgHint:
+      "Só muda a letra (contraste na cor escolhida). Toque numa amostra ou use o quadrado à direita.",
     fgCustomLabel: "Outra cor para a letra",
     fgAriaPrimary: "Cor primária personalizada",
     fgAriaText: "Cor do texto sobre a primária",
@@ -241,7 +250,8 @@ const admin: AdminLocale = {
   },
   doulasDb: {
     title: "Equipe (fotos e Stripe)",
-    subtitle: "Por pessoa: você pode enviar uma foto e, se o técnico pediu, colar o ID da conta Stripe.",
+    subtitle:
+      "Por pessoa: você pode enviar uma foto e, se o técnico pediu, colar o ID da conta Stripe.",
     loginPrompt: "Entre com e-mail e senha para ver a equipe aqui.",
     loading: "Carregando…",
     empty: "Ainda não há ninguém no banco. Peça ao técnico do site para adicionar a equipe.",
@@ -271,9 +281,11 @@ const admin: AdminLocale = {
     step3Title: "3. Variáveis no servidor (Vercel ou .env local)",
     step3SmtpUser: "Endereço Gmail (ex.: nome@gmail.com). Nome alternativo: EMAIL_USER.",
     step3SmtpPass: "Senha de app. Alternativa: EMAIL_PASS.",
-    step3ActionSecret: "Senha que você escolhe só para desbloquear o teste abaixo (não é a senha do Gmail).",
+    step3ActionSecret:
+      "Senha que você escolhe só para desbloquear o teste abaixo (não é a senha do Gmail).",
     step3FromName: "Nome no remetente (opcional).",
-    step3NotifyTo: "Para onde vão mensagens do formulário de contato (opcional; se vazio, igual a SMTP_USER).",
+    step3NotifyTo:
+      "Para onde vão mensagens do formulário de contato (opcional; se vazio, igual a SMTP_USER).",
     step3HostPort:
       "SMTP_HOST (opcional, padrão smtp.gmail.com), SMTP_PORT (587), SMTP_SECURE (true só se o host exigir SSL na porta dedicada).",
     step3Disable: "DISABLE_SMTP_SENDS=1 — desliga todos os envios em emergência.",

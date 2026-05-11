@@ -13,7 +13,11 @@ type AdminSitePhotosPanelProps = {
   canUpload: boolean;
 };
 
-export function AdminSitePhotosPanel({ siteImages, onChange, canUpload }: AdminSitePhotosPanelProps) {
+export function AdminSitePhotosPanel({
+  siteImages,
+  onChange,
+  canUpload,
+}: AdminSitePhotosPanelProps) {
   const { t } = useTranslation();
   const [busyKey, setBusyKey] = useState<string | null>(null);
 
@@ -59,7 +63,9 @@ export function AdminSitePhotosPanel({ siteImages, onChange, canUpload }: AdminS
                   <Label className="text-sm font-semibold text-foreground">
                     {t(`admin.photos.slots.${key}.title`)}
                   </Label>
-                  <p className="mt-1 text-xs text-muted-foreground">{t(`admin.photos.slots.${key}.hint`)}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {t(`admin.photos.slots.${key}.hint`)}
+                  </p>
                 </div>
               </div>
               <input
@@ -85,17 +91,27 @@ export function AdminSitePhotosPanel({ siteImages, onChange, canUpload }: AdminS
                   />
                   <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50">
                     <Upload className="h-3.5 w-3.5" />
-                    {busyKey === key ? t("admin.photos.uploadSending") : t("admin.photos.uploadPhoto")}
+                    {busyKey === key
+                      ? t("admin.photos.uploadSending")
+                      : t("admin.photos.uploadPhoto")}
                   </span>
                 </label>
                 {value ? (
-                  <Button type="button" variant="ghost" size="sm" className="h-8 gap-1 text-xs" onClick={() => setUrl(key, "")}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 gap-1 text-xs"
+                    onClick={() => setUrl(key, "")}
+                  >
                     <Trash2 className="h-3.5 w-3.5" /> {t("admin.photos.removeCustom")}
                   </Button>
                 ) : null}
               </div>
               {!canUpload ? (
-                <p className="mt-2 text-[11px] text-muted-foreground">{t("admin.photos.uploadHint")}</p>
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  {t("admin.photos.uploadHint")}
+                </p>
               ) : null}
             </div>
           );

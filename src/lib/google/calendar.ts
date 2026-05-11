@@ -61,7 +61,9 @@ export type CreateConsultationEventResult = {
   meetLink: string | null;
 };
 
-export async function createConsultationCalendarEvent(opts: CreateConsultationEventOpts): Promise<CreateConsultationEventResult> {
+export async function createConsultationCalendarEvent(
+  opts: CreateConsultationEventOpts,
+): Promise<CreateConsultationEventResult> {
   const { env, summary, description, date, time, durationMinutes, attendeeEmail } = opts;
   const startTime = normalizeTimeForApi(time);
   const endDateTime = endDateTimeWallClock(date, startTime, durationMinutes);

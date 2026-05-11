@@ -58,11 +58,7 @@ export function Header() {
           >
             {t("nav.book")}
           </Link>
-          <button
-            className="md:hidden"
-            aria-label="Menu"
-            onClick={() => setOpen((v) => !v)}
-          >
+          <button className="md:hidden" aria-label="Menu" onClick={() => setOpen((v) => !v)}>
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>

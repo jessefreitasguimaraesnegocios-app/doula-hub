@@ -90,7 +90,9 @@ export const completeBookingRequest = createServerFn({ method: "POST" })
         `Pacote: ${data.pkgLabel.trim()}`,
         `Doula: ${data.doulaLabel.trim()}`,
         `Telefone: ${data.phone.trim()}`,
-        bookingId ? `Id marcação: ${bookingId}` : "(sem registo CRM — defina SUPABASE_SERVICE_ROLE_KEY)",
+        bookingId
+          ? `Id marcação: ${bookingId}`
+          : "(sem registo CRM — defina SUPABASE_SERVICE_ROLE_KEY)",
         "",
         "Intake (JSON):",
         intakeDescriptionLines((data.intake ?? {}) as Record<string, unknown>, 6000),
@@ -123,7 +125,10 @@ export const completeBookingRequest = createServerFn({ method: "POST" })
         const msg = e instanceof Error ? e.message : String(e);
         googleError = msg;
         if (supabase && bookingId) {
-          await supabase.from("booking_requests").update({ google_sync_error: msg }).eq("id", bookingId);
+          await supabase
+            .from("booking_requests")
+            .update({ google_sync_error: msg })
+            .eq("id", bookingId);
         }
       }
     }
@@ -159,7 +164,10 @@ export const completeBookingRequest = createServerFn({ method: "POST" })
           .eq("id", bookingId);
       }
     } else if (supabase && bookingId) {
-      await supabase.from("booking_requests").update({ meet_link: meetForEmail || null }).eq("id", bookingId);
+      await supabase
+        .from("booking_requests")
+        .update({ meet_link: meetForEmail || null })
+        .eq("id", bookingId);
     }
 
     return {

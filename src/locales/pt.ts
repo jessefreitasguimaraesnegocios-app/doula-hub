@@ -24,13 +24,25 @@ const pt: Translation = {
     promiseBody:
       "Toda família merece uma presença calma e experiente ao seu lado. A gente escuta primeiro, planeja junto, e caminha com você — em casa, no hospital, e nas horas tranquilas depois.",
     pillars: {
-      one: { title: "Apoio contínuo", body: "Da gestação ao pós-parto — uma pessoa de confiança que conhece sua história." },
-      two: { title: "Baseado em evidências", body: "Doulas certificadas treinadas nas melhores práticas atuais." },
-      three: { title: "Inclusivo e acolhedor", body: "Cuidado para toda família, todo parto, toda história — sem julgamento." },
+      one: {
+        title: "Apoio contínuo",
+        body: "Da gestação ao pós-parto — uma pessoa de confiança que conhece sua história.",
+      },
+      two: {
+        title: "Baseado em evidências",
+        body: "Doulas certificadas treinadas nas melhores práticas atuais.",
+      },
+      three: {
+        title: "Inclusivo e acolhedor",
+        body: "Cuidado para toda família, todo parto, toda história — sem julgamento.",
+      },
     },
     stepsTitle: "Como funciona",
     steps: {
-      one: { title: "Consulta gratuita", body: "Uma chamada de vídeo de 30 minutos para nos conhecermos." },
+      one: {
+        title: "Consulta gratuita",
+        body: "Uma chamada de vídeo de 30 minutos para nos conhecermos.",
+      },
       two: { title: "Escolha seu pacote", body: "Escolha o apoio que combina com sua família." },
       three: { title: "Conheça sua doula", body: "Te conectamos com a doula certa para você." },
       four: { title: "Estamos com você", body: "Da gestação ao pós-parto, em cada passo." },
@@ -39,13 +51,18 @@ const pt: Translation = {
   },
   about: {
     title: "Olá, sou Raquel Manini.",
-    body:
-      "Sou a Raquel Manini, fundadora da All Things Babies. Acredito que toda pessoa que dá à luz merece uma companhia calma e informada — e lidero uma equipe pequena de doulas certificadas que compartilham essa visão: você é a especialista do seu corpo.\n\nTenho 9 anos de experiência como doula de parto e 11 como doula pós-parto. Sou certificada ProDoula em parto e em cuidados pós-parto e com bebês, com formação pela Doulas By The Bay (setembro de 2019). Prática individual, com cerca de 1 a 4 partos e 1 a 4 famílias no pós-parto por mês.\n\nAtendo em hospitais, centros de parto e em domicílio — e também ofereço doula virtual e remota.\n\nEntre os cuidados complementares estão acupressão, aromaterapia, educação para o parto e uso de sling, primeiros socorros e RCP, lactação, apoio em perdas, natimorto e aborto espontâneo, pós-parto noturno, gêmeos e múltiplos, consultoria de sono, massagem pré/pós-natal, fotografia de nascimento, maternidade e recém-nascido e apoio a famílias militares — sempre do jeito que faz sentido para a sua família.",
+    body: "Sou a Raquel Manini, fundadora da All Things Babies. Acredito que toda pessoa que dá à luz merece uma companhia calma e informada — e lidero uma equipe pequena de doulas certificadas que compartilham essa visão: você é a especialista do seu corpo.\n\nTenho 9 anos de experiência como doula de parto e 11 como doula pós-parto. Sou certificada ProDoula em parto e em cuidados pós-parto e com bebês, com formação pela Doulas By The Bay (setembro de 2019). Prática individual, com cerca de 1 a 4 partos e 1 a 4 famílias no pós-parto por mês.\n\nAtendo em hospitais, centros de parto e em domicílio — e também ofereço doula virtual e remota.\n\nEntre os cuidados complementares estão acupressão, aromaterapia, educação para o parto e uso de sling, primeiros socorros e RCP, lactação, apoio em perdas, natimorto e aborto espontâneo, pós-parto noturno, gêmeos e múltiplos, consultoria de sono, massagem pré/pós-natal, fotografia de nascimento, maternidade e recém-nascido e apoio a famílias militares — sempre do jeito que faz sentido para a sua família.",
     valuesTitle: "No que acreditamos",
     values: {
-      one: { title: "Presença, não performance", body: "A gente não tem pressa. A gente está com você." },
+      one: {
+        title: "Presença, não performance",
+        body: "A gente não tem pressa. A gente está com você.",
+      },
       two: { title: "Escolha informada", body: "Conhecimento é poder. Damos os dois." },
-      three: { title: "Sabedoria do corpo", body: "Seu instinto é real. Te ajudamos a confiar nele." },
+      three: {
+        title: "Sabedoria do corpo",
+        body: "Seu instinto é real. Te ajudamos a confiar nele.",
+      },
     },
     certsTitle: "Certificações e formação",
     certs: [
@@ -57,20 +74,33 @@ const pt: Translation = {
   },
   services: {
     title: "Cuidado que te encontra onde você está",
-    subtitle: "Escolha o pacote que combina com sua família. Combinações personalizadas são bem-vindas.",
+    subtitle:
+      "Escolha o pacote que combina com sua família. Combinações personalizadas são bem-vindas.",
     bookCta: "Contratar este pacote",
     items: {
       birth: {
         name: "Pacote Doula de Parto",
         price: "R$ 19.000",
         body: "Três visitas pré-natais, apoio contínuo no parto e duas visitas pós-parto.",
-        features: ["Suporte ilimitado por mensagem e ligação", "Plano de parto", "Apoio contínuo no trabalho de parto", "Duas visitas pós-parto", "Orientação de amamentação"],
+        features: [
+          "Suporte ilimitado por mensagem e ligação",
+          "Plano de parto",
+          "Apoio contínuo no trabalho de parto",
+          "Duas visitas pós-parto",
+          "Orientação de amamentação",
+        ],
       },
       postpartum: {
         name: "Cuidado Pós-parto",
         price: "R$ 465/h",
         body: "Cuidado diurno ou noturno durante o quarto trimestre.",
-        features: ["Cuidados com o recém-nascido", "Apoio à amamentação", "Preparo de refeições leves", "Apoio emocional", "Cuidado com irmãos"],
+        features: [
+          "Cuidados com o recém-nascido",
+          "Apoio à amamentação",
+          "Preparo de refeições leves",
+          "Apoio emocional",
+          "Cuidado com irmãos",
+        ],
       },
       bereavement: {
         name: "Doula de Luto Perinatal",
@@ -82,18 +112,26 @@ const pt: Translation = {
         name: "Visita de Lactação",
         price: "R$ 950",
         body: "Apoio em casa ou online para amamentação tranquila.",
-        features: ["Avaliação da pega", "Plano alimentar", "Orientação com bomba", "Acompanhamento"],
+        features: [
+          "Avaliação da pega",
+          "Plano alimentar",
+          "Orientação com bomba",
+          "Acompanhamento",
+        ],
       },
     },
   },
   team: {
     title: "As mãos que te seguram",
-    subtitle: "Uma equipe pequena e certificada — escolhida pelo carinho e dedicação à sua história.",
+    subtitle:
+      "Uma equipe pequena e certificada — escolhida pelo carinho e dedicação à sua história.",
     specialties: "Especialidades",
     languages: "Idiomas",
     scheduleVideoCall: "Agendar videochamada",
-    schedulePopupBlocked: "O navegador bloqueou a janela. Permita pop-ups para este site e tente de novo.",
-    scheduleUrlMissing: "Ainda não há link do agendador. Defina o URL da videochamada nas configurações do site (admin) ou tente mais tarde.",
+    schedulePopupBlocked:
+      "O navegador bloqueou a janela. Permita pop-ups para este site e tente de novo.",
+    scheduleUrlMissing:
+      "Ainda não há link do agendador. Defina o URL da videochamada nas configurações do site (admin) ou tente mais tarde.",
     contractedRole: "Doula da equipa",
     contractedBioFallback: "Membro da nossa equipa de apoio.",
     founder: {
@@ -155,7 +193,8 @@ const pt: Translation = {
     doulaAny: "Encontrar a doula ideal para mim",
     intake: {
       fillRequired: "Preencha todos os campos obrigatórios.",
-      fillRequiredDetail: "Ainda falta: {{fields}}. (Telefone: 10 dígitos no formato EUA; data: MM/DD/AAAA completa.)",
+      fillRequiredDetail:
+        "Ainda falta: {{fields}}. (Telefone: 10 dígitos no formato EUA; data: MM/DD/AAAA completa.)",
       fullName: "Nome e sobrenome",
       email: "Endereço de e-mail",
       phone: "Número de telefone",
@@ -174,7 +213,8 @@ const pt: Translation = {
       streetNumberPh: "ex.: 120, Apto 402",
       supportType: "Que tipo de suporte você procura?",
       supportOpenPick: "Toque para escolher um ou mais…",
-      supportDialogTitle: "Que tipo de suporte você precisa? Marque todos que quiser e toque em OK.",
+      supportDialogTitle:
+        "Que tipo de suporte você precisa? Marque todos que quiser e toque em OK.",
       supportConfirm: "OK",
       supportCancel: "Cancelar",
       selectPlaceholder: "Selecionar",

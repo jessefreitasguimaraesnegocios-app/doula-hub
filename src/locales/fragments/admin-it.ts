@@ -38,7 +38,8 @@ const admin: AdminLocale = {
     introThen: "Poi apri",
     introView: "Vedi il sito",
     introEnd: "per vedere il risultato.",
-    footnoteSupabase: "Con la sessione, Salva invia tutto anche online (oltre a questo dispositivo).",
+    footnoteSupabase:
+      "Con la sessione, Salva invia tutto anche online (oltre a questo dispositivo).",
     footnoteLocal: "Senza sessione online, Salva mantiene le modifiche solo su questo computer.",
     save: "Salva modifiche",
     viewSite: "Vedi il sito",
@@ -67,7 +68,8 @@ const admin: AdminLocale = {
     title: "Prenotazioni consulto (mini CRM)",
     subtitle:
       "Ogni prenotazione completata sul sito compare qui se il server ha SUPABASE_SERVICE_ROLE_KEY. Google Calendar + Meet si creano automaticamente con le variabili Google (vedi documentazione). L’email di conferma usa ancora SMTP se abilitato in Salva modifiche.",
-    empty: "Nessuna prenotazione — oppure Supabase non configurato / manca la service role key sul server.",
+    empty:
+      "Nessuna prenotazione — oppure Supabase non configurato / manca la service role key sul server.",
     loadError: "Impossibile caricare le prenotazioni.",
     colWhen: "Quando",
     colClient: "Cliente",
@@ -126,11 +128,23 @@ const admin: AdminLocale = {
         title: "Team e prenotazione — foto fondatrice",
         hint: "Scheda fondatrice e passo “chi” nella prenotazione.",
       },
-      team_member_sofia: { title: "Team e prenotazione — Sofia", hint: "Scheda e scelta in prenotazione." },
-      team_member_elena: { title: "Team e prenotazione — Elena", hint: "Scheda e scelta in prenotazione." },
-      team_member_mei: { title: "Team e prenotazione — Mei", hint: "Scheda e scelta in prenotazione." },
+      team_member_sofia: {
+        title: "Team e prenotazione — Sofia",
+        hint: "Scheda e scelta in prenotazione.",
+      },
+      team_member_elena: {
+        title: "Team e prenotazione — Elena",
+        hint: "Scheda e scelta in prenotazione.",
+      },
+      team_member_mei: {
+        title: "Team e prenotazione — Mei",
+        hint: "Scheda e scelta in prenotazione.",
+      },
       shop_hero: { title: "Negozio — fascia in alto", hint: "Fascia in cima al Negozio." },
-      footer_logo: { title: "Piè di pagina — logo", hint: "Piccola icona accanto al nome nel piè di pagina." },
+      footer_logo: {
+        title: "Piè di pagina — logo",
+        hint: "Piccola icona accanto al nome nel piè di pagina.",
+      },
     },
     toastSaveTop: "Foto caricata. Tocca Salva modifiche in alto.",
   },
@@ -271,9 +285,11 @@ const admin: AdminLocale = {
     step3Title: "3. Variabili sul server (Vercel o .env locale)",
     step3SmtpUser: "Indirizzo Gmail (es.: nome@gmail.com). Nome alternativo: EMAIL_USER.",
     step3SmtpPass: "Password app. Alternativa: EMAIL_PASS.",
-    step3ActionSecret: "Password che scegli solo per sbloccare il test sotto (non quella di Gmail).",
+    step3ActionSecret:
+      "Password che scegli solo per sbloccare il test sotto (non quella di Gmail).",
     step3FromName: "Nome mittente (facoltativo).",
-    step3NotifyTo: "Dove vanno i messaggi del modulo contatti (facoltativo; se vuoto, uguale a SMTP_USER).",
+    step3NotifyTo:
+      "Dove vanno i messaggi del modulo contatti (facoltativo; se vuoto, uguale a SMTP_USER).",
     step3HostPort:
       "SMTP_HOST (facoltativo, predefinito smtp.gmail.com), SMTP_PORT (587), SMTP_SECURE (true solo se l’host richiede SSL su porta dedicata).",
     step3Disable: "DISABLE_SMTP_SENDS=1 — disattiva tutti gli invii in emergenza.",

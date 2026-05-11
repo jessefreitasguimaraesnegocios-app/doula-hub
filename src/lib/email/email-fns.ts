@@ -23,12 +23,14 @@ export const sendSmtpTestEmail = createServerFn({ method: "POST" })
     if (data.actionSecret !== expected) {
       return { ok: false, error: "Chave de ação incorreta." };
     }
-    const { readSmtpEnv, buildSmtpTestMail, resolveFromHeader, sendHtmlMail } = await import("./smtp-mail");
+    const { readSmtpEnv, buildSmtpTestMail, resolveFromHeader, sendHtmlMail } =
+      await import("./smtp-mail");
     const cfg = readSmtpEnv();
     if (!cfg) {
       return {
         ok: false,
-        error: "SMTP_USER / SMTP_PASS (ou EMAIL_USER / EMAIL_PASS) não estão definidos no servidor.",
+        error:
+          "SMTP_USER / SMTP_PASS (ou EMAIL_USER / EMAIL_PASS) não estão definidos no servidor.",
       };
     }
     try {
@@ -69,7 +71,8 @@ export async function sendBookingConfirmationEmailImpl(
   if (process.env.DISABLE_SMTP_SENDS === "1") {
     return { ok: true, skipped: true };
   }
-  const { buildBookingConfirmationMail, readSmtpEnv, resolveFromHeader, sendHtmlMail } = await import("./smtp-mail");
+  const { buildBookingConfirmationMail, readSmtpEnv, resolveFromHeader, sendHtmlMail } =
+    await import("./smtp-mail");
   const cfg = readSmtpEnv();
   if (!cfg) {
     return { ok: true, skipped: true };
@@ -115,33 +118,36 @@ const contactInput = z.object({
 
 export const sendContactInquiryEmail = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => contactInput.parse(raw))
-  .handler(async ({ data }): Promise<{ ok: true; skipped?: boolean } | { ok: false; error: string }> => {
-    if (process.env.DISABLE_SMTP_SENDS === "1") {
-      return { ok: true, skipped: true };
-    }
-    const { buildContactNotifyMail, readSmtpEnv, resolveFromHeader, sendHtmlMail } = await import("./smtp-mail");
-    const cfg = readSmtpEnv();
-    if (!cfg) {
-      return { ok: true, skipped: true };
-    }
-    try {
-      const { subject, html } = buildContactNotifyMail({
-        locale: data.locale,
-        name: data.name,
-        email: data.email,
-        phone: data.phone ?? "",
-        message: data.message,
-      });
-      await sendHtmlMail(cfg, {
-        from: resolveFromHeader(cfg, data.fromDisplayName),
-        to: cfg.notifyTo,
-        replyTo: data.email,
-        subject,
-        html,
-      });
-      return { ok: true };
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      return { ok: false, error: msg };
-    }
-  });
+  .handler(
+    async ({ data }): Promise<{ ok: true; skipped?: boolean } | { ok: false; error: string }> => {
+      if (process.env.DISABLE_SMTP_SENDS === "1") {
+        return { ok: true, skipped: true };
+      }
+      const { buildContactNotifyMail, readSmtpEnv, resolveFromHeader, sendHtmlMail } =
+        await import("./smtp-mail");
+      const cfg = readSmtpEnv();
+      if (!cfg) {
+        return { ok: true, skipped: true };
+      }
+      try {
+        const { subject, html } = buildContactNotifyMail({
+          locale: data.locale,
+          name: data.name,
+          email: data.email,
+          phone: data.phone ?? "",
+          message: data.message,
+        });
+        await sendHtmlMail(cfg, {
+          from: resolveFromHeader(cfg, data.fromDisplayName),
+          to: cfg.notifyTo,
+          replyTo: data.email,
+          subject,
+          html,
+        });
+        return { ok: true };
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        return { ok: false, error: msg };
+      }
+    },
+  );

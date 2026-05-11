@@ -15,7 +15,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { uploadSiteCmsAsset } from "@/lib/supabase/queries";
 import type { ContractedDoula, ContractedDoulaStatus, SiteCmsV1 } from "@/lib/site-cms";
@@ -42,7 +48,11 @@ const emptyForm: Omit<ContractedDoula, "id"> = {
   visibleOnSite: false,
 };
 
-export function AdminContractedDoulasPanel({ list, onChange, canUpload }: AdminContractedDoulasPanelProps) {
+export function AdminContractedDoulasPanel({
+  list,
+  onChange,
+  canUpload,
+}: AdminContractedDoulasPanelProps) {
   const { t } = useTranslation();
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -146,7 +156,9 @@ export function AdminContractedDoulasPanel({ list, onChange, canUpload }: AdminC
       <p className="text-sm text-muted-foreground">{t("admin.contracted.intro")}</p>
 
       <div>
-        <h3 className="font-serif text-lg text-foreground">{t("admin.contracted.badgesTitle", { count: list.length })}</h3>
+        <h3 className="font-serif text-lg text-foreground">
+          {t("admin.contracted.badgesTitle", { count: list.length })}
+        </h3>
         {list.length === 0 ? (
           <p className="mt-3 text-sm text-muted-foreground">{t("admin.contracted.badgesEmpty")}</p>
         ) : (
@@ -161,22 +173,37 @@ export function AdminContractedDoulasPanel({ list, onChange, canUpload }: AdminC
                     {p.photoUrl.trim() ? (
                       <img src={p.photoUrl.trim()} alt="" className="h-full w-full object-cover" />
                     ) : (
-                      <div className="grid h-full w-full place-items-center font-serif text-3xl text-primary/40">✦</div>
+                      <div className="grid h-full w-full place-items-center font-serif text-3xl text-primary/40">
+                        ✦
+                      </div>
                     )}
                   </div>
                 </div>
-                <p className="mt-4 max-w-full truncate px-1 font-serif text-lg text-foreground">{p.name || "—"}</p>
+                <p className="mt-4 max-w-full truncate px-1 font-serif text-lg text-foreground">
+                  {p.name || "—"}
+                </p>
                 {p.monthlyFeeDisplay.trim() ? (
-                  <p className="mt-1 text-xs font-medium text-primary">{p.monthlyFeeDisplay.trim()}</p>
+                  <p className="mt-1 text-xs font-medium text-primary">
+                    {p.monthlyFeeDisplay.trim()}
+                  </p>
                 ) : (
-                  <p className="mt-1 text-xs text-muted-foreground">{t("admin.contracted.noMonthlyFee")}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {t("admin.contracted.noMonthlyFee")}
+                  </p>
                 )}
                 <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
                   <Badge variant={p.status === "active" ? "default" : "secondary"}>
-                    {p.status === "active" ? t("admin.contracted.active") : t("admin.contracted.paused")}
+                    {p.status === "active"
+                      ? t("admin.contracted.active")
+                      : t("admin.contracted.paused")}
                   </Badge>
-                  <Badge variant={p.visibleOnSite ? "outline" : "secondary"} className="border-primary/30">
-                    {p.visibleOnSite ? t("admin.contracted.visibleOnSite") : t("admin.contracted.panelOnly")}
+                  <Badge
+                    variant={p.visibleOnSite ? "outline" : "secondary"}
+                    className="border-primary/30"
+                  >
+                    {p.visibleOnSite
+                      ? t("admin.contracted.visibleOnSite")
+                      : t("admin.contracted.panelOnly")}
                   </Badge>
                 </div>
 
@@ -188,11 +215,15 @@ export function AdminContractedDoulasPanel({ list, onChange, canUpload }: AdminC
                     <Switch
                       id={`vis-${p.id}`}
                       checked={p.visibleOnSite}
-                      onCheckedChange={(checked) => patch(p.id, { visibleOnSite: Boolean(checked) })}
+                      onCheckedChange={(checked) =>
+                        patch(p.id, { visibleOnSite: Boolean(checked) })
+                      }
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs text-muted-foreground">{t("admin.contracted.statusLabel")}</Label>
+                    <Label className="text-xs text-muted-foreground">
+                      {t("admin.contracted.statusLabel")}
+                    </Label>
                     <Select
                       value={p.status}
                       onValueChange={(v) => patch(p.id, { status: v as ContractedDoulaStatus })}
@@ -209,7 +240,13 @@ export function AdminContractedDoulasPanel({ list, onChange, canUpload }: AdminC
                 </div>
 
                 <div className="mt-4 flex w-full flex-wrap justify-center gap-2">
-                  <Button type="button" variant="outline" size="sm" className="h-8 gap-1 rounded-full text-xs" onClick={() => startEdit(p)}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 gap-1 rounded-full text-xs"
+                    onClick={() => startEdit(p)}
+                  >
                     <Pencil className="h-3 w-3" /> {t("admin.contracted.edit")}
                   </Button>
                   <Button
@@ -229,7 +266,9 @@ export function AdminContractedDoulasPanel({ list, onChange, canUpload }: AdminC
       </div>
 
       <div ref={formRef} className="rounded-2xl border border-border bg-muted/20 p-5">
-        <h3 className="font-serif text-lg text-foreground">{editingId ? t("admin.contracted.editTitle") : t("admin.contracted.addTitle")}</h3>
+        <h3 className="font-serif text-lg text-foreground">
+          {editingId ? t("admin.contracted.editTitle") : t("admin.contracted.addTitle")}
+        </h3>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div className="space-y-2 sm:col-span-2">
             <Label>{t("admin.contracted.name")}</Label>
@@ -281,7 +320,9 @@ export function AdminContractedDoulasPanel({ list, onChange, canUpload }: AdminC
               <Switch
                 id="form-visible"
                 checked={form.visibleOnSite}
-                onCheckedChange={(checked) => setForm((f) => ({ ...f, visibleOnSite: Boolean(checked) }))}
+                onCheckedChange={(checked) =>
+                  setForm((f) => ({ ...f, visibleOnSite: Boolean(checked) }))
+                }
               />
               <Label htmlFor="form-visible" className="text-sm">
                 {t("admin.contracted.visibleLabel")}
@@ -289,7 +330,12 @@ export function AdminContractedDoulasPanel({ list, onChange, canUpload }: AdminC
             </div>
             <div className="space-y-1.5 sm:w-48">
               <Label className="text-xs">{t("admin.contracted.statusLabel")}</Label>
-              <Select value={form.status} onValueChange={(v) => setForm((f) => ({ ...f, status: v as ContractedDoulaStatus }))}>
+              <Select
+                value={form.status}
+                onValueChange={(v) =>
+                  setForm((f) => ({ ...f, status: v as ContractedDoulaStatus }))
+                }
+              >
                 <SelectTrigger className="rounded-xl">
                   <SelectValue />
                 </SelectTrigger>
@@ -323,7 +369,9 @@ export function AdminContractedDoulasPanel({ list, onChange, canUpload }: AdminC
                 />
                 <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:opacity-50">
                   <Upload className="h-3.5 w-3.5" />
-                  {photoBusy ? t("admin.contracted.uploadSending") : t("admin.contracted.uploadPhoto")}
+                  {photoBusy
+                    ? t("admin.contracted.uploadSending")
+                    : t("admin.contracted.uploadPhoto")}
                 </span>
               </label>
             </div>
@@ -353,13 +401,14 @@ export function AdminContractedDoulasPanel({ list, onChange, canUpload }: AdminC
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t("admin.contracted.deleteTitle")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("admin.contracted.deleteBody")}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t("admin.contracted.deleteBody")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("admin.contracted.cancel")}</AlertDialogCancel>
-            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={confirmDelete}>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={confirmDelete}
+            >
               {t("admin.contracted.confirmDelete")}
             </AlertDialogAction>
           </AlertDialogFooter>

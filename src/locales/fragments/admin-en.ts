@@ -12,7 +12,8 @@ const admin = {
     backToSite: "Back to the site",
   },
   toast: {
-    defineViteAdminPassword: "Set VITE_ADMIN_PASSWORD in .env (local) or on Vercel. Restart the dev server after changing it.",
+    defineViteAdminPassword:
+      "Set VITE_ADMIN_PASSWORD in .env (local) or on Vercel. Restart the dev server after changing it.",
     sessionStarted: "Signed in.",
     wrongPassword: "Incorrect password.",
     supabaseNotConfigured: "Supabase is not configured.",
@@ -35,7 +36,8 @@ const admin = {
     introThen: "Then open",
     introView: "View site",
     introEnd: "to see how it looks.",
-    footnoteSupabase: "With your session, Save also sends everything online (in addition to this device).",
+    footnoteSupabase:
+      "With your session, Save also sends everything online (in addition to this device).",
     footnoteLocal: "Without an online session, Save keeps changes only on this computer.",
     save: "Save changes",
     viewSite: "View site",
@@ -64,7 +66,8 @@ const admin = {
     title: "Consultation bookings (mini CRM)",
     subtitle:
       "Each finished booking on the site appears here when the server has SUPABASE_SERVICE_ROLE_KEY. Google Calendar + Meet are created automatically when Google env vars are set (see project docs). Client confirmation e-mail still uses SMTP when enabled in Save changes.",
-    empty: "No bookings yet — or Supabase is not configured / service role key missing on the server.",
+    empty:
+      "No bookings yet — or Supabase is not configured / service role key missing on the server.",
     loadError: "Could not load bookings.",
     colWhen: "When",
     colClient: "Client",
@@ -83,13 +86,15 @@ const admin = {
   },
   photos: {
     title: "Site photos",
-    subtitle: "Swap images without touching code. Shop product photos stay in the database or shop file — here it is mainly main pages and team.",
+    subtitle:
+      "Swap images without touching code. Shop product photos stay in the database or shop file — here it is mainly main pages and team.",
     intro:
       "Paste an image URL (starts with https) or, if the site is connected to the internet, use Upload photo. Leave blank to restore the site’s original image.",
     uploadSending: "Uploading…",
     uploadPhoto: "Upload photo",
     removeCustom: "Remove custom image",
-    uploadHint: "Direct upload from your computer only works when you are signed in and online. You can always paste an https link.",
+    uploadHint:
+      "Direct upload from your computer only works when you are signed in and online. You can always paste an https link.",
     uploadFail: "Could not upload the photo.",
     urlPlaceholder: "https://…",
     slots: {
@@ -156,7 +161,8 @@ const admin = {
     primaryLabel: "Main button color",
     sampleButton: "Sample button",
     fgSection: "Text color on buttons",
-    fgHint: "Only changes the lettering (for contrast on your chosen color). Tap a swatch or use the square on the right.",
+    fgHint:
+      "Only changes the lettering (for contrast on your chosen color). Tap a swatch or use the square on the right.",
     fgCustomLabel: "Another text color",
     fgAriaPrimary: "Custom primary color",
     fgAriaText: "Text color on primary",
@@ -207,7 +213,8 @@ const admin = {
   },
   prices: {
     title: "Service prices",
-    subtitle: "Only on English and Spanish does the site show these dollar ($) prices. Leave blank to use the default site text.",
+    subtitle:
+      "Only on English and Spanish does the site show these dollar ($) prices. Leave blank to use the default site text.",
     birth: "Birth (e.g. $3,800)",
     postpartum: "Postpartum (e.g. $95/hr)",
     lactation: "Lactation (e.g. $195)",
@@ -222,7 +229,8 @@ const admin = {
   },
   shop: {
     title: "Shop",
-    intro: "Products and shop photos are managed in the database or by your developer. There are no product buttons here — contact whoever maintains the site to change items or images.",
+    intro:
+      "Products and shop photos are managed in the database or by your developer. There are no product buttons here — contact whoever maintains the site to change items or images.",
     comingSoonTitle: "“Coming soon” message on Shop",
     comingSoonBody:
       "When enabled, a warm notice appears in the center (blurred background). Visitors can hide it only for that moment; if they leave Shop, close the tab, or come back later, it shows again until you turn it off here. If title or message are blank, the site uses the built-in translations per language.",
@@ -234,7 +242,8 @@ const admin = {
   },
   doulasDb: {
     title: "Team (photos & Stripe)",
-    subtitle: "For each person: you can upload a photo and, if your developer asked, paste the Stripe account ID.",
+    subtitle:
+      "For each person: you can upload a photo and, if your developer asked, paste the Stripe account ID.",
     loginPrompt: "Sign in with your email and password to see the team here.",
     loading: "Loading…",
     empty: "No one in the database yet. Ask your site developer to add the team.",
@@ -267,8 +276,7 @@ const admin = {
     step3ActionSecret:
       "A password you choose only to unlock the test below (not your Gmail password).",
     step3FromName: "Sender display name (optional).",
-    step3NotifyTo:
-      "Where contact form messages go (optional; if empty, same as SMTP_USER).",
+    step3NotifyTo: "Where contact form messages go (optional; if empty, same as SMTP_USER).",
     step3HostPort:
       "SMTP_HOST (optional, default smtp.gmail.com), SMTP_PORT (587), SMTP_SECURE (true only if your host requires SSL on a dedicated port).",
     step3Disable: "DISABLE_SMTP_SENDS=1 — disables all sends in an emergency.",

@@ -6,7 +6,12 @@ import { useTranslation } from "react-i18next";
 import { Video } from "lucide-react";
 import { toast } from "sonner";
 import { useSiteCms } from "@/hooks/use-site-cms";
-import { DEFAULT_TEAM_SCHEDULE_URL, pickSiteImageUrl, type SiteCmsV1, type SiteImageKey } from "@/lib/site-cms";
+import {
+  DEFAULT_TEAM_SCHEDULE_URL,
+  pickSiteImageUrl,
+  type SiteCmsV1,
+  type SiteImageKey,
+} from "@/lib/site-cms";
 import { asStringArray, fetchPublishedDoulas, type DoulaRow } from "@/lib/supabase/queries";
 import raquelTeam from "@/assets/team-imani.png";
 import d2 from "@/assets/doula-2.jpg";
@@ -44,7 +49,10 @@ export const Route = createFileRoute("/team")({
   head: () => ({
     meta: [
       { title: "Our Doulas — All Things Babies" },
-      { name: "description", content: "Meet our team of certified doulas — warm, experienced, inclusive." },
+      {
+        name: "description",
+        content: "Meet our team of certified doulas — warm, experienced, inclusive.",
+      },
       { property: "og:title", content: "Our Doulas — All Things Babies" },
       { property: "og:description", content: "The hands that hold you." },
       { property: "og:image", content: teamHero },
@@ -74,7 +82,12 @@ const BUNDLED_IMG: Record<string, string> = {
   mei: d4,
 };
 
-function resolveTeamMemberPhoto(cms: SiteCmsV1, slug: string, dbPhoto: string | null | undefined, bundledFallback: string): string {
+function resolveTeamMemberPhoto(
+  cms: SiteCmsV1,
+  slug: string,
+  dbPhoto: string | null | undefined,
+  bundledFallback: string,
+): string {
   const key = `team_member_${slug}` as SiteImageKey;
   return pickSiteImageUrl(cms, key, dbPhoto?.trim() || bundledFallback);
 }
@@ -190,7 +203,9 @@ function Team() {
 
   const cards = useMemo(() => {
     const base =
-      remoteDoulas && remoteDoulas.length > 0 ? teamCardsFromDb(remoteDoulas, cms) : staticTeamCards(cms);
+      remoteDoulas && remoteDoulas.length > 0
+        ? teamCardsFromDb(remoteDoulas, cms)
+        : staticTeamCards(cms);
     const fromContracted: TeamCardModel[] = cms.contractedDoulas
       .filter((c) => c.visibleOnSite && c.status === "active" && c.name.trim())
       .map((c) => ({
@@ -214,7 +229,13 @@ function Team() {
   return (
     <div>
       <section className="relative h-[40vh] min-h-[320px] overflow-hidden">
-        <img src={teamHeroSrc} alt="" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
+        <img
+          src={teamHeroSrc}
+          alt=""
+          width={1920}
+          height={1080}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
         <div className="absolute inset-0 bg-linear-to-t from-background via-background/60 to-background/20" />
         <div className="relative mx-auto flex h-full max-w-4xl flex-col items-center justify-end px-6 pb-12 text-center">
           <h1 className="font-serif text-5xl text-foreground md:text-6xl">{t("team.title")}</h1>
@@ -243,7 +264,10 @@ function Team() {
                   };
 
             return (
-              <article key={m.key} className="group rounded-[2rem] bg-card p-6 shadow-(--shadow-soft) transition hover:shadow-(--shadow-warm)">
+              <article
+                key={m.key}
+                className="group rounded-[2rem] bg-card p-6 shadow-(--shadow-soft) transition hover:shadow-(--shadow-warm)"
+              >
                 <div className="overflow-hidden rounded-[1.5rem]">
                   <img
                     src={m.img}
@@ -257,15 +281,22 @@ function Team() {
                 <div className="px-2 pt-6 pb-2">
                   <p className="font-serif text-2xl text-foreground">{content.name}</p>
                   <p className="text-sm text-clay">{content.role}</p>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{content.bio}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                    {content.bio}
+                  </p>
                   {(content.specs.length > 0 || content.langs.length > 0) && (
                     <div className="mt-5 grid gap-3 text-xs">
                       {content.specs.length > 0 ? (
                         <div>
-                          <p className="uppercase tracking-widest text-foreground/50">{t("team.specialties")}</p>
+                          <p className="uppercase tracking-widest text-foreground/50">
+                            {t("team.specialties")}
+                          </p>
                           <div className="mt-2 flex flex-wrap gap-1.5">
                             {content.specs.map((s) => (
-                              <span key={s} className="rounded-full bg-sage/30 px-3 py-1 text-foreground/80">
+                              <span
+                                key={s}
+                                className="rounded-full bg-sage/30 px-3 py-1 text-foreground/80"
+                              >
                                 {s}
                               </span>
                             ))}
@@ -274,7 +305,9 @@ function Team() {
                       ) : null}
                       {content.langs.length > 0 ? (
                         <div>
-                          <p className="uppercase tracking-widest text-foreground/50">{t("team.languages")}</p>
+                          <p className="uppercase tracking-widest text-foreground/50">
+                            {t("team.languages")}
+                          </p>
                           <p className="mt-1.5 text-foreground/80">{content.langs.join(" · ")}</p>
                         </div>
                       ) : null}
@@ -282,7 +315,9 @@ function Team() {
                   )}
                   <button
                     type="button"
-                    onClick={() => openZoomSchedulerPopup(scheduleUrlForCard(m, cms.teamDefaultScheduleUrl), t)}
+                    onClick={() =>
+                      openZoomSchedulerPopup(scheduleUrlForCard(m, cms.teamDefaultScheduleUrl), t)
+                    }
                     className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary bg-primary px-5 py-3.5 text-sm font-medium text-primary-foreground shadow-(--shadow-soft) transition hover:bg-primary/90"
                   >
                     <Video className="h-4 w-4 shrink-0" aria-hidden />

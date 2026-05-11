@@ -78,11 +78,21 @@ function Shop() {
               {t("shop.soon")}
               <Sparkles className="h-3.5 w-3.5" aria-hidden />
             </p>
-            <h2 id="shop-coming-soon-title" className="mt-3 font-serif text-2xl leading-snug text-foreground md:text-3xl">
+            <h2
+              id="shop-coming-soon-title"
+              className="mt-3 font-serif text-2xl leading-snug text-foreground md:text-3xl"
+            >
               {comingSoonTitle}
             </h2>
-            <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{comingSoonBody}</p>
-            <Button type="button" variant="outline" className="mt-8 rounded-full px-6" onClick={dismissComingSoon}>
+            <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+              {comingSoonBody}
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-8 rounded-full px-6"
+              onClick={dismissComingSoon}
+            >
               {t("shop.comingSoon.dismiss")}
             </Button>
           </div>
@@ -90,7 +100,13 @@ function Shop() {
       ) : null}
 
       <section className="relative h-[40vh] min-h-[300px] overflow-hidden">
-        <img src={heroSrc} alt="" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
+        <img
+          src={heroSrc}
+          alt=""
+          width={1920}
+          height={1080}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
         <div className="absolute inset-0 bg-linear-to-t from-background via-background/40 to-transparent" />
         <div className="relative mx-auto flex h-full max-w-4xl flex-col items-start justify-end px-6 pb-12">
           <h1 className="font-serif text-5xl text-foreground md:text-6xl">{t("shop.title")}</h1>
@@ -114,7 +130,9 @@ function Shop() {
               </div>
               <div className="mt-4 flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{p.tag}</p>
+                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                    {p.tag}
+                  </p>
                   <p className="mt-0.5 font-serif text-lg text-foreground">{p.name}</p>
                 </div>
                 <p className="font-serif text-lg text-primary">{p.price}</p>

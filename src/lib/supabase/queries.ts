@@ -53,7 +53,11 @@ export function mapShopRowToProduct(row: ShopProductRow): ShopProduct {
 export async function fetchSiteSettingsPayload(): Promise<unknown | null> {
   const client = getSupabaseBrowserClient();
   if (!client) return null;
-  const { data, error } = await client.from("site_settings").select("payload").eq("id", "main").maybeSingle();
+  const { data, error } = await client
+    .from("site_settings")
+    .select("payload")
+    .eq("id", "main")
+    .maybeSingle();
   if (error) {
     console.error("[supabase] site_settings", error);
     return null;
@@ -61,13 +65,14 @@ export async function fetchSiteSettingsPayload(): Promise<unknown | null> {
   return data?.payload ?? null;
 }
 
-export async function upsertSiteSettingsPayload(payload: SiteCmsV1): Promise<{ error: Error | null }> {
+export async function upsertSiteSettingsPayload(
+  payload: SiteCmsV1,
+): Promise<{ error: Error | null }> {
   const client = getSupabaseBrowserClient();
   if (!client) return { error: new Error("Supabase não configurado") };
-  const { error } = await client.from("site_settings").upsert(
-    { id: "main", payload, updated_at: new Date().toISOString() },
-    { onConflict: "id" },
-  );
+  const { error } = await client
+    .from("site_settings")
+    .upsert({ id: "main", payload, updated_at: new Date().toISOString() }, { onConflict: "id" });
   return { error: error ? new Error(error.message) : null };
 }
 
@@ -104,26 +109,40 @@ export async function fetchAllDoulasForAdmin(): Promise<DoulaRow[] | null> {
   return (data ?? []) as DoulaRow[];
 }
 
-export async function updateDoulaStripeAccount(id: string, stripe_account_id: string): Promise<{ error: Error | null }> {
+export async function updateDoulaStripeAccount(
+  id: string,
+  stripe_account_id: string,
+): Promise<{ error: Error | null }> {
   const client = getSupabaseBrowserClient();
   if (!client) return { error: new Error("Supabase não configurado") };
-  const { error } = await client.from("doulas").update({ stripe_account_id: stripe_account_id.trim() || null }).eq("id", id);
+  const { error } = await client
+    .from("doulas")
+    .update({ stripe_account_id: stripe_account_id.trim() || null })
+    .eq("id", id);
   return { error: error ? new Error(error.message) : null };
 }
 
-export async function updateDoulaPhotoUrl(id: string, photo_url: string): Promise<{ error: Error | null }> {
+export async function updateDoulaPhotoUrl(
+  id: string,
+  photo_url: string,
+): Promise<{ error: Error | null }> {
   const client = getSupabaseBrowserClient();
   if (!client) return { error: new Error("Supabase não configurado") };
   const { error } = await client.from("doulas").update({ photo_url }).eq("id", id);
   return { error: error ? new Error(error.message) : null };
 }
 
-export async function uploadDoulaPhoto(file: File, slug: string): Promise<{ publicUrl: string | null; error: Error | null }> {
+export async function uploadDoulaPhoto(
+  file: File,
+  slug: string,
+): Promise<{ publicUrl: string | null; error: Error | null }> {
   const client = getSupabaseBrowserClient();
   if (!client) return { publicUrl: null, error: new Error("Supabase não configurado") };
-  const safeName = file.name.replace(/[^\w.\-]+/g, "_");
+  const safeName = file.name.replace(/[^\w.-]+/g, "_");
   const path = `${slug}/${Date.now()}-${safeName}`;
-  const { error: upErr } = await client.storage.from("doulas").upload(path, file, { upsert: true, contentType: file.type });
+  const { error: upErr } = await client.storage
+    .from("doulas")
+    .upload(path, file, { upsert: true, contentType: file.type });
   if (upErr) return { publicUrl: null, error: new Error(upErr.message) };
   const { data } = client.storage.from("doulas").getPublicUrl(path);
   const publicUrl = data.publicUrl;
@@ -138,9 +157,11 @@ export async function uploadSiteCmsAsset(
   const client = getSupabaseBrowserClient();
   if (!client) return { publicUrl: null, error: new Error("Supabase não configurado") };
   const safeFolder = folder.replace(/[^a-z0-9_-]/gi, "_").slice(0, 80) || "misc";
-  const safeName = file.name.replace(/[^\w.\-]+/g, "_");
+  const safeName = file.name.replace(/[^\w.-]+/g, "_");
   const path = `site/${safeFolder}/${Date.now()}-${safeName}`;
-  const { error: upErr } = await client.storage.from("doulas").upload(path, file, { upsert: true, contentType: file.type });
+  const { error: upErr } = await client.storage
+    .from("doulas")
+    .upload(path, file, { upsert: true, contentType: file.type });
   if (upErr) return { publicUrl: null, error: new Error(upErr.message) };
   const { data } = client.storage.from("doulas").getPublicUrl(path);
   return { publicUrl: data.publicUrl || null, error: null };
@@ -191,7 +212,9 @@ export async function fetchActiveShopProducts(): Promise<ShopProduct[] | null> {
   if (!client) return null;
   const { data, error } = await client
     .from("shop_products")
-    .select("id, slug, name, description, price_cents, price_display, tag, image_url, sort_order, active")
+    .select(
+      "id, slug, name, description, price_cents, price_display, tag, image_url, sort_order, active",
+    )
     .eq("active", true)
     .order("sort_order", { ascending: true });
   if (error) {

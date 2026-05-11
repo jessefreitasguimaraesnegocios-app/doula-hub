@@ -44,7 +44,9 @@ function escapeHtml(s: string): string {
 function formatDateForLocale(isoDate: string, locale: string): string {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) return isoDate;
   try {
-    return new Intl.DateTimeFormat(locale || "en", { dateStyle: "long" }).format(new Date(`${isoDate}T12:00:00`));
+    return new Intl.DateTimeFormat(locale || "en", { dateStyle: "long" }).format(
+      new Date(`${isoDate}T12:00:00`),
+    );
   } catch {
     return isoDate;
   }
@@ -71,14 +73,16 @@ function bookingCopy(locale: string) {
     return {
       subject: "Hemos recibido tu solicitud de reserva",
       lead: "Hola",
-      intro: "Gracias por confiar en nosotras. Hemos registrado tu solicitud con los datos siguientes.",
+      intro:
+        "Gracias por confiar en nosotras. Hemos registrado tu solicitud con los datos siguientes.",
       date: "Fecha",
       time: "Hora",
       platform: "Plataforma",
       pkg: "Paquete",
       doula: "Doula",
       meet: "Enlace o agenda de la videollamada",
-      meetFallback: "El equipo te enviará el enlace o las instrucciones finales por correo muy pronto.",
+      meetFallback:
+        "El equipo te enviará el enlace o las instrucciones finales por correo muy pronto.",
       closing: "Con cariño,<br/>All Things Babies",
     };
   }
@@ -153,15 +157,27 @@ export function buildBookingConfirmationMail(opts: {
 function contactCopy(locale: string) {
   const l = locale.slice(0, 2);
   if (l === "pt") {
-    return { subject: "Nova mensagem do site (contactos)", heading: "Nova mensagem do formulário de contacto" };
+    return {
+      subject: "Nova mensagem do site (contactos)",
+      heading: "Nova mensagem do formulário de contacto",
+    };
   }
   if (l === "es") {
-    return { subject: "Nuevo mensaje del sitio (contacto)", heading: "Nuevo mensaje del formulario de contacto" };
+    return {
+      subject: "Nuevo mensaje del sitio (contacto)",
+      heading: "Nuevo mensaje del formulario de contacto",
+    };
   }
   if (l === "it") {
-    return { subject: "Nuovo messaggio dal sito (contatti)", heading: "Nuovo messaggio dal modulo contatti" };
+    return {
+      subject: "Nuovo messaggio dal sito (contatti)",
+      heading: "Nuovo messaggio dal modulo contatti",
+    };
   }
-  return { subject: "New message from your website (contact)", heading: "New contact form message" };
+  return {
+    subject: "New message from your website (contact)",
+    heading: "New contact form message",
+  };
 }
 
 export function buildContactNotifyMail(opts: {
