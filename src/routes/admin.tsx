@@ -3,7 +3,7 @@ import type { Session } from "@supabase/supabase-js";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, ChevronDown, Download, LogOut, Save, Upload } from "lucide-react";
+import { ArrowLeft, ChevronDown, Download, LogOut, Mail, Save, Upload } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -27,6 +27,7 @@ import {
   upsertSiteSettingsPayload,
   type DoulaRow,
 } from "@/lib/supabase/queries";
+import { sendSmtpTestEmail } from "@/lib/email/email-fns";
 
 const ADMIN_SESSION_KEY = "atb-admin-session";
 
@@ -164,6 +165,9 @@ function Admin() {
   const [email, setEmail] = useState("");
   const [supabasePassword, setSupabasePassword] = useState("");
   const [draft, setDraft] = useState<SiteCmsV1>(() => ({ ...getSiteCmsFromStorage() }));
+  const [emailTestTo, setEmailTestTo] = useState("");
+  const [emailTestSecret, setEmailTestSecret] = useState("");
+  const [emailTestBusy, setEmailTestBusy] = useState(false);
   const importRef = useRef<HTMLInputElement>(null);
 
   const unlocked = supabaseOk ? Boolean(session) : legacyUnlocked;
@@ -447,6 +451,9 @@ function Admin() {
             <TabsTrigger value="shop">Loja</TabsTrigger>
             {supabaseOk ? <TabsTrigger value="doulas-db">Equipa</TabsTrigger> : null}
             <TabsTrigger value="stripe">Pagamentos</TabsTrigger>
+            <TabsTrigger value="email" className="gap-1.5">
+              <Mail className="h-3.5 w-3.5" /> E-mail
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="photos" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
@@ -689,6 +696,181 @@ function Admin() {
               O identificador da conta Stripe de cada doula pode ser preenchido no separador <strong>Equipa</strong>,
               quando estiver com sessão iniciada.
             </p>
+          </TabsContent>
+
+          <TabsContent value="email" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <h2 className="font-serif text-xl">E-mail automático (Gmail / SMTP)</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              A <strong>senha de aplicação</strong> do Gmail e o e-mail da conta <strong>nunca</strong> devem ser
+              guardados neste painel nem no ficheiro JSON — só nas variáveis de ambiente do servidor (ex.: Vercel →
+              Settings → Environment Variables). Aqui configura o comportamento do site e testa o envio.
+            </p>
+
+            <div className="mt-8 space-y-6 rounded-2xl border border-border bg-muted/15 p-6 text-sm leading-relaxed text-foreground/90">
+              <div>
+                <h3 className="font-medium text-foreground">1. Segurança na conta Google</h3>
+                <p className="mt-2 text-muted-foreground">
+                  Em{" "}
+                  <a
+                    href="https://myaccount.google.com/security"
+                    className="text-primary underline"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Google Account → Security
+                  </a>
+                  , ative a <strong>verificação em duas etapas</strong>.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-medium text-foreground">2. Senha de aplicação</h3>
+                <p className="mt-2 text-muted-foreground">
+                  Depois abra{" "}
+                  <a
+                    href="https://myaccount.google.com/apppasswords"
+                    className="text-primary underline"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    App passwords
+                  </a>
+                  , crie um nome (ex.: «Meu site») e copie a senha de 16 caracteres — <strong>não</strong> use a senha
+                  normal do Gmail.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-medium text-foreground">3. Variáveis no servidor (Vercel ou .env local)</h3>
+                <ul className="mt-2 list-inside list-disc space-y-1 font-mono text-xs text-muted-foreground">
+                  <li>
+                    <code className="text-foreground">SMTP_USER</code> — o Gmail (ex.:{" "}
+                    <code>nome@gmail.com</code>) · alternativa: <code>EMAIL_USER</code>
+                  </li>
+                  <li>
+                    <code className="text-foreground">SMTP_PASS</code> — senha de aplicação · alternativa:{" "}
+                    <code>EMAIL_PASS</code>
+                  </li>
+                  <li>
+                    <code className="text-foreground">SMTP_ACTION_SECRET</code> — uma palavra-passe à sua escolha só
+                    para desbloquear o «teste» abaixo (não é a senha do Gmail)
+                  </li>
+                  <li>
+                    <code className="text-foreground">SMTP_FROM_NAME</code> — nome no remetente (opcional)
+                  </li>
+                  <li>
+                    <code className="text-foreground">SMTP_NOTIFY_TO</code> — para onde vão as mensagens do formulário
+                    de contacto (opcional; se vazio, usa o mesmo que <code>SMTP_USER</code>)
+                  </li>
+                  <li>
+                    <code className="text-foreground">SMTP_HOST</code> (opcional, predefinição{" "}
+                    <code>smtp.gmail.com</code>), <code>SMTP_PORT</code> (587), <code>SMTP_SECURE</code> (
+                    <code>true</code> só se o servidor exigir SSL na porta dedicada)
+                  </li>
+                  <li>
+                    <code className="text-foreground">DISABLE_SMTP_SENDS=1</code> — desliga todos os envios em
+                    emergência
+                  </li>
+                </ul>
+                <p className="mt-3 text-xs text-muted-foreground">
+                  Em produção na Vercel o site corre em Node (Nitro); o Nodemailer funciona aí. Num ambiente só
+                  Cloudflare Workers o SMTP clássico costuma <strong>não</strong> estar disponível — use Vercel ou
+                  outro backend Node para Gmail SMTP.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-8 rounded-2xl border border-border bg-muted/20 p-5">
+              <p className="font-medium text-foreground">Opções guardadas com «Guardar alterações»</p>
+              <div className="mt-4 space-y-2">
+                <Label htmlFor="email-from-name">Nome no remetente (opcional)</Label>
+                <input
+                  id="email-from-name"
+                  value={draft.emailFromName}
+                  onChange={(e) => setDraft((d) => ({ ...d, emailFromName: e.target.value }))}
+                  className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
+                  placeholder="Ex.: All Things Babies"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Se deixar vazio, usa-se o valor de <code className="font-mono">SMTP_FROM_NAME</code> no servidor.
+                </p>
+              </div>
+              <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="email-auto-booking"
+                    checked={draft.emailAutomationBooking}
+                    onCheckedChange={(checked) =>
+                      setDraft((d) => ({ ...d, emailAutomationBooking: Boolean(checked) }))
+                    }
+                  />
+                  <Label htmlFor="email-auto-booking">E-mail após concluir marcação no site</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="email-auto-contact"
+                    checked={draft.emailAutomationContact}
+                    onCheckedChange={(checked) =>
+                      setDraft((d) => ({ ...d, emailAutomationContact: Boolean(checked) }))
+                    }
+                  />
+                  <Label htmlFor="email-auto-contact">Notificar por e-mail o formulário de contactos</Label>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 rounded-2xl border border-border bg-card p-5 shadow-sm">
+              <h3 className="font-medium text-foreground">Enviar e-mail de teste</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Use o mesmo valor de <code className="rounded bg-muted px-1 font-mono text-xs">SMTP_ACTION_SECRET</code>{" "}
+                que colocou na Vercel (ou no .env local). Isto evita que qualquer visitante dispare e-mails.
+              </p>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="email-test-to">Destino do teste</Label>
+                  <input
+                    id="email-test-to"
+                    type="email"
+                    value={emailTestTo}
+                    onChange={(e) => setEmailTestTo(e.target.value)}
+                    className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
+                    placeholder="o seu e-mail"
+                  />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="email-test-secret">Chave de ação (SMTP_ACTION_SECRET)</Label>
+                  <input
+                    id="email-test-secret"
+                    type="password"
+                    autoComplete="off"
+                    value={emailTestSecret}
+                    onChange={(e) => setEmailTestSecret(e.target.value)}
+                    className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm font-mono"
+                    placeholder="o valor que definiu no servidor"
+                  />
+                </div>
+              </div>
+              <button
+                type="button"
+                disabled={emailTestBusy || !emailTestTo.trim() || !emailTestSecret.trim()}
+                onClick={async () => {
+                  setEmailTestBusy(true);
+                  try {
+                    const r = await sendSmtpTestEmail({
+                      data: { to: emailTestTo.trim(), actionSecret: emailTestSecret },
+                    });
+                    if (r.ok) toast.success("E-mail de teste enviado. Verifique a caixa de entrada (e o spam).");
+                    else toast.error(r.error);
+                  } catch (e) {
+                    toast.error(e instanceof Error ? e.message : "Falha no envio");
+                  } finally {
+                    setEmailTestBusy(false);
+                  }
+                }}
+                className="mt-4 inline-flex items-center gap-2 rounded-full border border-border bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+              >
+                <Mail className="h-4 w-4" />
+                {emailTestBusy ? "A enviar…" : "Enviar teste"}
+              </button>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

@@ -10,6 +10,7 @@ import d3 from "@/assets/doula-3.jpg";
 import d4 from "@/assets/doula-4.jpg";
 import { useSiteCms } from "@/hooks/use-site-cms";
 import { pickSiteImageUrl, servicePriceUsdOverride, type SiteImageKey } from "@/lib/site-cms";
+import { sendBookingConfirmationEmail } from "@/lib/email/email-fns";
 
 export const Route = createFileRoute("/booking")({
   head: () => ({
@@ -26,7 +27,8 @@ export const Route = createFileRoute("/booking")({
 const PKGS = ["birth", "postpartum", "bereavement", "lactation"] as const;
 const DOULAS = [
   { id: "any", name: "Match me", img: null },
-  { id: "raquel", name: "Raquel Manini", img: founder },
+  /** Mesmo slug que `doulas.slug` na base (seed `founder`) e slot `team_member_founder` no CMS. */
+  { id: "founder", name: "Raquel Manini", img: founder },
   { id: "sofia", name: "Sofia Rivera", img: d2 },
   { id: "elena", name: "Elena Conti", img: d3 },
   { id: "mei", name: "Mei Tanaka", img: d4 },
@@ -34,7 +36,7 @@ const DOULAS = [
 
 function bookingDoulaSlot(id: string): SiteImageKey | null {
   if (id === "any") return null;
-  if (id === "raquel") return "team_member_founder";
+  if (id === "founder") return "team_member_founder";
   return `team_member_${id}` as SiteImageKey;
 }
 
@@ -191,6 +193,7 @@ function Booking() {
   };
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
+  const [finishBusy, setFinishBusy] = useState(false);
   const [form, setForm] = useState<Form>({
     pkg: "birth",
     doula: "any",
@@ -225,6 +228,42 @@ function Booking() {
 
   const stepKeys = ["package", "doula", "intake", "schedule", "payment"] as const;
   const platforms = t("booking.schedule.platforms", { returnObjects: true }) as string[];
+
+  const finishBooking = async () => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(form.date) || !form.time.trim()) {
+      toast.error(t("booking.schedule.fillDateTime"));
+      return;
+    }
+    setFinishBusy(true);
+    try {
+      if (cms.emailAutomationBooking) {
+        const doulaLabel =
+          form.doula === "any" ? t("booking.doulaAny") : (DOULAS.find((d) => d.id === form.doula)?.name ?? "—");
+        const r = await sendBookingConfirmationEmail({
+          data: {
+            fullName: form.fullName,
+            email: form.email,
+            phone: form.phone,
+            pkgKey: form.pkg,
+            pkgLabel: t(`services.items.${form.pkg}.name`),
+            doulaLabel,
+            date: form.date,
+            time: form.time,
+            platform: form.platform,
+            meetLink: cms.teamDefaultScheduleUrl?.trim() || undefined,
+            locale: i18n.language,
+            fromDisplayName: cms.emailFromName?.trim() || undefined,
+          },
+        });
+        if (!r.ok) toast.error(r.error);
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "E-mail");
+    } finally {
+      setFinishBusy(false);
+      setDone(true);
+    }
+  };
 
   const goNext = () => {
     if (step === 2 && !validateIntake(form)) {
@@ -596,8 +635,13 @@ function Booking() {
               {t("booking.next")} <ArrowRight className="h-4 w-4" />
             </button>
           ) : (
-            <button type="button" onClick={() => setDone(true)} className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-medium text-primary-foreground hover:-translate-y-px">
-              {t("booking.finish")} <ShieldCheck className="h-4 w-4" />
+            <button
+              type="button"
+              disabled={finishBusy}
+              onClick={() => void finishBooking()}
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-medium text-primary-foreground hover:-translate-y-px disabled:opacity-60"
+            >
+              {finishBusy ? "…" : t("booking.finish")} <ShieldCheck className="h-4 w-4" />
             </button>
           )}
         </div>

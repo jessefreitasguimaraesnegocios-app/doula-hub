@@ -54,6 +54,7 @@
     "i18next": "^26.0.10",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.575.0",
+    "nodemailer": "^8.0.7",
     "react": "^19.2.0",
     "react-day-picker": "^9.14.0",
     "react-dom": "^19.2.0",

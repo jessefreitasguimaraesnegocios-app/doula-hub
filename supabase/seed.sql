@@ -1,2 +1,2 @@
--- Opcional: dados só para desenvolvimento local (`supabase db reset`).
--- O projecto já insere seeds na migration inicial; deixe vazio ou acrescente UPDATEs aqui.
+-- Opcional: dados extra para `supabase db reset` (além dos INSERTs em migrations).
+-- O CMS (`site_settings.payload`) segue o contrato SiteCmsV1 em src/lib/site-cms.ts.

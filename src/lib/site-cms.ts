@@ -70,6 +70,12 @@ export type SiteCmsV1 = {
   shopComingSoonTitle: string;
   /** Vazio = usar texto das traduções. Pode usar quebras de linha. */
   shopComingSoonMessage: string;
+  /** Nome amigável no remetente dos e-mails automáticos (vazio = usar SMTP_FROM_NAME no servidor). */
+  emailFromName: string;
+  /** Enviar e-mail de confirmação ao concluir o fluxo de marcação (requer SMTP no servidor). */
+  emailAutomationBooking: boolean;
+  /** Enviar cópia da mensagem do formulário de contactos para a caixa do site (SMTP_NOTIFY_TO ou SMTP_USER). */
+  emailAutomationContact: boolean;
 };
 
 export const DEFAULT_SITE_CMS: SiteCmsV1 = {
@@ -95,6 +101,9 @@ export const DEFAULT_SITE_CMS: SiteCmsV1 = {
   shopComingSoonEnabled: true,
   shopComingSoonTitle: "",
   shopComingSoonMessage: "",
+  emailFromName: "",
+  emailAutomationBooking: true,
+  emailAutomationContact: true,
 };
 
 /** Merge a remote JSON payload (e.g. Supabase `site_settings.payload`) into defaults. */
@@ -122,6 +131,11 @@ function mergePartial(base: SiteCmsV1, partial: unknown): SiteCmsV1 {
     typeof p.shopComingSoonTitle === "string" ? p.shopComingSoonTitle : base.shopComingSoonTitle;
   const shopComingSoonMessage =
     typeof p.shopComingSoonMessage === "string" ? p.shopComingSoonMessage : base.shopComingSoonMessage;
+  const emailFromName = typeof p.emailFromName === "string" ? p.emailFromName : base.emailFromName;
+  const emailAutomationBooking =
+    typeof p.emailAutomationBooking === "boolean" ? p.emailAutomationBooking : base.emailAutomationBooking;
+  const emailAutomationContact =
+    typeof p.emailAutomationContact === "boolean" ? p.emailAutomationContact : base.emailAutomationContact;
   return {
     ...base,
     ...p,
@@ -138,6 +152,9 @@ function mergePartial(base: SiteCmsV1, partial: unknown): SiteCmsV1 {
     shopComingSoonEnabled,
     shopComingSoonTitle,
     shopComingSoonMessage,
+    emailFromName,
+    emailAutomationBooking,
+    emailAutomationContact,
   } as SiteCmsV1;
 }
 

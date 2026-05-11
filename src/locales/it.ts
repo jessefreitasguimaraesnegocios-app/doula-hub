@@ -213,6 +213,7 @@ const it: Translation = {
       platforms: ["Zoom", "Google Meet", "Microsoft Teams", "Apple FaceTime"],
       date: "Data",
       time: "Ora",
+      fillDateTime: "Scegli una data e un orario validi per la consulenza prima di concludere.",
       linkNote: "Ti invieremo il link {{platform}} via email dopo la conferma.",
     },
     payment: {

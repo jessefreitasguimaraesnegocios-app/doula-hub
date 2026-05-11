@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Mail, Phone, MapPin, Instagram, Send } from "lucide-react";
+import { toast } from "sonner";
 import { useSiteCms } from "@/hooks/use-site-cms";
+import { sendContactInquiryEmail } from "@/lib/email/email-fns";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -17,7 +19,7 @@ export const Route = createFileRoute("/contact")({
 });
 
 function Contact() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const cms = useSiteCms();
   const email = cms.contactEmail.trim() || "Doula@AllThingsBabies.com";
   const phoneHref = cms.contactPhoneHref.trim() || "+13236406640";
@@ -25,7 +27,13 @@ function Contact() {
   const address = cms.addressLine.trim() || "Downtown Culver City, CA";
   const igUrl = cms.instagramUrl.trim() || "https://www.instagram.com/allthingsbabiesllc/";
   const igHandle = cms.instagramHandle.trim() || "@allthingsbabiesllc";
+  const [name, setName] = useState("");
+  const [formEmail, setFormEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [message, setMessage] = useState("");
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+
   return (
     <div className="mx-auto grid max-w-6xl gap-12 px-6 py-20 md:grid-cols-2 md:py-28">
       <div>
@@ -65,32 +73,64 @@ function Contact() {
         </ul>
       </div>
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
-          setSent(true);
+          if (sending) return;
+          setSending(true);
+          try {
+            if (cms.emailAutomationContact) {
+              const r = await sendContactInquiryEmail({
+                data: {
+                  name: name.trim(),
+                  email: formEmail.trim(),
+                  phone: phone.trim() || undefined,
+                  message: message.trim(),
+                  locale: i18n.language,
+                  fromDisplayName: cms.emailFromName?.trim() || undefined,
+                },
+              });
+              if (!r.ok) {
+                toast.error(r.error);
+                return;
+              }
+            }
+            setSent(true);
+          } catch (err) {
+            toast.error(err instanceof Error ? err.message : "E-mail");
+          } finally {
+            setSending(false);
+          }
         }}
         className="space-y-5 rounded-3xl bg-card p-8 shadow-(--shadow-soft)"
       >
-        <Field label={t("contact.name")} name="name" required />
-        <Field label={t("contact.email")} name="email" type="email" required />
-        <Field label={t("contact.phone")} name="phone" />
+        <Field label={t("contact.name")} name="name" required value={name} onChange={(e) => setName(e.target.value)} />
+        <Field
+          label={t("contact.email")}
+          name="email"
+          type="email"
+          required
+          value={formEmail}
+          onChange={(e) => setFormEmail(e.target.value)}
+        />
+        <Field label={t("contact.phone")} name="phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
         <div>
           <label className="text-xs uppercase tracking-widest text-foreground/60">{t("contact.message")}</label>
           <textarea
             required
             rows={5}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
             className="mt-2 w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none"
           />
         </div>
         <button
           type="submit"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-sm font-medium text-primary-foreground hover:-translate-y-px"
+          disabled={sending}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-sm font-medium text-primary-foreground hover:-translate-y-px disabled:opacity-60"
         >
-          {t("contact.send")} <Send className="h-4 w-4" />
+          {sending ? "…" : t("contact.send")} <Send className="h-4 w-4" />
         </button>
-        {sent && (
-          <p className="text-center text-sm text-sage-deep">{t("contact.sent")}</p>
-        )}
+        {sent && <p className="text-center text-sm text-sage-deep">{t("contact.sent")}</p>}
       </form>
     </div>
   );

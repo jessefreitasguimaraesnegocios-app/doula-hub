@@ -6,7 +6,7 @@ Este guia alinha o **projeto Supabase** (Postgres, Auth, Storage, RLS) com o que
 
 | Recurso | Uso no site |
 |--------|-------------|
-| **Tabela `site_settings`** | Uma linha `id = 'main'`. O campo **`payload`** (JSON) é o CMS (`SiteCmsV1`): contactos, preços em USD, cores, URL Zoom, **URLs de fotos** (`siteImages`), lista privada **contratadas** (`contractedDoulas`). O cliente faz pull no arranque (`SupabaseSiteBootstrap`) e grava no `localStorage`; o admin com sessão faz **upsert** da mesma estrutura. |
+| **Tabela `site_settings`** | Uma linha `id = 'main'`. O campo **`payload`** (JSON) é o CMS (`SiteCmsV1`): contactos, preços em USD, cores, URL Zoom, **URLs de fotos** (`siteImages`), lista privada **contratadas** (`contractedDoulas`), opções da **loja** (`shopComingSoon*`) e **e-mail** (`emailFromName`, `emailAutomationBooking`, `emailAutomationContact`). O cliente faz pull no arranque (`SupabaseSiteBootstrap`) e grava no `localStorage`; o admin com sessão faz **upsert** da mesma estrutura. |
 | **Tabela `doulas`** | Equipa na página **Equipa** e fotos na **Marcação** quando há dados remotos. Visitantes (`anon`) só veem `published = true`. Admin autenticado vê e edita todas. |
 | **Tabela `shop_products`** | Loja quando há produtos activos na base; caso contrário usa `src/data/shop-products.ts`. |
 | **Storage bucket `doulas`** (público) | Fotos de equipa (`{slug}/…`), ficheiros do CMS (`site/…`), **contratadas** (`contractors/…`). MIME permitidos nas migrations: imagens + **vídeo** (mp4, webm, quicktime) até 100 MiB — alinhado com vídeo opcional em `siteImages.about_founder`. |
@@ -27,6 +27,7 @@ Ficheiros em `supabase/migrations/` (aplicar **por ordem**):
 1. **`20260510052254_init_cms_schema.sql`** — tabelas, RLS, bucket `doulas`, seeds de `doulas` e `shop_products`, linha inicial `site_settings`.
 2. **`20260511000000_supabase_triggers_storage.sql`** — triggers `updated_at`, bucket `doulas` (100 MiB + imagens e vídeo), `COMMENT ON` nas tabelas.
 3. **`20260511120000_storage_allow_video.sql`** — idempotente; útil se já tinha aplicado uma versão antiga do ficheiro (2) só com imagens — volta a definir MIME com vídeo.
+4. **`20260512000000_site_settings_payload_comment.sql`** — actualiza o `COMMENT` da coluna `payload` para reflectir campos novos do CMS no código.
 
 ### Aplicar no Supabase (hosted)
 
@@ -49,6 +50,8 @@ No `.env` local e na Vercel (ou outro host):
 - `VITE_SUPABASE_ANON_KEY` — chave **anon** (pública no browser; a segurança vem das **RLS**).
 
 **Nunca** coloque `service_role` no bundle do site.
+
+**E-mail (SMTP)** — credenciais Gmail / senha de aplicação ficam só no **servidor** (ex.: Vercel), nunca com prefixo `VITE_`. Ver `.env.example` e o separador **E-mail** em `/admin`.
 
 ## Autenticação (painel admin)
 
@@ -90,7 +93,7 @@ O bucket é **público**; as URLs públicas são válidas em `photo_url`, `image
 |--------|------------------|
 | Admin diz “Supabase não configurado” | `VITE_SUPABASE_*` definidos e rebuild após alterar `.env`. |
 | Erro ao **Guardar** CMS | Sessão iniciada? Políticas `site_settings` para `authenticated`? |
-| Erro no **upload** de foto | Utilizador autenticado? Bucket `doulas` existe? Ficheiro ≤ 10 MiB e MIME JPEG/PNG/WebP? |
+| Erro no **upload** de foto ou vídeo CMS | Utilizador autenticado? Bucket `doulas` existe? Ficheiro dentro do limite do bucket (migrations: **100 MiB**) e MIME permitido (imagens JPEG/PNG/WebP + vídeo mp4/webm/quicktime)? |
 | Loja não muda | `shop_products` com `active = true` e `image_url` preenchido se quiser foto remota. |
 | Equipa não vem da base | Sem erros na query? Há linhas `published = true`? |
 
@@ -110,4 +113,4 @@ O bucket é **público**; as URLs públicas são válidas em `photo_url`, `image
 
 ---
 
-*Última revisão alinhada ao código em `src/lib/site-cms.ts` e `src/lib/supabase/queries.ts`.*
+*Última revisão: CMS (loja + e-mail), SQL `payload` comment, marcação com slug `founder` alinhado ao seed `doulas`.*

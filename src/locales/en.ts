@@ -211,6 +211,7 @@ const en = {
       platforms: ["Zoom", "Google Meet", "Microsoft Teams", "Apple FaceTime"],
       date: "Date",
       time: "Time",
+      fillDateTime: "Please choose a valid date and time for your consultation before finishing.",
       linkNote: "We'll email you a {{platform}} link after confirmation.",
     },
     payment: {
