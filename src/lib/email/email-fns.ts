@@ -1,13 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import {
-  buildBookingConfirmationMail,
-  buildContactNotifyMail,
-  buildSmtpTestMail,
-  readSmtpEnv,
-  resolveFromHeader,
-  sendHtmlMail,
-} from "./smtp-mail";
 
 const testInput = z.object({
   to: z.string().email(),
@@ -31,6 +23,7 @@ export const sendSmtpTestEmail = createServerFn({ method: "POST" })
     if (data.actionSecret !== expected) {
       return { ok: false, error: "Chave de ação incorreta." };
     }
+    const { readSmtpEnv, buildSmtpTestMail, resolveFromHeader, sendHtmlMail } = await import("./smtp-mail");
     const cfg = readSmtpEnv();
     if (!cfg) {
       return {
@@ -68,41 +61,48 @@ const bookingInput = z.object({
   fromDisplayName: z.string().max(200).optional(),
 });
 
+export type BookingEmailResult = { ok: true; skipped?: boolean } | { ok: false; error: string };
+
+export async function sendBookingConfirmationEmailImpl(
+  data: z.infer<typeof bookingInput>,
+): Promise<BookingEmailResult> {
+  if (process.env.DISABLE_SMTP_SENDS === "1") {
+    return { ok: true, skipped: true };
+  }
+  const { buildBookingConfirmationMail, readSmtpEnv, resolveFromHeader, sendHtmlMail } = await import("./smtp-mail");
+  const cfg = readSmtpEnv();
+  if (!cfg) {
+    return { ok: true, skipped: true };
+  }
+  try {
+    const { subject, html } = buildBookingConfirmationMail({
+      locale: data.locale,
+      fullName: data.fullName,
+      email: data.email,
+      phone: data.phone,
+      pkgLabel: data.pkgLabel,
+      doulaLabel: data.doulaLabel,
+      date: data.date,
+      time: data.time,
+      platform: data.platform,
+      meetLink: (data.meetLink ?? "").trim(),
+    });
+    await sendHtmlMail(cfg, {
+      from: resolveFromHeader(cfg, data.fromDisplayName),
+      to: data.email,
+      subject,
+      html,
+    });
+    return { ok: true };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return { ok: false, error: msg };
+  }
+}
+
 export const sendBookingConfirmationEmail = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => bookingInput.parse(raw))
-  .handler(async ({ data }): Promise<{ ok: true; skipped?: boolean } | { ok: false; error: string }> => {
-    if (process.env.DISABLE_SMTP_SENDS === "1") {
-      return { ok: true, skipped: true };
-    }
-    const cfg = readSmtpEnv();
-    if (!cfg) {
-      return { ok: true, skipped: true };
-    }
-    try {
-      const { subject, html } = buildBookingConfirmationMail({
-        locale: data.locale,
-        fullName: data.fullName,
-        email: data.email,
-        phone: data.phone,
-        pkgLabel: data.pkgLabel,
-        doulaLabel: data.doulaLabel,
-        date: data.date,
-        time: data.time,
-        platform: data.platform,
-        meetLink: (data.meetLink ?? "").trim(),
-      });
-      await sendHtmlMail(cfg, {
-        from: resolveFromHeader(cfg, data.fromDisplayName),
-        to: data.email,
-        subject,
-        html,
-      });
-      return { ok: true };
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      return { ok: false, error: msg };
-    }
-  });
+  .handler(async ({ data }): Promise<BookingEmailResult> => sendBookingConfirmationEmailImpl(data));
 
 const contactInput = z.object({
   name: z.string().min(1).max(200),
@@ -119,6 +119,7 @@ export const sendContactInquiryEmail = createServerFn({ method: "POST" })
     if (process.env.DISABLE_SMTP_SENDS === "1") {
       return { ok: true, skipped: true };
     }
+    const { buildContactNotifyMail, readSmtpEnv, resolveFromHeader, sendHtmlMail } = await import("./smtp-mail");
     const cfg = readSmtpEnv();
     if (!cfg) {
       return { ok: true, skipped: true };

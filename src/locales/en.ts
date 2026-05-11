@@ -1,3 +1,5 @@
+import admin from "./fragments/admin-en";
+
 const en = {
   brand: "All Things Babies",
   nav: {
@@ -90,6 +92,8 @@ const en = {
     languages: "Languages",
     scheduleVideoCall: "Schedule a video call",
     schedulePopupBlocked: "Pop-up was blocked. Allow pop-ups for this site and try again.",
+    contractedRole: "Doula — our team",
+    contractedBioFallback: "A valued member of our doula circle.",
     founder: {
       name: "Raquel Manini",
       role: "Founder & practice lead · Birth & postpartum doula",
@@ -221,6 +225,10 @@ const en = {
       terms: "By confirming, you agree to our terms and cancellation policy.",
       success: "Booking confirmed",
       successBody: "A confirmation email is on its way with your certificate and consultation link.",
+      saveFailed: "We could not complete your booking: {{detail}}",
+      saveFailedGeneric: "Something went wrong while completing your booking. Please try again or contact us.",
+      googleSyncWarn: "Google Calendar could not be updated: {{detail}}",
+      emailSyncWarn: "The confirmation email could not be sent: {{detail}}",
     },
   },
   footer: {
@@ -231,6 +239,7 @@ const en = {
     emailSubject: "All Things Babies — message from the website",
     emailAria: "Send email to Doula@AllThingsBabies.com",
   },
+  admin,
   language: "Language",
 };
 

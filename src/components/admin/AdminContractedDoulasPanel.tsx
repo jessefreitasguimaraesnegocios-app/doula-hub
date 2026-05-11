@@ -1,10 +1,24 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { Plus, Trash2, Upload } from "lucide-react";
+import { Pencil, Plus, Trash2, Upload } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { uploadSiteCmsAsset } from "@/lib/supabase/queries";
-import type { ContractedDoula, SiteCmsV1 } from "@/lib/site-cms";
+import type { ContractedDoula, ContractedDoulaStatus, SiteCmsV1 } from "@/lib/site-cms";
 
 function newId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
@@ -24,36 +38,94 @@ const emptyForm: Omit<ContractedDoula, "id"> = {
   monthlyFeeDisplay: "",
   notes: "",
   photoUrl: "",
+  status: "active",
+  visibleOnSite: false,
 };
 
 export function AdminContractedDoulasPanel({ list, onChange, canUpload }: AdminContractedDoulasPanelProps) {
+  const { t } = useTranslation();
   const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [photoBusy, setPhotoBusy] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const formRef = useRef<HTMLDivElement>(null);
 
-  const add = () => {
-    const name = form.name.trim();
-    if (!name) {
-      toast.error("Escreva pelo menos o nome.");
-      return;
-    }
-    onChange([
-      ...list,
-      {
-        id: newId(),
-        name,
-        phone: form.phone.trim(),
-        email: form.email.trim(),
-        monthlyFeeDisplay: form.monthlyFeeDisplay.trim(),
-        notes: form.notes.trim(),
-        photoUrl: form.photoUrl.trim(),
-      },
-    ]);
-    setForm(emptyForm);
-    toast.success("Pessoa adicionada à lista. Toque em Guardar alterações no topo.");
+  const patch = (id: string, partial: Partial<ContractedDoula>) => {
+    onChange(list.map((x) => (x.id === id ? { ...x, ...partial } : x)));
   };
 
-  const remove = (id: string) => {
-    onChange(list.filter((x) => x.id !== id));
+  const save = () => {
+    const name = form.name.trim();
+    if (!name) {
+      toast.error(t("admin.contracted.nameRequired"));
+      return;
+    }
+    if (editingId) {
+      onChange(
+        list.map((x) =>
+          x.id === editingId
+            ? {
+                ...x,
+                name,
+                phone: form.phone.trim(),
+                email: form.email.trim(),
+                monthlyFeeDisplay: form.monthlyFeeDisplay.trim(),
+                notes: form.notes.trim(),
+                photoUrl: form.photoUrl.trim(),
+                status: form.status,
+                visibleOnSite: form.visibleOnSite,
+              }
+            : x,
+        ),
+      );
+      toast.success(t("admin.contracted.updated"));
+    } else {
+      onChange([
+        ...list,
+        {
+          id: newId(),
+          name,
+          phone: form.phone.trim(),
+          email: form.email.trim(),
+          monthlyFeeDisplay: form.monthlyFeeDisplay.trim(),
+          notes: form.notes.trim(),
+          photoUrl: form.photoUrl.trim(),
+          status: form.status,
+          visibleOnSite: form.visibleOnSite,
+        },
+      ]);
+      toast.success(t("admin.contracted.added"));
+    }
+    setForm(emptyForm);
+    setEditingId(null);
+  };
+
+  const startEdit = (p: ContractedDoula) => {
+    setEditingId(p.id);
+    setForm({
+      name: p.name,
+      phone: p.phone,
+      email: p.email,
+      monthlyFeeDisplay: p.monthlyFeeDisplay,
+      notes: p.notes,
+      photoUrl: p.photoUrl,
+      status: p.status,
+      visibleOnSite: p.visibleOnSite,
+    });
+    queueMicrotask(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+  };
+
+  const confirmDelete = () => {
+    if (!deleteId) return;
+    onChange(list.filter((x) => x.id !== deleteId));
+    if (editingId === deleteId) cancelEdit();
+    setDeleteId(null);
+    toast.success(t("admin.contracted.removed"));
   };
 
   const uploadPhotoForForm = async (file: File | undefined) => {
@@ -62,34 +134,114 @@ export function AdminContractedDoulasPanel({ list, onChange, canUpload }: AdminC
     const { publicUrl, error } = await uploadSiteCmsAsset(file, "contractors");
     setPhotoBusy(false);
     if (error || !publicUrl) {
-      toast.error(error?.message ?? "Não foi possível enviar a foto.");
+      toast.error(error?.message ?? t("admin.photos.uploadFail"));
       return;
     }
     setForm((f) => ({ ...f, photoUrl: publicUrl }));
-    toast.success("Foto anexada ao formulário.");
+    toast.success(t("admin.contracted.photoAttachedForm"));
   };
 
   return (
-    <div className="space-y-8">
-      <p className="text-sm text-muted-foreground">
-        Lista <strong>privada</strong>: para anotar quem trabalha consigo, contacto, valor mensal e foto.{" "}
-        <strong>Não aparece</strong> no site público — só vê aqui no painel (e na cópia das definições, se exportar).
-      </p>
+    <div className="space-y-10">
+      <p className="text-sm text-muted-foreground">{t("admin.contracted.intro")}</p>
 
-      <div className="rounded-2xl border border-border bg-muted/20 p-5">
-        <h3 className="font-serif text-lg text-foreground">Adicionar pessoa</h3>
+      <div>
+        <h3 className="font-serif text-lg text-foreground">{t("admin.contracted.badgesTitle", { count: list.length })}</h3>
+        {list.length === 0 ? (
+          <p className="mt-3 text-sm text-muted-foreground">{t("admin.contracted.badgesEmpty")}</p>
+        ) : (
+          <ul className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {list.map((p) => (
+              <li
+                key={p.id}
+                className="flex flex-col items-center rounded-3xl border border-border bg-linear-to-b from-card to-muted/20 px-4 pb-5 pt-6 text-center shadow-sm ring-1 ring-border/60"
+              >
+                <div className="relative">
+                  <div className="mx-auto h-28 w-28 overflow-hidden rounded-full border-4 border-primary/25 bg-muted shadow-md ring-2 ring-background">
+                    {p.photoUrl.trim() ? (
+                      <img src={p.photoUrl.trim()} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="grid h-full w-full place-items-center font-serif text-3xl text-primary/40">✦</div>
+                    )}
+                  </div>
+                </div>
+                <p className="mt-4 max-w-full truncate px-1 font-serif text-lg text-foreground">{p.name || "—"}</p>
+                {p.monthlyFeeDisplay.trim() ? (
+                  <p className="mt-1 text-xs font-medium text-primary">{p.monthlyFeeDisplay.trim()}</p>
+                ) : (
+                  <p className="mt-1 text-xs text-muted-foreground">{t("admin.contracted.noMonthlyFee")}</p>
+                )}
+                <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
+                  <Badge variant={p.status === "active" ? "default" : "secondary"}>
+                    {p.status === "active" ? t("admin.contracted.active") : t("admin.contracted.paused")}
+                  </Badge>
+                  <Badge variant={p.visibleOnSite ? "outline" : "secondary"} className="border-primary/30">
+                    {p.visibleOnSite ? t("admin.contracted.visibleOnSite") : t("admin.contracted.panelOnly")}
+                  </Badge>
+                </div>
+
+                <div className="mt-4 w-full space-y-3 text-left">
+                  <div className="flex items-center justify-between gap-2 rounded-xl bg-background/80 px-3 py-2">
+                    <Label htmlFor={`vis-${p.id}`} className="text-xs text-muted-foreground">
+                      {t("admin.contracted.clientsSee")}
+                    </Label>
+                    <Switch
+                      id={`vis-${p.id}`}
+                      checked={p.visibleOnSite}
+                      onCheckedChange={(checked) => patch(p.id, { visibleOnSite: Boolean(checked) })}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs text-muted-foreground">{t("admin.contracted.statusLabel")}</Label>
+                    <Select
+                      value={p.status}
+                      onValueChange={(v) => patch(p.id, { status: v as ContractedDoulaStatus })}
+                    >
+                      <SelectTrigger className="h-9 rounded-xl text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">{t("admin.contracted.active")}</SelectItem>
+                        <SelectItem value="paused">{t("admin.contracted.paused")}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex w-full flex-wrap justify-center gap-2">
+                  <Button type="button" variant="outline" size="sm" className="h-8 gap-1 rounded-full text-xs" onClick={() => startEdit(p)}>
+                    <Pencil className="h-3 w-3" /> {t("admin.contracted.edit")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 gap-1 rounded-full text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    onClick={() => setDeleteId(p.id)}
+                  >
+                    <Trash2 className="h-3 w-3" /> {t("admin.contracted.delete")}
+                  </Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div ref={formRef} className="rounded-2xl border border-border bg-muted/20 p-5">
+        <h3 className="font-serif text-lg text-foreground">{editingId ? t("admin.contracted.editTitle") : t("admin.contracted.addTitle")}</h3>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div className="space-y-2 sm:col-span-2">
-            <Label>Nome *</Label>
+            <Label>{t("admin.contracted.name")}</Label>
             <input
               value={form.name}
               onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
               className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
-              placeholder="Nome completo"
+              placeholder={t("admin.contracted.namePlaceholder")}
             />
           </div>
           <div className="space-y-2">
-            <Label>Telefone</Label>
+            <Label>{t("admin.contracted.phone")}</Label>
             <input
               value={form.phone}
               onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
@@ -97,7 +249,7 @@ export function AdminContractedDoulasPanel({ list, onChange, canUpload }: AdminC
             />
           </div>
           <div className="space-y-2">
-            <Label>E-mail</Label>
+            <Label>{t("admin.contracted.email")}</Label>
             <input
               type="email"
               value={form.email}
@@ -106,31 +258,55 @@ export function AdminContractedDoulasPanel({ list, onChange, canUpload }: AdminC
             />
           </div>
           <div className="space-y-2 sm:col-span-2">
-            <Label>Valor mensal (texto livre)</Label>
+            <Label>{t("admin.contracted.monthly")}</Label>
             <input
               value={form.monthlyFeeDisplay}
               onChange={(e) => setForm((f) => ({ ...f, monthlyFeeDisplay: e.target.value }))}
               className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
-              placeholder="Ex.: US$ 500 / mês"
+              placeholder={t("admin.contracted.monthlyPh")}
             />
           </div>
           <div className="space-y-2 sm:col-span-2">
-            <Label>Notas</Label>
+            <Label>{t("admin.contracted.notes")}</Label>
             <textarea
               value={form.notes}
               onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
               rows={2}
               className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
-              placeholder="Horário, funções, etc."
+              placeholder={t("admin.contracted.notesPh")}
             />
           </div>
+          <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex items-center gap-2">
+              <Switch
+                id="form-visible"
+                checked={form.visibleOnSite}
+                onCheckedChange={(checked) => setForm((f) => ({ ...f, visibleOnSite: Boolean(checked) }))}
+              />
+              <Label htmlFor="form-visible" className="text-sm">
+                {t("admin.contracted.visibleLabel")}
+              </Label>
+            </div>
+            <div className="space-y-1.5 sm:w-48">
+              <Label className="text-xs">{t("admin.contracted.statusLabel")}</Label>
+              <Select value={form.status} onValueChange={(v) => setForm((f) => ({ ...f, status: v as ContractedDoulaStatus }))}>
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">{t("admin.contracted.active")}</SelectItem>
+                  <SelectItem value="paused">{t("admin.contracted.paused")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           <div className="space-y-2 sm:col-span-2">
-            <Label>Foto (link ou ficheiro)</Label>
+            <Label>{t("admin.contracted.photoUrl")}</Label>
             <input
               value={form.photoUrl}
               onChange={(e) => setForm((f) => ({ ...f, photoUrl: e.target.value }))}
               className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs"
-              placeholder="https://…"
+              placeholder={t("admin.photos.urlPlaceholder")}
             />
             <div className="mt-2 flex flex-wrap gap-2">
               <label className="inline-flex cursor-pointer">
@@ -147,55 +323,48 @@ export function AdminContractedDoulasPanel({ list, onChange, canUpload }: AdminC
                 />
                 <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:opacity-50">
                   <Upload className="h-3.5 w-3.5" />
-                  {photoBusy ? "A enviar…" : "Carregar foto"}
+                  {photoBusy ? t("admin.contracted.uploadSending") : t("admin.contracted.uploadPhoto")}
                 </span>
               </label>
             </div>
           </div>
         </div>
-        <Button type="button" className="mt-5 rounded-full" onClick={add}>
-          <Plus className="h-4 w-4" /> Adicionar à lista
-        </Button>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Button type="button" className="rounded-full" onClick={save}>
+            {editingId ? (
+              <>
+                <Pencil className="h-4 w-4" /> {t("admin.contracted.savePerson")}
+              </>
+            ) : (
+              <>
+                <Plus className="h-4 w-4" /> {t("admin.contracted.addToList")}
+              </>
+            )}
+          </Button>
+          {editingId ? (
+            <Button type="button" variant="outline" className="rounded-full" onClick={cancelEdit}>
+              {t("admin.contracted.cancelEdit")}
+            </Button>
+          ) : null}
+        </div>
       </div>
 
-      <div className="space-y-3">
-        <h3 className="font-serif text-lg text-foreground">Lista ({list.length})</h3>
-        {list.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Ainda não há ninguém na lista.</p>
-        ) : (
-          <ul className="grid gap-4 md:grid-cols-2">
-            {list.map((p) => (
-              <li key={p.id} className="flex gap-3 rounded-2xl border border-border bg-card p-4">
-                <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-border bg-muted">
-                  {p.photoUrl.trim() ? (
-                    <img src={p.photoUrl.trim()} alt="" className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="grid h-full w-full place-items-center text-xs text-muted-foreground">Sem foto</div>
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium text-foreground">{p.name}</p>
-                  {p.monthlyFeeDisplay.trim() ? (
-                    <p className="mt-1 text-sm text-primary">{p.monthlyFeeDisplay.trim()}</p>
-                  ) : null}
-                  {p.phone.trim() ? <p className="mt-1 text-xs text-muted-foreground">{p.phone}</p> : null}
-                  {p.email.trim() ? <p className="mt-1 text-xs text-muted-foreground">{p.email}</p> : null}
-                  {p.notes.trim() ? <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{p.notes}</p> : null}
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="mt-2 h-8 gap-1 px-2 text-xs text-destructive hover:text-destructive"
-                    onClick={() => remove(p.id)}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" /> Retirar da lista
-                  </Button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <AlertDialog open={deleteId !== null} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("admin.contracted.deleteTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("admin.contracted.deleteBody")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("admin.contracted.cancel")}</AlertDialogCancel>
+            <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={confirmDelete}>
+              {t("admin.contracted.confirmDelete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

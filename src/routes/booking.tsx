@@ -9,8 +9,8 @@ import d2 from "@/assets/doula-2.jpg";
 import d3 from "@/assets/doula-3.jpg";
 import d4 from "@/assets/doula-4.jpg";
 import { useSiteCms } from "@/hooks/use-site-cms";
-import { pickSiteImageUrl, servicePriceUsdOverride, type SiteImageKey } from "@/lib/site-cms";
-import { sendBookingConfirmationEmail } from "@/lib/email/email-fns";
+import { pickSiteImageUrl, servicePriceUsdOverride, type SiteCmsV1, type SiteImageKey } from "@/lib/site-cms";
+import { completeBookingRequest } from "@/lib/booking/booking-fns";
 
 export const Route = createFileRoute("/booking")({
   head: () => ({
@@ -38,6 +38,17 @@ function bookingDoulaSlot(id: string): SiteImageKey | null {
   if (id === "any") return null;
   if (id === "founder") return "team_member_founder";
   return `team_member_${id}` as SiteImageKey;
+}
+
+const CONTRACTED_BOOKING_PREFIX = "contracted:" as const;
+
+function resolveBookingDoulaLabel(doulaId: string, t: TFunction, cms: SiteCmsV1): string {
+  if (doulaId === "any") return t("booking.doulaAny");
+  if (doulaId.startsWith(CONTRACTED_BOOKING_PREFIX)) {
+    const cid = doulaId.slice(CONTRACTED_BOOKING_PREFIX.length);
+    return cms.contractedDoulas.find((c) => c.id === cid)?.name?.trim() || "—";
+  }
+  return DOULAS.find((d) => d.id === doulaId)?.name ?? "—";
 }
 
 const SUPPORT_ORDER = ["birth", "postpartum", "lactation", "bereavement", "combo", "other"] as const;
@@ -170,19 +181,48 @@ function intakeMissingLabels(f: Form, t: TFunction): string[] {
   return labels;
 }
 
+function bookingIntakeSnapshot(form: Form): Record<string, unknown> {
+  return {
+    dueDate: form.dueDate,
+    firstBaby: form.firstBaby,
+    birthLocation: form.birthLocation,
+    hospitalProvider: form.hospitalProvider,
+    zipCode: form.zipCode,
+    streetNumber: form.streetNumber,
+    zipCity: form.zipCity,
+    zipState: form.zipState,
+    supportTypes: form.supportTypes,
+    includeSupport: form.includeSupport,
+    supportName: form.supportName,
+    supportRelation: form.supportRelation,
+    preferredLanguage: form.preferredLanguage,
+    babyCount: form.babyCount,
+    howHeard: form.howHeard,
+    notesBeforeCall: form.notesBeforeCall,
+  };
+}
+
 function Booking() {
   const { t, i18n } = useTranslation();
   const cms = useSiteCms();
-  const doulasWithImages = useMemo(
-    () =>
-      DOULAS.map((d) => {
-        if (!d.img) return { ...d, imgSrc: null as string | null };
-        const slot = bookingDoulaSlot(d.id);
-        if (!slot) return { ...d, imgSrc: null };
-        return { ...d, imgSrc: pickSiteImageUrl(cms, slot, d.img) };
-      }),
-    [cms],
+  const visibleContracted = useMemo(
+    () => cms.contractedDoulas.filter((c) => c.visibleOnSite && c.status === "active" && c.name.trim()),
+    [cms.contractedDoulas],
   );
+  const doulasWithImages = useMemo(() => {
+    const core = DOULAS.map((d) => {
+      if (!d.img) return { id: d.id, name: d.name, imgSrc: null as string | null };
+      const slot = bookingDoulaSlot(d.id);
+      if (!slot) return { id: d.id, name: d.name, imgSrc: null as string | null };
+      return { id: d.id, name: d.name, imgSrc: pickSiteImageUrl(cms, slot, d.img) };
+    });
+    const extra = visibleContracted.map((c) => ({
+      id: `${CONTRACTED_BOOKING_PREFIX}${c.id}`,
+      name: c.name.trim(),
+      imgSrc: c.photoUrl.trim() || null,
+    }));
+    return [...core, ...extra];
+  }, [cms, visibleContracted]);
   const allowUsdOverride = i18n.language === "en" || i18n.language === "es";
   const pkgPriceDisplay = (pkg: string) => {
     if (allowUsdOverride) {
@@ -236,32 +276,40 @@ function Booking() {
     }
     setFinishBusy(true);
     try {
-      if (cms.emailAutomationBooking) {
-        const doulaLabel =
-          form.doula === "any" ? t("booking.doulaAny") : (DOULAS.find((d) => d.id === form.doula)?.name ?? "—");
-        const r = await sendBookingConfirmationEmail({
-          data: {
-            fullName: form.fullName,
-            email: form.email,
-            phone: form.phone,
-            pkgKey: form.pkg,
-            pkgLabel: t(`services.items.${form.pkg}.name`),
-            doulaLabel,
-            date: form.date,
-            time: form.time,
-            platform: form.platform,
-            meetLink: cms.teamDefaultScheduleUrl?.trim() || undefined,
-            locale: i18n.language,
-            fromDisplayName: cms.emailFromName?.trim() || undefined,
-          },
-        });
-        if (!r.ok) toast.error(r.error);
+      const doulaLabel = resolveBookingDoulaLabel(form.doula, t, cms);
+      const r = await completeBookingRequest({
+        data: {
+          fullName: form.fullName,
+          email: form.email,
+          phone: form.phone,
+          pkgKey: form.pkg,
+          pkgLabel: t(`services.items.${form.pkg}.name`),
+          doulaLabel,
+          date: form.date,
+          time: form.time,
+          platform: form.platform,
+          meetLink: cms.teamDefaultScheduleUrl?.trim() || undefined,
+          locale: i18n.language,
+          fromDisplayName: cms.emailFromName?.trim() || undefined,
+          sendClientEmail: cms.emailAutomationBooking,
+          intake: bookingIntakeSnapshot(form),
+        },
+      });
+      if (!r.ok) {
+        toast.error(t("booking.payment.saveFailed", { detail: r.error }));
+        return;
       }
+      if (r.googleError) {
+        toast.warning(t("booking.payment.googleSyncWarn", { detail: r.googleError }));
+      }
+      if (r.emailError) {
+        toast.warning(t("booking.payment.emailSyncWarn", { detail: r.emailError }));
+      }
+      setDone(true);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "E-mail");
+      toast.error(e instanceof Error ? e.message : t("booking.payment.saveFailedGeneric"));
     } finally {
       setFinishBusy(false);
-      setDone(true);
     }
   };
 
@@ -580,7 +628,7 @@ function Booking() {
             <p className="font-serif text-2xl text-foreground">{t("booking.payment.summary")}</p>
             <dl className="space-y-3 rounded-2xl bg-background p-6">
               <Row label={t("booking.steps.package")} value={t(`services.items.${form.pkg}.name`)} />
-              <Row label={t("booking.steps.doula")} value={form.doula === "any" ? t("booking.doulaAny") : DOULAS.find((d) => d.id === form.doula)?.name ?? "—"} />
+              <Row label={t("booking.steps.doula")} value={resolveBookingDoulaLabel(form.doula, t, cms)} />
               <Row label={t("booking.intake.fullName")} value={form.fullName || "—"} />
               <Row label={t("booking.intake.email")} value={form.email || "—"} />
               <Row label={t("booking.intake.phone")} value={form.phone || "—"} />

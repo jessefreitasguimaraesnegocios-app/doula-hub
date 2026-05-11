@@ -1,4 +1,5 @@
 import type { Translation } from "./en";
+import admin from "./fragments/admin-es";
 
 const es: Translation = {
   brand: "All Things Babies",
@@ -92,6 +93,8 @@ const es: Translation = {
     languages: "Idiomas",
     scheduleVideoCall: "Programar videollamada",
     schedulePopupBlocked: "El navegador bloqueó la ventana. Permite ventanas emergentes para este sitio e inténtalo de nuevo.",
+    contractedRole: "Doula del equipo",
+    contractedBioFallback: "Integrante de nuestro círculo de apoyo.",
     founder: {
       name: "Raquel Manini",
       role: "Fundadora y líder del equipo · Doula de parto y posparto",
@@ -223,6 +226,10 @@ const es: Translation = {
       terms: "Al confirmar, aceptas nuestros términos y política de cancelación.",
       success: "Reserva confirmada",
       successBody: "Un email de confirmación va en camino con tu certificado y enlace de consulta.",
+      saveFailed: "No pudimos completar la reserva: {{detail}}",
+      saveFailedGeneric: "Algo salió mal al completar la reserva. Inténtalo de nuevo o contáctanos.",
+      googleSyncWarn: "No se pudo actualizar Google Calendar: {{detail}}",
+      emailSyncWarn: "No se pudo enviar el correo de confirmación: {{detail}}",
     },
   },
   footer: {
@@ -233,6 +240,7 @@ const es: Translation = {
     emailSubject: "All Things Babies — mensaje desde la web",
     emailAria: "Enviar correo a Doula@AllThingsBabies.com",
   },
+  admin,
   language: "Idioma",
 };
 

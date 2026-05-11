@@ -6,7 +6,7 @@ import founder from "@/assets/founder.png";
 import aboutFounderVideo from "@/assets/about-founder-support.mp4";
 import certsPhoto from "@/assets/about-doula-campus.png";
 import { useSiteCms } from "@/hooks/use-site-cms";
-import { pickSiteImageUrl, type SiteCmsV1 } from "@/lib/site-cms";
+import { isVideoAssetUrl, pickSiteImageUrl, type SiteCmsV1 } from "@/lib/site-cms";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -20,11 +20,6 @@ export const Route = createFileRoute("/about")({
   }),
   component: About,
 });
-
-function isVideoAssetUrl(url: string): boolean {
-  const base = (url.split("?")[0] ?? "").toLowerCase();
-  return /\.(mp4|webm|ogg)$/i.test(base);
-}
 
 function AboutFounderMedia({ cms }: { cms: SiteCmsV1 }) {
   const primedFrame = useRef(false);

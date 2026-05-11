@@ -183,9 +183,25 @@ function Team() {
   });
 
   const cards = useMemo(() => {
-    if (remoteDoulas && remoteDoulas.length > 0) return teamCardsFromDb(remoteDoulas, cms);
-    return staticTeamCards(cms);
-  }, [remoteDoulas, cms]);
+    const base =
+      remoteDoulas && remoteDoulas.length > 0 ? teamCardsFromDb(remoteDoulas, cms) : staticTeamCards(cms);
+    const fromContracted: TeamCardModel[] = cms.contractedDoulas
+      .filter((c) => c.visibleOnSite && c.status === "active" && c.name.trim())
+      .map((c) => ({
+        key: `contracted-${c.id}`,
+        slug: `contracted-${c.id}`,
+        kind: "doula" as const,
+        useI18n: false,
+        img: c.photoUrl.trim() || BUNDLED_IMG.founder,
+        scheduleUrl: cms.teamDefaultScheduleUrl?.trim() || null,
+        name: c.name.trim(),
+        role: t("team.contractedRole"),
+        bio: c.notes.trim() || t("team.contractedBioFallback"),
+        specs: [],
+        langs: [],
+      }));
+    return [...base, ...fromContracted];
+  }, [remoteDoulas, cms, t]);
 
   const teamHeroSrc = pickSiteImageUrl(cms, "team_hero", teamHero);
 
@@ -236,22 +252,28 @@ function Team() {
                   <p className="font-serif text-2xl text-foreground">{content.name}</p>
                   <p className="text-sm text-clay">{content.role}</p>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{content.bio}</p>
-                  <div className="mt-5 grid gap-3 text-xs">
-                    <div>
-                      <p className="uppercase tracking-widest text-foreground/50">{t("team.specialties")}</p>
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        {content.specs.map((s) => (
-                          <span key={s} className="rounded-full bg-sage/30 px-3 py-1 text-foreground/80">
-                            {s}
-                          </span>
-                        ))}
-                      </div>
+                  {(content.specs.length > 0 || content.langs.length > 0) && (
+                    <div className="mt-5 grid gap-3 text-xs">
+                      {content.specs.length > 0 ? (
+                        <div>
+                          <p className="uppercase tracking-widest text-foreground/50">{t("team.specialties")}</p>
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            {content.specs.map((s) => (
+                              <span key={s} className="rounded-full bg-sage/30 px-3 py-1 text-foreground/80">
+                                {s}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
+                      {content.langs.length > 0 ? (
+                        <div>
+                          <p className="uppercase tracking-widest text-foreground/50">{t("team.languages")}</p>
+                          <p className="mt-1.5 text-foreground/80">{content.langs.join(" · ")}</p>
+                        </div>
+                      ) : null}
                     </div>
-                    <div>
-                      <p className="uppercase tracking-widest text-foreground/50">{t("team.languages")}</p>
-                      <p className="mt-1.5 text-foreground/80">{content.langs.join(" · ")}</p>
-                    </div>
-                  </div>
+                  )}
                   <button
                     type="button"
                     onClick={() =>

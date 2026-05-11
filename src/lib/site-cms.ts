@@ -28,7 +28,10 @@ export const SITE_IMAGE_KEYS = [
 
 export type SiteImageKey = (typeof SITE_IMAGE_KEYS)[number];
 
-/** Registo privado no painel (não aparece no site público). */
+/** Estado operacional (só no painel). */
+export type ContractedDoulaStatus = "active" | "paused";
+
+/** Registo no painel; com `visibleOnSite` pode aparecer em Equipa e Marcação. */
 export type ContractedDoula = {
   id: string;
   name: string;
@@ -38,7 +41,30 @@ export type ContractedDoula = {
   monthlyFeeDisplay: string;
   notes: string;
   photoUrl: string;
+  /** Pausada: não entra no site nem na lista de marcação. */
+  status: ContractedDoulaStatus;
+  /** Se os clientes a veem em /team e podem escolhê-la em /booking. */
+  visibleOnSite: boolean;
 };
+
+/** Normaliza JSON antigo ou parcial para o tipo actual. */
+export function normalizeContractedDoula(raw: unknown): ContractedDoula | null {
+  if (!raw || typeof raw !== "object") return null;
+  const x = raw as Record<string, unknown>;
+  if (typeof x.id !== "string" || !x.id.trim()) return null;
+  const status: ContractedDoulaStatus = x.status === "paused" ? "paused" : "active";
+  return {
+    id: x.id.trim(),
+    name: typeof x.name === "string" ? x.name : "",
+    phone: typeof x.phone === "string" ? x.phone : "",
+    email: typeof x.email === "string" ? x.email : "",
+    monthlyFeeDisplay: typeof x.monthlyFeeDisplay === "string" ? x.monthlyFeeDisplay : "",
+    notes: typeof x.notes === "string" ? x.notes : "",
+    photoUrl: typeof x.photoUrl === "string" ? x.photoUrl : "",
+    status,
+    visibleOnSite: x.visibleOnSite === true,
+  };
+}
 
 export type SiteCmsV1 = {
   version: 1;
@@ -62,7 +88,7 @@ export type SiteCmsV1 = {
   teamDefaultScheduleUrl: string;
   /** Full URL per slot; empty = keep default image from the site code. */
   siteImages: Partial<Record<SiteImageKey, string>>;
-  /** Doulas que trabalham consigo — só para o seu controlo no admin. */
+  /** Doulas contratadas: gestão no admin; as com `visibleOnSite` entram em Equipa/Marcação. */
   contractedDoulas: ContractedDoula[];
   /** Overlay «em breve» na página Loja (desliga no admin quando abrir). */
   shopComingSoonEnabled: boolean;
@@ -123,7 +149,7 @@ function mergePartial(base: SiteCmsV1, partial: unknown): SiteCmsV1 {
   };
   const cd = p.contractedDoulas;
   const contractedDoulas: ContractedDoula[] = Array.isArray(cd)
-    ? (cd as ContractedDoula[]).filter((x) => x && typeof x === "object" && typeof (x as ContractedDoula).id === "string")
+    ? (cd as unknown[]).map((x) => normalizeContractedDoula(x)).filter((x): x is ContractedDoula => x !== null)
     : base.contractedDoulas;
   const shopComingSoonEnabled =
     typeof p.shopComingSoonEnabled === "boolean" ? p.shopComingSoonEnabled : base.shopComingSoonEnabled;
@@ -194,6 +220,12 @@ export function servicePriceUsdOverride(cms: SiteCmsV1, pkg: string): string | n
 export function pickSiteImageUrl(cms: SiteCmsV1, key: SiteImageKey, fallback: string): string {
   const u = cms.siteImages?.[key]?.trim();
   return u || fallback;
+}
+
+/** Whether a URL points at a common browser-playable video file. */
+export function isVideoAssetUrl(url: string): boolean {
+  const base = (url.split("?")[0] ?? "").toLowerCase();
+  return /\.(mp4|webm|ogg)$/i.test(base);
 }
 
 export function applySiteCmsTheme(cms: SiteCmsV1) {

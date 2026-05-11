@@ -146,6 +146,46 @@ export async function uploadSiteCmsAsset(
   return { publicUrl: data.publicUrl || null, error: null };
 }
 
+export type BookingRequestRow = {
+  id: string;
+  created_at: string;
+  full_name: string;
+  email: string;
+  phone: string;
+  pkg_key: string;
+  pkg_label: string;
+  doula_label: string;
+  consult_date: string;
+  consult_time: string;
+  platform: string;
+  meet_link: string | null;
+  locale: string;
+  intake: unknown;
+  google_event_id: string | null;
+  google_html_link: string | null;
+  google_meet_link: string | null;
+  google_sync_error: string | null;
+  email_sent: boolean;
+  email_error: string | null;
+};
+
+export async function fetchBookingRequestsForAdmin(): Promise<BookingRequestRow[] | null> {
+  const client = getSupabaseBrowserClient();
+  if (!client) return null;
+  const { data, error } = await client
+    .from("booking_requests")
+    .select(
+      "id, created_at, full_name, email, phone, pkg_key, pkg_label, doula_label, consult_date, consult_time, platform, meet_link, locale, intake, google_event_id, google_html_link, google_meet_link, google_sync_error, email_sent, email_error",
+    )
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (error) {
+    console.error("[supabase] booking_requests", error);
+    return null;
+  }
+  return (data ?? []) as BookingRequestRow[];
+}
+
 export async function fetchActiveShopProducts(): Promise<ShopProduct[] | null> {
   const client = getSupabaseBrowserClient();
   if (!client) return null;

@@ -2,8 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { ArrowLeft, ChevronDown, Download, LogOut, Mail, Save, Upload } from "lucide-react";
+import { ArrowLeft, Calendar, ChevronDown, Download, LogOut, Mail, Save, Upload } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -15,6 +16,7 @@ import {
   setSiteCmsToStorage,
   type SiteCmsV1,
 } from "@/lib/site-cms";
+import { AdminBookingsPanel } from "@/components/admin/AdminBookingsPanel";
 import { AdminContractedDoulasPanel } from "@/components/admin/AdminContractedDoulasPanel";
 import { AdminSitePhotosPanel } from "@/components/admin/AdminSitePhotosPanel";
 import { AdminThemePanel } from "@/components/admin/AdminThemePanel";
@@ -39,6 +41,7 @@ export const Route = createFileRoute("/admin")({
 });
 
 function DoulaRowEditor({ row, onUpdated }: { row: DoulaRow; onUpdated: () => void }) {
+  const { t } = useTranslation();
   const [stripeId, setStripeId] = useState(row.stripe_account_id ?? "");
   const [busy, setBusy] = useState(false);
 
@@ -54,7 +57,7 @@ function DoulaRowEditor({ row, onUpdated }: { row: DoulaRow; onUpdated: () => vo
       toast.error(error.message);
       return;
     }
-    toast.success("Conta Stripe guardada.");
+    toast.success(t("admin.toast.stripeSaved"));
     onUpdated();
   };
 
@@ -63,7 +66,7 @@ function DoulaRowEditor({ row, onUpdated }: { row: DoulaRow; onUpdated: () => vo
     setBusy(true);
     const { publicUrl, error: upErr } = await uploadDoulaPhoto(file, row.slug);
     if (upErr || !publicUrl) {
-      toast.error(upErr?.message ?? "Falha no upload");
+      toast.error(upErr?.message ?? t("admin.toast.uploadFailed"));
       setBusy(false);
       return;
     }
@@ -73,7 +76,7 @@ function DoulaRowEditor({ row, onUpdated }: { row: DoulaRow; onUpdated: () => vo
       toast.error(error.message);
       return;
     }
-    toast.success("Foto guardada.");
+    toast.success(t("admin.toast.photoSaved"));
     onUpdated();
   };
 
@@ -81,10 +84,10 @@ function DoulaRowEditor({ row, onUpdated }: { row: DoulaRow; onUpdated: () => vo
     <div className="rounded-xl border border-border bg-muted/30 p-4">
       <p className="font-medium text-foreground">{row.slug}</p>
       <p className="text-xs text-muted-foreground">
-        {row.kind} · ordem {row.display_order}
+        {t("admin.doulasDb.kindOrder", { kind: row.kind, order: row.display_order })}
       </p>
       <div className="mt-3 space-y-2">
-        <Label>Identificador da conta Stripe (opcional)</Label>
+        <Label>{t("admin.doulasDb.stripeLabel")}</Label>
         <div className="flex flex-wrap gap-2">
           <input
             value={stripeId}
@@ -98,12 +101,12 @@ function DoulaRowEditor({ row, onUpdated }: { row: DoulaRow; onUpdated: () => vo
             onClick={() => void saveStripe()}
             className="rounded-full border border-border bg-background px-3 py-2 text-xs font-medium hover:bg-muted disabled:opacity-50"
           >
-            Guardar
+            {t("admin.doulasDb.save")}
           </button>
         </div>
       </div>
       <div className="mt-4 space-y-2">
-        <Label>Foto (escolher ficheiro no computador)</Label>
+        <Label>{t("admin.doulasDb.photoLabel")}</Label>
         <input
           type="file"
           accept="image/jpeg,image/png,image/webp"
@@ -121,6 +124,7 @@ function DoulaRowEditor({ row, onUpdated }: { row: DoulaRow; onUpdated: () => vo
 }
 
 function DoulaSupabaseTab({ enabled }: { enabled: boolean }) {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { data: rows, isPending } = useQuery({
     queryKey: ["doulas", "admin"],
@@ -132,15 +136,15 @@ function DoulaSupabaseTab({ enabled }: { enabled: boolean }) {
   const onUpdated = () => void qc.invalidateQueries({ queryKey: ["doulas", "admin"] });
 
   if (!enabled) {
-    return <p className="text-sm text-muted-foreground">Entre com o seu e-mail e palavra-passe para ver a equipa aqui.</p>;
+    return <p className="text-sm text-muted-foreground">{t("admin.doulasDb.loginPrompt")}</p>;
   }
   if (isPending && !rows) {
-    return <p className="text-sm text-muted-foreground">A carregar…</p>;
+    return <p className="text-sm text-muted-foreground">{t("admin.doulasDb.loading")}</p>;
   }
   if (!rows?.length) {
     return (
       <p className="text-sm text-muted-foreground">
-        Ainda não há ninguém na lista da base de dados. Peça ao técnico do site para adicionar a equipa.
+        {t("admin.doulasDb.empty")}
       </p>
     );
   }
@@ -155,6 +159,7 @@ function DoulaSupabaseTab({ enabled }: { enabled: boolean }) {
 }
 
 function Admin() {
+  const { t } = useTranslation();
   const supabaseOk = isSupabaseConfigured();
   const envPassword = import.meta.env.VITE_ADMIN_PASSWORD as string | undefined;
   const [legacyUnlocked, setLegacyUnlocked] = useState(
@@ -200,23 +205,23 @@ function Admin() {
 
   const tryLegacyLogin = useCallback(() => {
     if (!envPassword?.trim()) {
-      toast.error("Defina VITE_ADMIN_PASSWORD no .env (local) ou na Vercel. Reinicie o dev server após alterar.");
+      toast.error(t("admin.toast.defineViteAdminPassword"));
       return;
     }
     if (password === envPassword) {
       sessionStorage.setItem(ADMIN_SESSION_KEY, "1");
       setLegacyUnlocked(true);
       setPassword("");
-      toast.success("Sessão iniciada.");
+      toast.success(t("admin.toast.sessionStarted"));
     } else {
-      toast.error("Senha incorreta.");
+      toast.error(t("admin.toast.wrongPassword"));
     }
-  }, [envPassword, password]);
+  }, [envPassword, password, t]);
 
   const trySupabaseLogin = useCallback(async () => {
     const c = getSupabaseBrowserClient();
     if (!c) {
-      toast.error("Supabase não configurado.");
+      toast.error(t("admin.toast.supabaseNotConfigured"));
       return;
     }
     const { error } = await c.auth.signInWithPassword({
@@ -228,8 +233,8 @@ function Admin() {
       return;
     }
     setSupabasePassword("");
-    toast.success("Sessão iniciada.");
-  }, [email, supabasePassword]);
+    toast.success(t("admin.toast.sessionStarted"));
+  }, [email, supabasePassword, t]);
 
   const logout = useCallback(async () => {
     if (supabaseOk) {
@@ -240,8 +245,8 @@ function Admin() {
       sessionStorage.removeItem(ADMIN_SESSION_KEY);
       setLegacyUnlocked(false);
     }
-    toast.message("Saiu das definições.");
-  }, [supabaseOk]);
+    toast.message(t("admin.toast.signedOut"));
+  }, [supabaseOk, t]);
 
   const save = useCallback(async () => {
     setSiteCmsToStorage(draft);
@@ -252,11 +257,11 @@ function Admin() {
         toast.error(error.message);
         return;
       }
-      toast.success("Guardado na Internet e neste computador.");
+      toast.success(t("admin.toast.savedCloud"));
       return;
     }
-    toast.success("Guardado neste computador.");
-  }, [draft, supabaseOk, session]);
+    toast.success(t("admin.toast.savedLocal"));
+  }, [draft, supabaseOk, session, t]);
 
   const exportJson = useCallback(() => {
     const blob = new Blob([JSON.stringify(draft, null, 2)], { type: "application/json" });
@@ -265,8 +270,8 @@ function Admin() {
     a.download = `atb-site-cms-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(a.href);
-    toast.success("Ficheiro descarregado. Guarde-o num sítio seguro, se quiser.");
-  }, [draft]);
+    toast.success(t("admin.toast.exportDownloaded"));
+  }, [draft, t]);
 
   const onImportFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -279,24 +284,21 @@ function Admin() {
       setDraft(parsed);
       setSiteCmsToStorage(parsed);
       applySiteCmsTheme(parsed);
-      toast.success(
-        "Ficheiro carregado. O site neste computador já mostra essas definições. Toque em Guardar alterações para ficarem guardadas de vez.",
-      );
+      toast.success(t("admin.toast.importLoaded"));
     };
     reader.readAsText(file);
-  }, []);
+  }, [t]);
 
   if (!unlocked) {
     if (supabaseOk) {
       return (
         <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-6 py-20">
-          <h1 className="font-serif text-3xl text-foreground">Entrar nas definições</h1>
+          <h1 className="font-serif text-3xl text-foreground">{t("admin.login.title")}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Use o e-mail e a palavra-passe que o técnico do site lhe deu. Se não tiver conta, peça ajuda a quem gere o
-            site.
+            {t("admin.login.supabaseIntro")}
           </p>
           <div className="mt-8 space-y-2">
-            <Label htmlFor="admin-email">E-mail</Label>
+            <Label htmlFor="admin-email">{t("admin.login.email")}</Label>
             <input
               id="admin-email"
               type="email"
@@ -307,7 +309,7 @@ function Admin() {
             />
           </div>
           <div className="mt-4 space-y-2">
-            <Label htmlFor="admin-supa-pw">Palavra-passe</Label>
+            <Label htmlFor="admin-supa-pw">{t("admin.login.password")}</Label>
             <input
               id="admin-supa-pw"
               type="password"
@@ -323,10 +325,10 @@ function Admin() {
             onClick={() => void trySupabaseLogin()}
             className="mt-6 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           >
-            Entrar
+            {t("admin.login.submit")}
           </button>
           <Link to="/" className="mt-8 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" /> Voltar ao site
+            <ArrowLeft className="h-4 w-4" /> {t("admin.login.backToSite")}
           </Link>
         </div>
       );
@@ -334,13 +336,12 @@ function Admin() {
 
     return (
         <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-6 py-20">
-          <h1 className="font-serif text-3xl text-foreground">Entrar nas definições</h1>
+          <h1 className="font-serif text-3xl text-foreground">{t("admin.login.title")}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Modo simples de teste: escreva a senha que está no ficheiro de configuração do site (só para quem montou o
-            projeto). Em produção costuma-se usar e-mail e palavra-passe em vez disto.
+            {t("admin.login.legacyIntro")}
           </p>
         <div className="mt-8 space-y-2">
-          <Label htmlFor="admin-pw">Senha</Label>
+          <Label htmlFor="admin-pw">{t("admin.login.password")}</Label>
           <input
             id="admin-pw"
             type="password"
@@ -356,10 +357,10 @@ function Admin() {
           onClick={tryLegacyLogin}
           className="mt-6 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
         >
-          Entrar
+          {t("admin.login.submit")}
         </button>
         <Link to="/" className="mt-8 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> Voltar ao site
+          <ArrowLeft className="h-4 w-4" /> {t("admin.login.backToSite")}
         </Link>
       </div>
     );
@@ -371,16 +372,16 @@ function Admin() {
         <div className="mx-auto max-w-6xl px-6 py-4">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0 max-w-xl">
-              <h1 className="font-serif text-2xl text-foreground">Definições do site</h1>
+              <h1 className="font-serif text-2xl text-foreground">{t("admin.header.title")}</h1>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                Mude o que precisar nos separadores abaixo. Quando terminar, toque em{" "}
-                <strong className="text-foreground">Guardar alterações</strong>. Depois abra{" "}
-                <strong className="text-foreground">Ver o site</strong> para ver como ficou.
+                {t("admin.header.intro")}{" "}
+                <strong className="text-foreground">{t("admin.header.introSave")}</strong>. {t("admin.header.introThen")}{" "}
+                <strong className="text-foreground">{t("admin.header.introView")}</strong> {t("admin.header.introEnd")}
               </p>
               <p className="mt-2 text-xs text-muted-foreground">
                 {supabaseOk && session
-                  ? "Com a sua sessão, Guardar também envia tudo para a Internet (além deste computador)."
-                  : "Sem sessão na Internet, Guardar mantém as alterações só neste computador."}
+                  ? t("admin.header.footnoteSupabase")
+                  : t("admin.header.footnoteLocal")}
               </p>
             </div>
             <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
@@ -389,20 +390,20 @@ function Admin() {
                 onClick={() => void save()}
                 className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90"
               >
-                <Save className="h-4 w-4" /> Guardar alterações
+                <Save className="h-4 w-4" /> {t("admin.header.save")}
               </button>
               <Link
                 to="/"
                 className="inline-flex items-center rounded-full border border-border bg-background px-5 py-2.5 text-sm font-medium hover:bg-muted"
               >
-                Ver o site
+                {t("admin.header.viewSite")}
               </Link>
               <button
                 type="button"
                 onClick={() => void logout()}
                 className="inline-flex items-center gap-2 rounded-full border border-transparent px-4 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
               >
-                <LogOut className="h-4 w-4" /> Sair
+                <LogOut className="h-4 w-4" /> {t("admin.header.signOut")}
               </button>
             </div>
           </div>
@@ -410,12 +411,11 @@ function Admin() {
           <details className="group mt-5 border-t border-border pt-4">
             <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-medium text-foreground hover:underline [&::-webkit-details-marker]:hidden">
               <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
-              Só se precisar: cópia no computador (ficheiro)
+              {t("admin.backup.summary")}
             </summary>
             <div className="mt-4 flex flex-col gap-3 rounded-xl border border-border bg-muted/30 p-4 sm:flex-row sm:items-center sm:justify-between">
               <p className="max-w-lg text-xs leading-relaxed text-muted-foreground">
-                Isto não é obrigatório. Serve para descarregar uma cópia das definições ou para trazer uma cópia antiga
-                — por exemplo se mudou de computador. O dia a dia do site é só: alterar → Guardar alterações.
+                {t("admin.backup.body")}
               </p>
               <div className="flex shrink-0 flex-wrap gap-2">
                 <button
@@ -423,14 +423,14 @@ function Admin() {
                   onClick={exportJson}
                   className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm hover:bg-muted"
                 >
-                  <Download className="h-4 w-4" /> Baixar cópia
+                  <Download className="h-4 w-4" /> {t("admin.backup.download")}
                 </button>
                 <button
                   type="button"
                   onClick={() => importRef.current?.click()}
                   className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm hover:bg-muted"
                 >
-                  <Upload className="h-4 w-4" /> Carregar cópia
+                  <Upload className="h-4 w-4" /> {t("admin.backup.upload")}
                 </button>
               </div>
             </div>
@@ -442,25 +442,29 @@ function Admin() {
       <div className="mx-auto max-w-6xl px-6 pt-8">
         <Tabs defaultValue="contacts" className="w-full">
           <TabsList className="mb-6 flex h-auto flex-wrap justify-start gap-1 bg-muted/80 p-1">
-            <TabsTrigger value="contacts">Contactos</TabsTrigger>
-            <TabsTrigger value="photos">Fotos do site</TabsTrigger>
-            <TabsTrigger value="contracted">Contratadas</TabsTrigger>
-            <TabsTrigger value="theme">Cores</TabsTrigger>
-            <TabsTrigger value="prices">Preços</TabsTrigger>
-            <TabsTrigger value="team">Videochamada</TabsTrigger>
-            <TabsTrigger value="shop">Loja</TabsTrigger>
-            {supabaseOk ? <TabsTrigger value="doulas-db">Equipa</TabsTrigger> : null}
-            <TabsTrigger value="stripe">Pagamentos</TabsTrigger>
+            <TabsTrigger value="contacts">{t("admin.tabs.contacts")}</TabsTrigger>
+            <TabsTrigger value="photos">{t("admin.tabs.photos")}</TabsTrigger>
+            <TabsTrigger value="contracted">{t("admin.tabs.contracted")}</TabsTrigger>
+            <TabsTrigger value="theme">{t("admin.tabs.theme")}</TabsTrigger>
+            <TabsTrigger value="prices">{t("admin.tabs.prices")}</TabsTrigger>
+            <TabsTrigger value="team">{t("admin.tabs.team")}</TabsTrigger>
+            <TabsTrigger value="shop">{t("admin.tabs.shop")}</TabsTrigger>
+            {supabaseOk ? <TabsTrigger value="doulas-db">{t("admin.tabs.teamDb")}</TabsTrigger> : null}
+            {supabaseOk ? (
+              <TabsTrigger value="bookings" className="gap-1.5">
+                <Calendar className="h-3.5 w-3.5" /> {t("admin.tabs.bookings")}
+              </TabsTrigger>
+            ) : null}
+            <TabsTrigger value="stripe">{t("admin.tabs.stripe")}</TabsTrigger>
             <TabsTrigger value="email" className="gap-1.5">
-              <Mail className="h-3.5 w-3.5" /> E-mail
+              <Mail className="h-3.5 w-3.5" /> {t("admin.tabs.email")}
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="photos" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="font-serif text-xl">Fotos do site</h2>
+            <h2 className="font-serif text-xl">{t("admin.photos.title")}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Troque imagens sem mexer no código. As fotos da loja por produto continuam na base de dados ou no ficheiro
-              da loja — aqui são sobretudo páginas principais e equipa.
+              {t("admin.photos.subtitle")}
             </p>
             <div className="mt-6">
               <AdminSitePhotosPanel
@@ -472,7 +476,7 @@ function Admin() {
           </TabsContent>
 
           <TabsContent value="contracted" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="font-serif text-xl">Contratadas (lista privada)</h2>
+            <h2 className="font-serif text-xl">{t("admin.tabs.contracted")}</h2>
             <div className="mt-6">
               <AdminContractedDoulasPanel
                 list={draft.contractedDoulas}
@@ -483,11 +487,11 @@ function Admin() {
           </TabsContent>
 
           <TabsContent value="contacts" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="font-serif text-xl">Contactos e redes sociais</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Aparecem no rodapé e na página de contactos do site.</p>
+            <h2 className="font-serif text-xl">{t("admin.contacts.title")}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t("admin.contacts.subtitle")}</p>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               <div className="space-y-2 sm:col-span-2">
-                <Label>E-mail de contacto</Label>
+                <Label>{t("admin.contacts.email")}</Label>
                 <input
                   value={draft.contactEmail}
                   onChange={(e) => setDraft((d) => ({ ...d, contactEmail: e.target.value }))}
@@ -495,7 +499,7 @@ function Admin() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Telefone (como aparece escrito)</Label>
+                <Label>{t("admin.contacts.phoneDisplay")}</Label>
                 <input
                   value={draft.contactPhoneDisplay}
                   onChange={(e) => setDraft((d) => ({ ...d, contactPhoneDisplay: e.target.value }))}
@@ -503,7 +507,7 @@ function Admin() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Telefone para o botão “ligar” (só números e +)</Label>
+                <Label>{t("admin.contacts.phoneHref")}</Label>
                 <input
                   value={draft.contactPhoneHref}
                   onChange={(e) => setDraft((d) => ({ ...d, contactPhoneHref: e.target.value }))}
@@ -512,7 +516,7 @@ function Admin() {
                 />
               </div>
               <div className="space-y-2 sm:col-span-2">
-                <Label>Morada (linha única)</Label>
+                <Label>{t("admin.contacts.address")}</Label>
                 <input
                   value={draft.addressLine}
                   onChange={(e) => setDraft((d) => ({ ...d, addressLine: e.target.value }))}
@@ -520,7 +524,7 @@ function Admin() {
                 />
               </div>
               <div className="space-y-2 sm:col-span-2">
-                <Label>URL do Instagram</Label>
+                <Label>{t("admin.contacts.instagramUrl")}</Label>
                 <input
                   value={draft.instagramUrl}
                   onChange={(e) => setDraft((d) => ({ ...d, instagramUrl: e.target.value }))}
@@ -528,7 +532,7 @@ function Admin() {
                 />
               </div>
               <div className="space-y-2 sm:col-span-2">
-                <Label>Nome no Instagram (com @)</Label>
+                <Label>{t("admin.contacts.instagramHandle")}</Label>
                 <input
                   value={draft.instagramHandle}
                   onChange={(e) => setDraft((d) => ({ ...d, instagramHandle: e.target.value }))}
@@ -539,8 +543,8 @@ function Admin() {
           </TabsContent>
 
           <TabsContent value="theme" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="font-serif text-xl">Cores do site</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Toque nas cores; não precisa de escrever códigos.</p>
+            <h2 className="font-serif text-xl">{t("admin.themeTab.title")}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t("admin.themeTab.subtitle")}</p>
             <div className="mt-6">
               <AdminThemePanel
                 theme={draft.theme}
@@ -550,14 +554,13 @@ function Admin() {
           </TabsContent>
 
           <TabsContent value="prices" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="font-serif text-xl">Preços nos serviços</h2>
+            <h2 className="font-serif text-xl">{t("admin.prices.title")}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Só em inglês e espanhol no site aparecem estes preços em dólares ($). Deixe em branco para usar o texto
-              padrão do site.
+              {t("admin.prices.subtitle")}
             </p>
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
-                <Label>Nascimento (ex.: $3,800)</Label>
+                <Label>{t("admin.prices.birth")}</Label>
                 <input
                   value={draft.servicesPrices.birthUsd}
                   onChange={(e) =>
@@ -570,7 +573,7 @@ function Admin() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Pós-parto (ex.: $95/hr)</Label>
+                <Label>{t("admin.prices.postpartum")}</Label>
                 <input
                   value={draft.servicesPrices.postpartumUsd}
                   onChange={(e) =>
@@ -583,7 +586,7 @@ function Admin() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Amamentação (ex.: $195)</Label>
+                <Label>{t("admin.prices.lactation")}</Label>
                 <input
                   value={draft.servicesPrices.lactationUsd}
                   onChange={(e) =>
@@ -599,13 +602,12 @@ function Admin() {
           </TabsContent>
 
           <TabsContent value="team" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="font-serif text-xl">Link da videochamada (Zoom)</h2>
+            <h2 className="font-serif text-xl">{t("admin.team.title")}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Cole aqui o link do calendário Zoom que as visitantes devem abrir ao tocar em “Agendar videochamada” na
-              página da equipa. Se deixar em branco, o site usa o link que já veio configurado.
+              {t("admin.team.subtitle")}
             </p>
             <div className="mt-6 space-y-2">
-              <Label>Endereço do link (URL)</Label>
+              <Label>{t("admin.team.urlLabel")}</Label>
               <input
                 value={draft.teamDefaultScheduleUrl}
                 onChange={(e) => setDraft((d) => ({ ...d, teamDefaultScheduleUrl: e.target.value }))}
@@ -614,32 +616,27 @@ function Admin() {
               />
             </div>
             <p className="mt-6 text-sm text-muted-foreground">
-              As fotos e textos das pessoas na página da equipa vêm da base de dados quando o site está ligado à
-              Internet; caso contrário usa-se o conteúdo fixo que veio no site.
+              {t("admin.team.footerNote")}
             </p>
           </TabsContent>
 
           <TabsContent value="shop" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="font-serif text-xl">Loja</h2>
+            <h2 className="font-serif text-xl">{t("admin.shop.title")}</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Os produtos e fotos da loja são geridos na base de dados ou pelo técnico do site. Aqui não há botões para
-              mudar produtos — fale com quem mantém o site se precisar de alterar artigos ou imagens.
+              {t("admin.shop.intro")}
             </p>
 
             <div className="mt-8 rounded-2xl border border-border bg-muted/20 p-5">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <p className="font-medium text-foreground">Mensagem «em breve» na página Loja</p>
+                  <p className="font-medium text-foreground">{t("admin.shop.comingSoonTitle")}</p>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Quando está ligada, aparece um aviso acolhedor no centro do ecrã (com o fundo desfocado). A visitante
-                    pode esconder o aviso só para ver os produtos naquele momento; se sair da loja, fechar o separador
-                    ou voltar mais tarde, o aviso volta a aparecer até desligar aqui. Se deixar o título ou o texto em
-                    branco, o site usa as frases que já vêm nas traduções (por idioma).
+                    {t("admin.shop.comingSoonBody")}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <Label htmlFor="shop-coming-soon-switch" className="text-sm text-muted-foreground">
-                    Mostrar aviso
+                    {t("admin.shop.showNotice")}
                   </Label>
                   <Switch
                     id="shop-coming-soon-switch"
@@ -651,24 +648,24 @@ function Admin() {
                 </div>
               </div>
               <div className="mt-6 space-y-2">
-                <Label htmlFor="shop-coming-soon-title">Título personalizado (opcional)</Label>
+                <Label htmlFor="shop-coming-soon-title">{t("admin.shop.customTitle")}</Label>
                 <input
                   id="shop-coming-soon-title"
                   value={draft.shopComingSoonTitle}
                   onChange={(e) => setDraft((d) => ({ ...d, shopComingSoonTitle: e.target.value }))}
                   className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
-                  placeholder="Deixe vazio para usar o texto automático do site"
+                  placeholder={t("admin.shop.customTitlePh")}
                 />
               </div>
               <div className="mt-4 space-y-2">
-                <Label htmlFor="shop-coming-soon-msg">Mensagem personalizada (opcional)</Label>
+                <Label htmlFor="shop-coming-soon-msg">{t("admin.shop.customMessage")}</Label>
                 <textarea
                   id="shop-coming-soon-msg"
                   rows={5}
                   value={draft.shopComingSoonMessage}
                   onChange={(e) => setDraft((d) => ({ ...d, shopComingSoonMessage: e.target.value }))}
                   className="w-full resize-y rounded-xl border border-border bg-background px-3 py-2 text-sm leading-relaxed"
-                  placeholder="Deixe vazio para usar o texto automático. Pode usar Enter para parágrafos."
+                  placeholder={t("admin.shop.customMessagePh")}
                 />
               </div>
             </div>
@@ -676,9 +673,9 @@ function Admin() {
 
           {supabaseOk ? (
             <TabsContent value="doulas-db" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-              <h2 className="font-serif text-xl">Equipa (fotos e Stripe)</h2>
+              <h2 className="font-serif text-xl">{t("admin.doulasDb.title")}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Por cada pessoa: pode carregar uma foto e, se o técnico pediu, colar o identificador da conta Stripe.
+                {t("admin.doulasDb.subtitle")}
               </p>
               <div className="mt-6">
                 <DoulaSupabaseTab enabled={Boolean(session)} />
@@ -686,111 +683,108 @@ function Admin() {
             </TabsContent>
           ) : null}
 
+          {supabaseOk ? (
+            <TabsContent value="bookings" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+              <h2 className="font-serif text-xl">{t("admin.bookings.title")}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{t("admin.bookings.subtitle")}</p>
+              <div className="mt-6">
+                <AdminBookingsPanel enabled={Boolean(session)} />
+              </div>
+            </TabsContent>
+          ) : null}
+
           <TabsContent value="stripe" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="font-serif text-xl">Pagamentos online</h2>
+            <h2 className="font-serif text-xl">{t("admin.stripe.title")}</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Cartões e pagamentos seguros são montados pelo técnico do site (Stripe). Se precisar de mudar contas ou
-              preços ligados ao dinheiro, peça ajuda a essa pessoa — não é seguro tratar disso só por aqui.
+              {t("admin.stripe.p1")}
             </p>
             <p className="mt-3 text-sm text-muted-foreground">
-              O identificador da conta Stripe de cada doula pode ser preenchido no separador <strong>Equipa</strong>,
-              quando estiver com sessão iniciada.
+              {t("admin.stripe.p2")}
             </p>
           </TabsContent>
 
           <TabsContent value="email" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="font-serif text-xl">E-mail automático (Gmail / SMTP)</h2>
+            <h2 className="font-serif text-xl">{t("admin.email.title")}</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              A <strong>senha de aplicação</strong> do Gmail e o e-mail da conta <strong>nunca</strong> devem ser
-              guardados neste painel nem no ficheiro JSON — só nas variáveis de ambiente do servidor (ex.: Vercel →
-              Settings → Environment Variables). Aqui configura o comportamento do site e testa o envio.
+              {t("admin.email.intro")}
             </p>
 
             <div className="mt-8 space-y-6 rounded-2xl border border-border bg-muted/15 p-6 text-sm leading-relaxed text-foreground/90">
               <div>
-                <h3 className="font-medium text-foreground">1. Segurança na conta Google</h3>
+                <h3 className="font-medium text-foreground">{t("admin.email.step1Title")}</h3>
                 <p className="mt-2 text-muted-foreground">
-                  Em{" "}
+                  {t("admin.email.step1Open")}{" "}
                   <a
                     href="https://myaccount.google.com/security"
                     className="text-primary underline"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Google Account → Security
+                    {t("admin.email.step1Link")}
                   </a>
-                  , ative a <strong>verificação em duas etapas</strong>.
+                  {t("admin.email.step1AfterLink")}
                 </p>
               </div>
               <div>
-                <h3 className="font-medium text-foreground">2. Senha de aplicação</h3>
+                <h3 className="font-medium text-foreground">{t("admin.email.step2Title")}</h3>
                 <p className="mt-2 text-muted-foreground">
-                  Depois abra{" "}
+                  {t("admin.email.step2Open")}{" "}
                   <a
                     href="https://myaccount.google.com/apppasswords"
                     className="text-primary underline"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    App passwords
+                    {t("admin.email.step2Link")}
                   </a>
-                  , crie um nome (ex.: «Meu site») e copie a senha de 16 caracteres — <strong>não</strong> use a senha
-                  normal do Gmail.
+                  {t("admin.email.step2AfterLink")}
                 </p>
               </div>
               <div>
-                <h3 className="font-medium text-foreground">3. Variáveis no servidor (Vercel ou .env local)</h3>
+                <h3 className="font-medium text-foreground">{t("admin.email.step3Title")}</h3>
                 <ul className="mt-2 list-inside list-disc space-y-1 font-mono text-xs text-muted-foreground">
                   <li>
-                    <code className="text-foreground">SMTP_USER</code> — o Gmail (ex.:{" "}
-                    <code>nome@gmail.com</code>) · alternativa: <code>EMAIL_USER</code>
+                    <code className="text-foreground">SMTP_USER</code> — {t("admin.email.step3SmtpUser")}
                   </li>
                   <li>
-                    <code className="text-foreground">SMTP_PASS</code> — senha de aplicação · alternativa:{" "}
-                    <code>EMAIL_PASS</code>
+                    <code className="text-foreground">SMTP_PASS</code> — {t("admin.email.step3SmtpPass")}
                   </li>
                   <li>
-                    <code className="text-foreground">SMTP_ACTION_SECRET</code> — uma palavra-passe à sua escolha só
-                    para desbloquear o «teste» abaixo (não é a senha do Gmail)
+                    <code className="text-foreground">SMTP_ACTION_SECRET</code> — {t("admin.email.step3ActionSecret")}
                   </li>
                   <li>
-                    <code className="text-foreground">SMTP_FROM_NAME</code> — nome no remetente (opcional)
+                    <code className="text-foreground">SMTP_FROM_NAME</code> — {t("admin.email.step3FromName")}
                   </li>
                   <li>
-                    <code className="text-foreground">SMTP_NOTIFY_TO</code> — para onde vão as mensagens do formulário
-                    de contacto (opcional; se vazio, usa o mesmo que <code>SMTP_USER</code>)
+                    <code className="text-foreground">SMTP_NOTIFY_TO</code> — {t("admin.email.step3NotifyTo")}
                   </li>
                   <li>
-                    <code className="text-foreground">SMTP_HOST</code> (opcional, predefinição{" "}
-                    <code>smtp.gmail.com</code>), <code>SMTP_PORT</code> (587), <code>SMTP_SECURE</code> (
-                    <code>true</code> só se o servidor exigir SSL na porta dedicada)
+                    <code className="text-foreground">SMTP_HOST</code> / <code>SMTP_PORT</code> /{" "}
+                    <code>SMTP_SECURE</code> — {t("admin.email.step3HostPort")}
                   </li>
                   <li>
-                    <code className="text-foreground">DISABLE_SMTP_SENDS=1</code> — desliga todos os envios em
-                    emergência
+                    <code className="text-foreground">DISABLE_SMTP_SENDS=1</code> — {t("admin.email.step3Disable")}
                   </li>
                 </ul>
                 <p className="mt-3 text-xs text-muted-foreground">
-                  Em produção na Vercel o site corre em Node (Nitro); o Nodemailer funciona aí. Num ambiente só
-                  Cloudflare Workers o SMTP clássico costuma <strong>não</strong> estar disponível — use Vercel ou
-                  outro backend Node para Gmail SMTP.
+                  {t("admin.email.step3Foot")}
                 </p>
               </div>
             </div>
 
             <div className="mt-8 rounded-2xl border border-border bg-muted/20 p-5">
-              <p className="font-medium text-foreground">Opções guardadas com «Guardar alterações»</p>
+              <p className="font-medium text-foreground">{t("admin.email.optionsTitle")}</p>
               <div className="mt-4 space-y-2">
-                <Label htmlFor="email-from-name">Nome no remetente (opcional)</Label>
+                <Label htmlFor="email-from-name">{t("admin.email.fromName")}</Label>
                 <input
                   id="email-from-name"
                   value={draft.emailFromName}
                   onChange={(e) => setDraft((d) => ({ ...d, emailFromName: e.target.value }))}
                   className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
-                  placeholder="Ex.: All Things Babies"
+                  placeholder={t("admin.email.fromNamePh")}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Se deixar vazio, usa-se o valor de <code className="font-mono">SMTP_FROM_NAME</code> no servidor.
+                  {t("admin.email.fromNameHint")}
                 </p>
               </div>
               <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
@@ -802,7 +796,7 @@ function Admin() {
                       setDraft((d) => ({ ...d, emailAutomationBooking: Boolean(checked) }))
                     }
                   />
-                  <Label htmlFor="email-auto-booking">E-mail após concluir marcação no site</Label>
+                  <Label htmlFor="email-auto-booking">{t("admin.email.autoBooking")}</Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <Switch
@@ -812,31 +806,30 @@ function Admin() {
                       setDraft((d) => ({ ...d, emailAutomationContact: Boolean(checked) }))
                     }
                   />
-                  <Label htmlFor="email-auto-contact">Notificar por e-mail o formulário de contactos</Label>
+                  <Label htmlFor="email-auto-contact">{t("admin.email.autoContact")}</Label>
                 </div>
               </div>
             </div>
 
             <div className="mt-8 rounded-2xl border border-border bg-card p-5 shadow-sm">
-              <h3 className="font-medium text-foreground">Enviar e-mail de teste</h3>
+              <h3 className="font-medium text-foreground">{t("admin.email.testTitle")}</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Use o mesmo valor de <code className="rounded bg-muted px-1 font-mono text-xs">SMTP_ACTION_SECRET</code>{" "}
-                que colocou na Vercel (ou no .env local). Isto evita que qualquer visitante dispare e-mails.
+                {t("admin.email.testIntro")}
               </p>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="email-test-to">Destino do teste</Label>
+                  <Label htmlFor="email-test-to">{t("admin.email.testTo")}</Label>
                   <input
                     id="email-test-to"
                     type="email"
                     value={emailTestTo}
                     onChange={(e) => setEmailTestTo(e.target.value)}
                     className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
-                    placeholder="o seu e-mail"
+                    placeholder={t("admin.email.testToPh")}
                   />
                 </div>
                 <div className="space-y-2 sm:col-span-2">
-                  <Label htmlFor="email-test-secret">Chave de ação (SMTP_ACTION_SECRET)</Label>
+                  <Label htmlFor="email-test-secret">{t("admin.email.testSecret")}</Label>
                   <input
                     id="email-test-secret"
                     type="password"
@@ -844,7 +837,7 @@ function Admin() {
                     value={emailTestSecret}
                     onChange={(e) => setEmailTestSecret(e.target.value)}
                     className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm font-mono"
-                    placeholder="o valor que definiu no servidor"
+                    placeholder={t("admin.email.testSecretPh")}
                   />
                 </div>
               </div>
@@ -857,10 +850,10 @@ function Admin() {
                     const r = await sendSmtpTestEmail({
                       data: { to: emailTestTo.trim(), actionSecret: emailTestSecret },
                     });
-                    if (r.ok) toast.success("E-mail de teste enviado. Verifique a caixa de entrada (e o spam).");
+                    if (r.ok) toast.success(t("admin.toast.emailTestSent"));
                     else toast.error(r.error);
                   } catch (e) {
-                    toast.error(e instanceof Error ? e.message : "Falha no envio");
+                    toast.error(e instanceof Error ? e.message : t("admin.toast.emailSendFailed"));
                   } finally {
                     setEmailTestBusy(false);
                   }
@@ -868,7 +861,7 @@ function Admin() {
                 className="mt-4 inline-flex items-center gap-2 rounded-full border border-border bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
               >
                 <Mail className="h-4 w-4" />
-                {emailTestBusy ? "A enviar…" : "Enviar teste"}
+                {emailTestBusy ? t("admin.email.testSending") : t("admin.email.testButton")}
               </button>
             </div>
           </TabsContent>

@@ -3,9 +3,9 @@ import { useTranslation } from "react-i18next";
 import { ArrowRight, Heart, Leaf, Sparkles, Quote } from "lucide-react";
 import heroImg from "@/assets/hero-doula.jpg";
 import newbornImg from "@/assets/cta-newborn.png";
-import promiseImg from "@/assets/home-promise-support.png";
+import promiseVideo from "@/assets/home-promise-support.mp4";
 import { useSiteCms } from "@/hooks/use-site-cms";
-import { pickSiteImageUrl } from "@/lib/site-cms";
+import { isVideoAssetUrl, pickSiteImageUrl, type SiteCmsV1 } from "@/lib/site-cms";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -20,11 +20,43 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
+function HomePromiseMedia({ cms }: { cms: SiteCmsV1 }) {
+  const promiseSrc = pickSiteImageUrl(cms, "home_promise", promiseVideo);
+  const alt = "Doula comforting a pregnant person during labor in a hospital room";
+
+  if (!isVideoAssetUrl(promiseSrc)) {
+    return (
+      <img
+        src={promiseSrc}
+        alt={alt}
+        loading="lazy"
+        width={1080}
+        height={1500}
+        className="aspect-4/5 w-full rounded-[2rem] object-cover shadow-(--shadow-soft)"
+      />
+    );
+  }
+
+  return (
+    <div className="aspect-4/5 w-full overflow-hidden rounded-[2rem] shadow-(--shadow-soft)">
+      <video
+        src={promiseSrc}
+        className="h-full w-full object-cover"
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="metadata"
+        aria-label={alt}
+      />
+    </div>
+  );
+}
+
 function Home() {
   const { t } = useTranslation();
   const cms = useSiteCms();
   const heroSrc = pickSiteImageUrl(cms, "home_hero", heroImg);
-  const promiseSrc = pickSiteImageUrl(cms, "home_promise", promiseImg);
   const newbornSrc = pickSiteImageUrl(cms, "home_cta_newborn", newbornImg);
   const pillars = [
     { key: "one", icon: Heart },
@@ -86,14 +118,7 @@ function Home() {
       {/* PROMISE */}
       <section className="bg-[oklch(0.94_0.02_80)] py-24">
         <div className="mx-auto grid max-w-6xl gap-12 px-6 md:grid-cols-2 md:items-center">
-          <img
-            src={promiseSrc}
-            alt="Doula comforting a pregnant person during labor in a hospital room"
-            loading="lazy"
-            width={1080}
-            height={1500}
-            className="aspect-4/5 w-full rounded-[2rem] object-cover shadow-(--shadow-soft)"
-          />
+          <HomePromiseMedia cms={cms} />
           <div>
             <h2 className="font-serif text-4xl leading-tight text-foreground md:text-5xl">
               {t("home.promiseTitle")}
