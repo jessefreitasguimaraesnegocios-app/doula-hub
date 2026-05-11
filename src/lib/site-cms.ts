@@ -64,6 +64,12 @@ export type SiteCmsV1 = {
   siteImages: Partial<Record<SiteImageKey, string>>;
   /** Doulas que trabalham consigo — só para o seu controlo no admin. */
   contractedDoulas: ContractedDoula[];
+  /** Overlay «em breve» na página Loja (desliga no admin quando abrir). */
+  shopComingSoonEnabled: boolean;
+  /** Vazio = usar texto das traduções (por idioma). */
+  shopComingSoonTitle: string;
+  /** Vazio = usar texto das traduções. Pode usar quebras de linha. */
+  shopComingSoonMessage: string;
 };
 
 export const DEFAULT_SITE_CMS: SiteCmsV1 = {
@@ -86,6 +92,9 @@ export const DEFAULT_SITE_CMS: SiteCmsV1 = {
   teamDefaultScheduleUrl: "",
   siteImages: {},
   contractedDoulas: [],
+  shopComingSoonEnabled: true,
+  shopComingSoonTitle: "",
+  shopComingSoonMessage: "",
 };
 
 /** Merge a remote JSON payload (e.g. Supabase `site_settings.payload`) into defaults. */
@@ -107,6 +116,12 @@ function mergePartial(base: SiteCmsV1, partial: unknown): SiteCmsV1 {
   const contractedDoulas: ContractedDoula[] = Array.isArray(cd)
     ? (cd as ContractedDoula[]).filter((x) => x && typeof x === "object" && typeof (x as ContractedDoula).id === "string")
     : base.contractedDoulas;
+  const shopComingSoonEnabled =
+    typeof p.shopComingSoonEnabled === "boolean" ? p.shopComingSoonEnabled : base.shopComingSoonEnabled;
+  const shopComingSoonTitle =
+    typeof p.shopComingSoonTitle === "string" ? p.shopComingSoonTitle : base.shopComingSoonTitle;
+  const shopComingSoonMessage =
+    typeof p.shopComingSoonMessage === "string" ? p.shopComingSoonMessage : base.shopComingSoonMessage;
   return {
     ...base,
     ...p,
@@ -120,6 +135,9 @@ function mergePartial(base: SiteCmsV1, partial: unknown): SiteCmsV1 {
     },
     siteImages,
     contractedDoulas,
+    shopComingSoonEnabled,
+    shopComingSoonTitle,
+    shopComingSoonMessage,
   } as SiteCmsV1;
 }
 

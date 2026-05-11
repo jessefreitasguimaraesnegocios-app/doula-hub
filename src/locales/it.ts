@@ -106,6 +106,12 @@ const it: Translation = {
     addToCart: "Aggiungi alla borsa",
     added: "Aggiunto alla borsa",
     soon: "In arrivo",
+    comingSoon: {
+      fallbackTitle: "Il nostro angolino shop si sta scaldando… apre presto",
+      fallbackBody:
+        "Ciao, famiglia bellissima,\n\nStiamo preparando ogni dettaglio di questa piccola bottega con la stessa tenerezza che portiamo al tuo parto e postpartum. Presto potrai scegliere qui i coccoli che ti accompagnano in questa fase.\n\nPer ora, un abbraccio morbido attraverso lo schermo — torniamo subito.",
+      dismiss: "Vedi i prodotti sotto",
+    },
   },
   cart: {
     title: "La tua borsa",
@@ -145,6 +151,7 @@ const it: Translation = {
     doulaAny: "Trova la doula ideale per me",
     intake: {
       fillRequired: "Compila tutti i campi obbligatori.",
+      fillRequiredDetail: "Manca ancora: {{fields}}. (Telefono: 10 cifre formato USA; data: MM/GG/AAAA completa.)",
       fullName: "Nome e cognome",
       email: "Indirizzo email",
       phone: "Numero di telefono",

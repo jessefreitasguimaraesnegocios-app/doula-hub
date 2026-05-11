@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { ArrowLeft, ChevronDown, Download, LogOut, Save, Upload } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   DEFAULT_TEAM_SCHEDULE_URL,
   applySiteCmsTheme,
@@ -617,6 +618,53 @@ function Admin() {
               Os produtos e fotos da loja são geridos na base de dados ou pelo técnico do site. Aqui não há botões para
               mudar produtos — fale com quem mantém o site se precisar de alterar artigos ou imagens.
             </p>
+
+            <div className="mt-8 rounded-2xl border border-border bg-muted/20 p-5">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <p className="font-medium text-foreground">Mensagem «em breve» na página Loja</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Quando está ligada, aparece um aviso acolhedor no centro do ecrã (com o fundo desfocado). A visitante
+                    pode esconder o aviso só para ver os produtos naquele momento; se sair da loja, fechar o separador
+                    ou voltar mais tarde, o aviso volta a aparecer até desligar aqui. Se deixar o título ou o texto em
+                    branco, o site usa as frases que já vêm nas traduções (por idioma).
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <Label htmlFor="shop-coming-soon-switch" className="text-sm text-muted-foreground">
+                    Mostrar aviso
+                  </Label>
+                  <Switch
+                    id="shop-coming-soon-switch"
+                    checked={draft.shopComingSoonEnabled}
+                    onCheckedChange={(checked) =>
+                      setDraft((d) => ({ ...d, shopComingSoonEnabled: Boolean(checked) }))
+                    }
+                  />
+                </div>
+              </div>
+              <div className="mt-6 space-y-2">
+                <Label htmlFor="shop-coming-soon-title">Título personalizado (opcional)</Label>
+                <input
+                  id="shop-coming-soon-title"
+                  value={draft.shopComingSoonTitle}
+                  onChange={(e) => setDraft((d) => ({ ...d, shopComingSoonTitle: e.target.value }))}
+                  className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
+                  placeholder="Deixe vazio para usar o texto automático do site"
+                />
+              </div>
+              <div className="mt-4 space-y-2">
+                <Label htmlFor="shop-coming-soon-msg">Mensagem personalizada (opcional)</Label>
+                <textarea
+                  id="shop-coming-soon-msg"
+                  rows={5}
+                  value={draft.shopComingSoonMessage}
+                  onChange={(e) => setDraft((d) => ({ ...d, shopComingSoonMessage: e.target.value }))}
+                  className="w-full resize-y rounded-xl border border-border bg-background px-3 py-2 text-sm leading-relaxed"
+                  placeholder="Deixe vazio para usar o texto automático. Pode usar Enter para parágrafos."
+                />
+              </div>
+            </div>
           </TabsContent>
 
           {supabaseOk ? (

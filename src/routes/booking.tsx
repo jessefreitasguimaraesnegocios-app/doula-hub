@@ -147,6 +147,27 @@ function validateIntake(f: Form) {
   );
 }
 
+/** Rótulos para o toast quando falta algo no passo «Sua história». */
+function intakeMissingLabels(f: Form, t: TFunction): string[] {
+  const labels: string[] = [];
+  if (!f.fullName.trim()) labels.push(t("booking.intake.fullName"));
+  if (!f.email.trim()) labels.push(t("booking.intake.email"));
+  if (!usPhoneHasTenDigits(f.phone)) labels.push(t("booking.intake.phone"));
+  if (!f.dueDate) labels.push(t("booking.intake.dueDate"));
+  if (!f.firstBaby) labels.push(t("booking.intake.firstBaby"));
+  if (!f.birthLocation) labels.push(t("booking.intake.birthLocation"));
+  if (!zipUsIsValid(f.zipCode)) labels.push(t("booking.intake.zipCode"));
+  if (!f.streetNumber.trim()) labels.push(t("booking.intake.streetNumber"));
+  if (f.supportTypes.length === 0) labels.push(t("booking.intake.supportType"));
+  if (f.includeSupport === "yes") {
+    if (!f.supportName.trim()) labels.push(t("booking.intake.supportName"));
+    if (!f.supportRelation.trim()) labels.push(t("booking.intake.supportRelation"));
+  }
+  if (!f.preferredLanguage) labels.push(t("booking.intake.preferredLanguage"));
+  if (!f.babyCount) labels.push(t("booking.intake.babyCount"));
+  return labels;
+}
+
 function Booking() {
   const { t, i18n } = useTranslation();
   const cms = useSiteCms();
@@ -207,7 +228,10 @@ function Booking() {
 
   const goNext = () => {
     if (step === 2 && !validateIntake(form)) {
-      toast.error(t("booking.intake.fillRequired"));
+      const missing = intakeMissingLabels(form, t);
+      const detail =
+        missing.length > 0 ? t("booking.intake.fillRequiredDetail", { fields: missing.join(" · ") }) : t("booking.intake.fillRequired");
+      toast.error(detail);
       return;
     }
     setStep((s) => s + 1);
@@ -683,7 +707,10 @@ function BookDateUsField({
 }) {
   const [text, setText] = useState(() => isoToUsDisplay(value));
 
+  // Sincronizar só quando o pai tem uma data ISO válida. Se enviarmos "" durante a digitação
+  // (menos de 8 dígitos), não limpar o texto local — senão o campo apaga a cada tecla e dueDate nunca grava.
   useEffect(() => {
+    if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return;
     setText(isoToUsDisplay(value));
   }, [value]);
 

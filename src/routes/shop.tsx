@@ -1,9 +1,11 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Heart, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import shopHero from "@/assets/shop-hero.jpg";
+import { Button } from "@/components/ui/button";
 import { useSiteCms } from "@/hooks/use-site-cms";
 import { pickSiteImageUrl } from "@/lib/site-cms";
 import { useCart } from "@/context/cart-context";
@@ -29,6 +31,24 @@ function Shop() {
   const heroSrc = pickSiteImageUrl(cms, "shop_hero", shopHero);
   const { addProduct } = useCart();
   const router = useRouter();
+  /** Dismiss only for this stay on /shop; leaving or reloading shows the overlay again if CMS still enables it. */
+  const [comingSoonDismissed, setComingSoonDismissed] = useState(false);
+
+  const showComingSoonOverlay = cms.shopComingSoonEnabled && !comingSoonDismissed;
+  const comingSoonTitle = cms.shopComingSoonTitle.trim() || t("shop.comingSoon.fallbackTitle");
+  const comingSoonBody = cms.shopComingSoonMessage.trim() || t("shop.comingSoon.fallbackBody");
+
+  useEffect(() => {
+    if (!showComingSoonOverlay) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [showComingSoonOverlay]);
+
+  const dismissComingSoon = () => setComingSoonDismissed(true);
+
   const { data: remoteProducts } = useQuery({
     queryKey: ["shop_products", "active"],
     queryFn: fetchActiveShopProducts,
@@ -41,7 +61,34 @@ function Shop() {
   }, [remoteProducts]);
 
   return (
-    <div>
+    <div className="relative">
+      {showComingSoonOverlay ? (
+        <div
+          className="fixed inset-0 z-30 flex items-center justify-center bg-background/50 p-4 backdrop-blur-md backdrop-saturate-150"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="shop-coming-soon-title"
+        >
+          <div className="relative max-w-md rounded-[2rem] border border-border/60 bg-card/95 px-8 py-10 text-center shadow-2xl shadow-primary/5 ring-1 ring-primary/10">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Heart className="h-7 w-7" strokeWidth={1.5} aria-hidden />
+            </div>
+            <p className="mt-4 flex items-center justify-center gap-1.5 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+              <Sparkles className="h-3.5 w-3.5" aria-hidden />
+              {t("shop.soon")}
+              <Sparkles className="h-3.5 w-3.5" aria-hidden />
+            </p>
+            <h2 id="shop-coming-soon-title" className="mt-3 font-serif text-2xl leading-snug text-foreground md:text-3xl">
+              {comingSoonTitle}
+            </h2>
+            <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{comingSoonBody}</p>
+            <Button type="button" variant="outline" className="mt-8 rounded-full px-6" onClick={dismissComingSoon}>
+              {t("shop.comingSoon.dismiss")}
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
       <section className="relative h-[40vh] min-h-[300px] overflow-hidden">
         <img src={heroSrc} alt="" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-linear-to-t from-background via-background/40 to-transparent" />

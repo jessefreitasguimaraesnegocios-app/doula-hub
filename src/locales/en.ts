@@ -104,6 +104,12 @@ const en = {
     addToCart: "Add to bag",
     added: "Added to your bag",
     soon: "Coming soon",
+    comingSoon: {
+      fallbackTitle: "Our little shop nook is warming up… opening soon",
+      fallbackBody:
+        "Hello, beautiful family,\n\nWe're setting up every detail of this tiny shop with the same tenderness we bring to your birth and postpartum journey. Soon you'll be able to choose the gentle essentials that walk beside you in this season.\n\nFor now, here's a soft hug through the screen — we'll be right back.",
+      dismiss: "Browse the products underneath",
+    },
   },
   cart: {
     title: "Your bag",
@@ -143,6 +149,7 @@ const en = {
     doulaAny: "Match me with the right doula",
     intake: {
       fillRequired: "Please fill in all required fields.",
+      fillRequiredDetail: "Still missing: {{fields}}. (Phone: 10 digits US format; due date: full MM/DD/YYYY.)",
       fullName: "First & last name",
       email: "Email address",
       phone: "Phone number",
