@@ -9,7 +9,8 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
-import "../i18n";
+import { I18nextProvider } from "react-i18next";
+import i18n, { ensureI18nInitialized } from "../i18n";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { I18nClientLanguageSync } from "@/components/I18nClientLanguageSync";
@@ -76,6 +77,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  loader: async () => {
+    await ensureI18nInitialized();
+    return {};
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -121,19 +126,21 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <I18nClientLanguageSync />
-        <SupabaseSiteBootstrap />
-        <SiteCmsThemeSync />
-        <div className="flex min-h-screen flex-col">
-          <Header />
-          <main className="flex-1">
-            <Outlet />
-          </main>
-          <Footer />
-        </div>
-        <Toaster />
-      </CartProvider>
+      <I18nextProvider i18n={i18n}>
+        <CartProvider>
+          <I18nClientLanguageSync />
+          <SupabaseSiteBootstrap />
+          <SiteCmsThemeSync />
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">
+              <Outlet />
+            </main>
+            <Footer />
+          </div>
+          <Toaster />
+        </CartProvider>
+      </I18nextProvider>
     </QueryClientProvider>
   );
 }

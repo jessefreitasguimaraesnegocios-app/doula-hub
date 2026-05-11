@@ -1,11 +1,12 @@
 import { createStart, createMiddleware } from "@tanstack/react-start";
 
-import i18n from "./i18n";
+import i18n, { ensureI18nInitialized } from "./i18n";
 import { renderErrorPage } from "./lib/error-page";
 import { resolveLangForRequest } from "./lib/i18n-locale";
 
-/** Reset global i18n per request so SSR matches the incoming cookie / Accept-Language (avoids stale language between requests). */
+/** Load resources then set language per request so SSR matches cookie / Accept-Language. */
 const i18nRequestMiddleware = createMiddleware().server(async ({ next, request }) => {
+  await ensureI18nInitialized();
   const lng = request ? resolveLangForRequest(request) : "en";
   await i18n.changeLanguage(lng);
   return next();

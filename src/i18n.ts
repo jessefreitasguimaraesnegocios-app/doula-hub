@@ -7,21 +7,34 @@ import es from "./locales/es";
 import it from "./locales/it";
 import { resolveLangForClientBootstrap } from "@/lib/i18n-locale";
 
-if (!i18n.isInitialized) {
-  const lng = typeof document !== "undefined" ? resolveLangForClientBootstrap() : "en";
-  await i18n.use(initReactI18next).init({
-    resources: {
-      en: { translation: en },
-      pt: { translation: pt },
-      es: { translation: es },
-      it: { translation: it },
-    },
-    lng,
-    fallbackLng: "en",
-    supportedLngs: ["en", "pt", "es", "it"],
-    interpolation: { escapeValue: false },
-    react: { useSuspense: false },
-  });
+let initPromise: Promise<void> | null = null;
+
+/**
+ * Ensures i18n is initialized before any route renders (SSR + client).
+ * Avoids top-level `await` in this module, which can race with the first paint on some serverless bundles.
+ */
+export function ensureI18nInitialized(): Promise<void> {
+  if (i18n.isInitialized) return Promise.resolve();
+  if (!initPromise) {
+    const lng = typeof document !== "undefined" ? resolveLangForClientBootstrap() : "en";
+    initPromise = i18n
+      .use(initReactI18next)
+      .init({
+        resources: {
+          en: { translation: en },
+          pt: { translation: pt },
+          es: { translation: es },
+          it: { translation: it },
+        },
+        lng,
+        fallbackLng: "en",
+        supportedLngs: ["en", "pt", "es", "it"],
+        interpolation: { escapeValue: false },
+        react: { useSuspense: false },
+      })
+      .then(() => undefined);
+  }
+  return initPromise;
 }
 
 export default i18n;
