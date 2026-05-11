@@ -391,7 +391,7 @@ function Booking() {
       : "—";
 
   return (
-    <div className="relative isolate mx-auto max-w-4xl px-6 py-16 md:py-24">
+    <div className="relative mx-auto max-w-4xl px-6 py-16 md:py-24">
       <div className="text-center">
         <h1 className="font-serif text-5xl text-foreground md:text-6xl">{t("booking.title")}</h1>
         <p className="mt-4 text-muted-foreground">{t("booking.subtitle")}</p>
@@ -417,7 +417,7 @@ function Booking() {
         ))}
       </ol>
 
-      <div className="relative isolate z-0 mt-12 rounded-[2rem] bg-card p-8 shadow-(--shadow-soft) md:p-12">
+      <div className="relative mt-12 rounded-[2rem] bg-card p-8 shadow-(--shadow-soft) md:p-12">
         {step === 0 && (
           <div className="grid gap-4 sm:grid-cols-2">
             {PKGS.map((k) => {
@@ -783,7 +783,7 @@ function Booking() {
           </div>
         )}
 
-        <div className="relative z-10 mt-10 flex items-center justify-between">
+        <div className="relative z-20 mt-10 flex items-center justify-between pointer-events-auto">
           <button
             type="button"
             onClick={() => setStep((s) => Math.max(0, s - 1))}

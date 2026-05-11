@@ -178,12 +178,13 @@
   }
 
   /*
-   * Sonner: `[data-sonner-toaster]` is `position: fixed` with z-index ~1e9. The list `<ol>` can
-   * still overlap bottom-right CTAs (e.g. booking "Continue"). Never make the whole `<ol>`
-   * `pointer-events: auto` — only each `[data-sonner-toast]` should receive clicks.
+   * Sonner: runtime injects `z-index: 999999999` on `[data-sonner-toaster]`, which paints above
+   * the entire app. Cap it so hit-testing + stacking stay predictable; keep the list click-through
+   * except on real toast nodes.
    */
   [data-sonner-toaster] {
     pointer-events: none !important;
+    z-index: 60 !important;
   }
 
   [data-sonner-toast] {
