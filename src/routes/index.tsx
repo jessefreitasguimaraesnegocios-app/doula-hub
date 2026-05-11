@@ -69,7 +69,7 @@ function Home() {
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-6 pt-12 pb-24 md:grid-cols-2 md:pt-20 md:pb-32">
-          <div className="space-y-6">
+          <div className="relative z-10 space-y-6">
             <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-foreground/70 backdrop-blur">
               <span className="h-1.5 w-1.5 rounded-full bg-clay" />
               {t("home.eyebrow")}
@@ -97,7 +97,7 @@ function Home() {
             </div>
           </div>
           <div className="relative">
-            <div className="absolute -inset-6 rounded-[3rem] bg-linear-to-br from-sage/30 to-clay/20 blur-2xl" />
+            <div className="pointer-events-none absolute -inset-6 rounded-[3rem] bg-linear-to-br from-sage/30 to-clay/20 blur-2xl" />
             <img
               src={heroSrc}
               alt="A pregnant person gently holding her belly"
@@ -189,7 +189,14 @@ function Home() {
       <section className="py-24">
         <div className="mx-auto max-w-5xl px-6">
           <div className="relative overflow-hidden rounded-[2.5rem] bg-primary px-8 py-16 text-center text-primary-foreground md:px-16 md:py-24">
-            <img src={newbornSrc} alt="" loading="lazy" width={1080} height={1500} className="absolute inset-0 h-full w-full object-cover opacity-25" />
+            <img
+              src={newbornSrc}
+              alt=""
+              loading="lazy"
+              width={1080}
+              height={1500}
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-25"
+            />
             <div className="relative mx-auto max-w-2xl">
               <h2 className="font-serif text-4xl md:text-5xl">{t("home.cta")}</h2>
               <p className="mt-4 text-base text-primary-foreground/80">{t("home.subtitle")}</p>

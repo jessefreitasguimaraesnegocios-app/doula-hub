@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 import { Video } from "lucide-react";
 import { toast } from "sonner";
@@ -16,15 +17,20 @@ import teamHero from "@/assets/team-hero.png";
 const ZOOM_SCHEDULER_WINDOW_NAME = "atb-zoom-scheduler";
 
 /** Zoom does not allow embedding scheduler.zoom.us in iframes on third-party sites (CSP). Opens a centered app-like window instead. */
-function openZoomSchedulerPopup(url: string, blockedMessage: string) {
+function openZoomSchedulerPopup(url: string, t: TFunction) {
+  const trimmed = url.trim();
+  if (!trimmed || trimmed === "#") {
+    toast.error(t("team.scheduleUrlMissing"));
+    return;
+  }
   const width = Math.min(1180, window.screen.availWidth - 48);
   const height = Math.min(900, window.screen.availHeight - 48);
   const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - width) / 2));
   const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - height) / 2));
   const features = `popup=yes,width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes,noopener,noreferrer`;
-  const win = window.open(url, ZOOM_SCHEDULER_WINDOW_NAME, features);
+  const win = window.open(trimmed, ZOOM_SCHEDULER_WINDOW_NAME, features);
   if (!win) {
-    toast.error(blockedMessage);
+    toast.error(t("team.schedulePopupBlocked"));
     return;
   }
   try {
@@ -276,9 +282,7 @@ function Team() {
                   )}
                   <button
                     type="button"
-                    onClick={() =>
-                      openZoomSchedulerPopup(scheduleUrlForCard(m, cms.teamDefaultScheduleUrl), t("team.schedulePopupBlocked"))
-                    }
+                    onClick={() => openZoomSchedulerPopup(scheduleUrlForCard(m, cms.teamDefaultScheduleUrl), t)}
                     className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary bg-primary px-5 py-3.5 text-sm font-medium text-primary-foreground shadow-(--shadow-soft) transition hover:bg-primary/90"
                   >
                     <Video className="h-4 w-4 shrink-0" aria-hidden />

@@ -92,6 +92,7 @@ const en = {
     languages: "Languages",
     scheduleVideoCall: "Schedule a video call",
     schedulePopupBlocked: "Pop-up was blocked. Allow pop-ups for this site and try again.",
+    scheduleUrlMissing: "No scheduler link is set yet. Add the video call URL in site settings (admin) or try again later.",
     contractedRole: "Doula — our team",
     contractedBioFallback: "A valued member of our doula circle.",
     founder: {

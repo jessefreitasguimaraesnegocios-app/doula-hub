@@ -93,6 +93,7 @@ const es: Translation = {
     languages: "Idiomas",
     scheduleVideoCall: "Programar videollamada",
     schedulePopupBlocked: "El navegador bloqueó la ventana. Permite ventanas emergentes para este sitio e inténtalo de nuevo.",
+    scheduleUrlMissing: "Aún no hay enlace del agendador. Añade la URL de la videollamada en los ajustes del sitio (admin) o inténtalo más tarde.",
     contractedRole: "Doula del equipo",
     contractedBioFallback: "Integrante de nuestro círculo de apoyo.",
     founder: {

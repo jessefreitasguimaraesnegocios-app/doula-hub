@@ -20,7 +20,7 @@ export function LanguageSwitcher() {
   const current = LANGS.find((l) => l.code === i18n.resolvedLanguage) ?? LANGS[0];
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger
         aria-label={t("language")}
         className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/60 px-3 py-1.5 text-xs font-medium text-foreground/80 backdrop-blur transition hover:border-primary/40 hover:text-foreground"
@@ -28,11 +28,11 @@ export function LanguageSwitcher() {
         <Globe className="h-3.5 w-3.5" />
         <span className="uppercase tracking-wider">{current.code}</span>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-[10rem]">
+      <DropdownMenuContent align="end" className="z-100 min-w-40">
         {LANGS.map((l) => (
           <DropdownMenuItem
             key={l.code}
-            onClick={() => {
+            onSelect={() => {
               const code = l.code as SupportedLang;
               void i18n.changeLanguage(code);
               setLangCookie(code);

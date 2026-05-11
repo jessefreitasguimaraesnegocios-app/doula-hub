@@ -668,7 +668,7 @@ function Booking() {
           </div>
         )}
 
-        <div className="mt-10 flex items-center justify-between">
+        <div className="relative z-10 mt-10 flex items-center justify-between">
           <button
             type="button"
             onClick={() => setStep((s) => Math.max(0, s - 1))}

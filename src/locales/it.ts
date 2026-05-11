@@ -93,6 +93,7 @@ const it: Translation = {
     languages: "Lingue",
     scheduleVideoCall: "Prenota una videochiamata",
     schedulePopupBlocked: "Il browser ha bloccato la finestra. Consenti i pop-up per questo sito e riprova.",
+    scheduleUrlMissing: "Non c’è ancora un link per l’agenda. Aggiungi l’URL della videochiamata nelle impostazioni del sito (admin) o riprova più tardi.",
     contractedRole: "Doula del team",
     contractedBioFallback: "Membro del nostro cerchio di supporto.",
     founder: {

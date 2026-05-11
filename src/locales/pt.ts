@@ -93,6 +93,7 @@ const pt: Translation = {
     languages: "Idiomas",
     scheduleVideoCall: "Agendar videochamada",
     schedulePopupBlocked: "O navegador bloqueou a janela. Permita pop-ups para este site e tente de novo.",
+    scheduleUrlMissing: "Ainda não há link do agendador. Defina o URL da videochamada nas configurações do site (admin) ou tente mais tarde.",
     contractedRole: "Doula da equipa",
     contractedBioFallback: "Membro da nossa equipa de apoio.",
     founder: {
