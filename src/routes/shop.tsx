@@ -4,6 +4,8 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import shopHero from "@/assets/shop-hero.jpg";
+import { useSiteCms } from "@/hooks/use-site-cms";
+import { pickSiteImageUrl } from "@/lib/site-cms";
 import { useCart } from "@/context/cart-context";
 import { SHOP_PRODUCTS } from "@/data/shop-products";
 import { fetchActiveShopProducts } from "@/lib/supabase/queries";
@@ -23,6 +25,8 @@ export const Route = createFileRoute("/shop")({
 
 function Shop() {
   const { t } = useTranslation();
+  const cms = useSiteCms();
+  const heroSrc = pickSiteImageUrl(cms, "shop_hero", shopHero);
   const { addProduct } = useCart();
   const router = useRouter();
   const { data: remoteProducts } = useQuery({
@@ -39,7 +43,7 @@ function Shop() {
   return (
     <div>
       <section className="relative h-[40vh] min-h-[300px] overflow-hidden">
-        <img src={shopHero} alt="" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
+        <img src={heroSrc} alt="" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-linear-to-t from-background via-background/40 to-transparent" />
         <div className="relative mx-auto flex h-full max-w-4xl flex-col items-start justify-end px-6 pb-12">
           <h1 className="font-serif text-5xl text-foreground md:text-6xl">{t("shop.title")}</h1>

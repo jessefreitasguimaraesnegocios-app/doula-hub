@@ -3,7 +3,7 @@ import type { Session } from "@supabase/supabase-js";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Download, LogOut, Save, Upload } from "lucide-react";
+import { ArrowLeft, ChevronDown, Download, LogOut, Save, Upload } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import {
@@ -14,6 +14,9 @@ import {
   setSiteCmsToStorage,
   type SiteCmsV1,
 } from "@/lib/site-cms";
+import { AdminContractedDoulasPanel } from "@/components/admin/AdminContractedDoulasPanel";
+import { AdminSitePhotosPanel } from "@/components/admin/AdminSitePhotosPanel";
+import { AdminThemePanel } from "@/components/admin/AdminThemePanel";
 import { getSupabaseBrowserClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import {
   fetchAllDoulasForAdmin,
@@ -49,7 +52,7 @@ function DoulaRowEditor({ row, onUpdated }: { row: DoulaRow; onUpdated: () => vo
       toast.error(error.message);
       return;
     }
-    toast.success("Stripe ID actualizado.");
+    toast.success("Conta Stripe guardada.");
     onUpdated();
   };
 
@@ -68,7 +71,7 @@ function DoulaRowEditor({ row, onUpdated }: { row: DoulaRow; onUpdated: () => vo
       toast.error(error.message);
       return;
     }
-    toast.success("Foto actualizada.");
+    toast.success("Foto guardada.");
     onUpdated();
   };
 
@@ -79,7 +82,7 @@ function DoulaRowEditor({ row, onUpdated }: { row: DoulaRow; onUpdated: () => vo
         {row.kind} · ordem {row.display_order}
       </p>
       <div className="mt-3 space-y-2">
-        <Label>stripe_account_id (Connect)</Label>
+        <Label>Identificador da conta Stripe (opcional)</Label>
         <div className="flex flex-wrap gap-2">
           <input
             value={stripeId}
@@ -98,7 +101,7 @@ function DoulaRowEditor({ row, onUpdated }: { row: DoulaRow; onUpdated: () => vo
         </div>
       </div>
       <div className="mt-4 space-y-2">
-        <Label>Foto (Storage: bucket doulas)</Label>
+        <Label>Foto (escolher ficheiro no computador)</Label>
         <input
           type="file"
           accept="image/jpeg,image/png,image/webp"
@@ -127,13 +130,17 @@ function DoulaSupabaseTab({ enabled }: { enabled: boolean }) {
   const onUpdated = () => void qc.invalidateQueries({ queryKey: ["doulas", "admin"] });
 
   if (!enabled) {
-    return <p className="text-sm text-muted-foreground">Inicie sessão para gerir doulas na base de dados.</p>;
+    return <p className="text-sm text-muted-foreground">Entre com o seu e-mail e palavra-passe para ver a equipa aqui.</p>;
   }
   if (isPending && !rows) {
     return <p className="text-sm text-muted-foreground">A carregar…</p>;
   }
   if (!rows?.length) {
-    return <p className="text-sm text-muted-foreground">Sem linhas na tabela doulas. Corra a migration no projeto Supabase.</p>;
+    return (
+      <p className="text-sm text-muted-foreground">
+        Ainda não há ninguém na lista da base de dados. Peça ao técnico do site para adicionar a equipa.
+      </p>
+    );
   }
 
   return (
@@ -159,6 +166,7 @@ function Admin() {
   const importRef = useRef<HTMLInputElement>(null);
 
   const unlocked = supabaseOk ? Boolean(session) : legacyUnlocked;
+  const canUploadToCloud = supabaseOk && Boolean(session);
 
   useEffect(() => {
     if (!supabaseOk) return;
@@ -171,6 +179,18 @@ function Admin() {
 
   useEffect(() => {
     if (unlocked) setDraft({ ...getSiteCmsFromStorage() });
+  }, [unlocked]);
+
+  useEffect(() => {
+    if (!unlocked) return;
+    applySiteCmsTheme(draft);
+  }, [unlocked, draft.theme.primary, draft.theme.primaryForeground]);
+
+  useEffect(() => {
+    if (!unlocked) return;
+    return () => {
+      applySiteCmsTheme(getSiteCmsFromStorage());
+    };
   }, [unlocked]);
 
   const tryLegacyLogin = useCallback(() => {
@@ -215,7 +235,7 @@ function Admin() {
       sessionStorage.removeItem(ADMIN_SESSION_KEY);
       setLegacyUnlocked(false);
     }
-    toast.message("Sessão encerrada.");
+    toast.message("Saiu das definições.");
   }, [supabaseOk]);
 
   const save = useCallback(async () => {
@@ -227,10 +247,10 @@ function Admin() {
         toast.error(error.message);
         return;
       }
-      toast.success("Guardado no Supabase e neste navegador.");
+      toast.success("Guardado na Internet e neste computador.");
       return;
     }
-    toast.success("Alterações guardadas neste navegador.");
+    toast.success("Guardado neste computador.");
   }, [draft, supabaseOk, session]);
 
   const exportJson = useCallback(() => {
@@ -240,7 +260,7 @@ function Admin() {
     a.download = `atb-site-cms-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(a.href);
-    toast.success("JSON exportado.");
+    toast.success("Ficheiro descarregado. Guarde-o num sítio seguro, se quiser.");
   }, [draft]);
 
   const onImportFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -254,7 +274,9 @@ function Admin() {
       setDraft(parsed);
       setSiteCmsToStorage(parsed);
       applySiteCmsTheme(parsed);
-      toast.success("JSON importado e aplicado.");
+      toast.success(
+        "Ficheiro carregado. O site neste computador já mostra essas definições. Toque em Guardar alterações para ficarem guardadas de vez.",
+      );
     };
     reader.readAsText(file);
   }, []);
@@ -263,12 +285,10 @@ function Admin() {
     if (supabaseOk) {
       return (
         <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-6 py-20">
-          <h1 className="font-serif text-3xl text-foreground">Painel admin</h1>
+          <h1 className="font-serif text-3xl text-foreground">Entrar nas definições</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Inicie sessão com um utilizador criado em Supabase → Authentication (email/password). As chaves{" "}
-            <code className="rounded bg-muted px-1">VITE_SUPABASE_URL</code> e{" "}
-            <code className="rounded bg-muted px-1">VITE_SUPABASE_ANON_KEY</code> são públicas no cliente; permissões vêm
-            das políticas RLS.
+            Use o e-mail e a palavra-passe que o técnico do site lhe deu. Se não tiver conta, peça ajuda a quem gere o
+            site.
           </p>
           <div className="mt-8 space-y-2">
             <Label htmlFor="admin-email">E-mail</Label>
@@ -308,14 +328,12 @@ function Admin() {
     }
 
     return (
-      <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-6 py-20">
-        <h1 className="font-serif text-3xl text-foreground">Painel admin</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Sem Supabase configurado, o acesso usa <code className="rounded bg-muted px-1">VITE_ADMIN_PASSWORD</code> no
-          bundle — só para desenvolvimento ou staging. Para produção, configure{" "}
-          <code className="rounded bg-muted px-1">VITE_SUPABASE_URL</code> e{" "}
-          <code className="rounded bg-muted px-1">VITE_SUPABASE_ANON_KEY</code>.
-        </p>
+        <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-6 py-20">
+          <h1 className="font-serif text-3xl text-foreground">Entrar nas definições</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Modo simples de teste: escreva a senha que está no ficheiro de configuração do site (só para quem montou o
+            projeto). Em produção costuma-se usar e-mail e palavra-passe em vez disto.
+          </p>
         <div className="mt-8 space-y-2">
           <Label htmlFor="admin-pw">Senha</Label>
           <input
@@ -345,67 +363,120 @@ function Admin() {
   return (
     <div className="min-h-screen bg-muted/30 pb-20">
       <header className="sticky top-0 z-10 border-b border-border bg-card/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-4">
-          <div>
-            <h1 className="font-serif text-2xl text-foreground">Painel admin</h1>
-            <p className="text-xs text-muted-foreground">
-              {supabaseOk && session
-                ? "Guardar envia o CMS para Supabase (site_settings) e para este navegador."
-                : "Alterações guardadas no navegador (localStorage). Exporte/importe JSON se precisar."}
-            </p>
+        <div className="mx-auto max-w-6xl px-6 py-4">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="min-w-0 max-w-xl">
+              <h1 className="font-serif text-2xl text-foreground">Definições do site</h1>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Mude o que precisar nos separadores abaixo. Quando terminar, toque em{" "}
+                <strong className="text-foreground">Guardar alterações</strong>. Depois abra{" "}
+                <strong className="text-foreground">Ver o site</strong> para ver como ficou.
+              </p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                {supabaseOk && session
+                  ? "Com a sua sessão, Guardar também envia tudo para a Internet (além deste computador)."
+                  : "Sem sessão na Internet, Guardar mantém as alterações só neste computador."}
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => void save()}
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm hover:bg-primary/90"
+              >
+                <Save className="h-4 w-4" /> Guardar alterações
+              </button>
+              <Link
+                to="/"
+                className="inline-flex items-center rounded-full border border-border bg-background px-5 py-2.5 text-sm font-medium hover:bg-muted"
+              >
+                Ver o site
+              </Link>
+              <button
+                type="button"
+                onClick={() => void logout()}
+                className="inline-flex items-center gap-2 rounded-full border border-transparent px-4 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+              >
+                <LogOut className="h-4 w-4" /> Sair
+              </button>
+            </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => void save()}
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-            >
-              <Save className="h-4 w-4" /> Guardar
-            </button>
-            <button
-              type="button"
-              onClick={exportJson}
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm hover:bg-muted"
-            >
-              <Download className="h-4 w-4" /> Exportar JSON
-            </button>
-            <button
-              type="button"
-              onClick={() => importRef.current?.click()}
-              className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm hover:bg-muted"
-            >
-              <Upload className="h-4 w-4" /> Importar JSON
-            </button>
+
+          <details className="group mt-5 border-t border-border pt-4">
+            <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-medium text-foreground hover:underline [&::-webkit-details-marker]:hidden">
+              <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
+              Só se precisar: cópia no computador (ficheiro)
+            </summary>
+            <div className="mt-4 flex flex-col gap-3 rounded-xl border border-border bg-muted/30 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="max-w-lg text-xs leading-relaxed text-muted-foreground">
+                Isto não é obrigatório. Serve para descarregar uma cópia das definições ou para trazer uma cópia antiga
+                — por exemplo se mudou de computador. O dia a dia do site é só: alterar → Guardar alterações.
+              </p>
+              <div className="flex shrink-0 flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={exportJson}
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm hover:bg-muted"
+                >
+                  <Download className="h-4 w-4" /> Baixar cópia
+                </button>
+                <button
+                  type="button"
+                  onClick={() => importRef.current?.click()}
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm hover:bg-muted"
+                >
+                  <Upload className="h-4 w-4" /> Carregar cópia
+                </button>
+              </div>
+            </div>
             <input ref={importRef} type="file" accept="application/json,.json" className="hidden" onChange={onImportFile} />
-            <button
-              type="button"
-              onClick={() => void logout()}
-              className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm hover:bg-muted"
-            >
-              <LogOut className="h-4 w-4" /> Sair
-            </button>
-            <Link to="/" className="text-sm text-primary underline-offset-4 hover:underline">
-              Ver site
-            </Link>
-          </div>
+          </details>
         </div>
       </header>
 
       <div className="mx-auto max-w-6xl px-6 pt-8">
         <Tabs defaultValue="contacts" className="w-full">
           <TabsList className="mb-6 flex h-auto flex-wrap justify-start gap-1 bg-muted/80 p-1">
-            <TabsTrigger value="contacts">Contatos & redes</TabsTrigger>
-            <TabsTrigger value="theme">Cores (tema)</TabsTrigger>
-            <TabsTrigger value="prices">Preços (USD)</TabsTrigger>
-            <TabsTrigger value="team">Equipe / Zoom</TabsTrigger>
+            <TabsTrigger value="contacts">Contactos</TabsTrigger>
+            <TabsTrigger value="photos">Fotos do site</TabsTrigger>
+            <TabsTrigger value="contracted">Contratadas</TabsTrigger>
+            <TabsTrigger value="theme">Cores</TabsTrigger>
+            <TabsTrigger value="prices">Preços</TabsTrigger>
+            <TabsTrigger value="team">Videochamada</TabsTrigger>
             <TabsTrigger value="shop">Loja</TabsTrigger>
-            {supabaseOk ? <TabsTrigger value="doulas-db">Doulas (Supabase)</TabsTrigger> : null}
-            <TabsTrigger value="stripe">Stripe</TabsTrigger>
+            {supabaseOk ? <TabsTrigger value="doulas-db">Equipa</TabsTrigger> : null}
+            <TabsTrigger value="stripe">Pagamentos</TabsTrigger>
           </TabsList>
 
+          <TabsContent value="photos" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <h2 className="font-serif text-xl">Fotos do site</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Troque imagens sem mexer no código. As fotos da loja por produto continuam na base de dados ou no ficheiro
+              da loja — aqui são sobretudo páginas principais e equipa.
+            </p>
+            <div className="mt-6">
+              <AdminSitePhotosPanel
+                siteImages={draft.siteImages}
+                onChange={(next) => setDraft((d) => ({ ...d, siteImages: next }))}
+                canUpload={canUploadToCloud}
+              />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="contracted" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <h2 className="font-serif text-xl">Contratadas (lista privada)</h2>
+            <div className="mt-6">
+              <AdminContractedDoulasPanel
+                list={draft.contractedDoulas}
+                onChange={(next) => setDraft((d) => ({ ...d, contractedDoulas: next }))}
+                canUpload={canUploadToCloud}
+              />
+            </div>
+          </TabsContent>
+
           <TabsContent value="contacts" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="font-serif text-xl">Contatos & redes</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Usados no rodapé e na página Contactos.</p>
+            <h2 className="font-serif text-xl">Contactos e redes sociais</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Aparecem no rodapé e na página de contactos do site.</p>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               <div className="space-y-2 sm:col-span-2">
                 <Label>E-mail de contacto</Label>
@@ -416,7 +487,7 @@ function Admin() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Telefone (texto)</Label>
+                <Label>Telefone (como aparece escrito)</Label>
                 <input
                   value={draft.contactPhoneDisplay}
                   onChange={(e) => setDraft((d) => ({ ...d, contactPhoneDisplay: e.target.value }))}
@@ -424,7 +495,7 @@ function Admin() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Telefone (href, só dígitos +)</Label>
+                <Label>Telefone para o botão “ligar” (só números e +)</Label>
                 <input
                   value={draft.contactPhoneHref}
                   onChange={(e) => setDraft((d) => ({ ...d, contactPhoneHref: e.target.value }))}
@@ -449,7 +520,7 @@ function Admin() {
                 />
               </div>
               <div className="space-y-2 sm:col-span-2">
-                <Label>Handle Instagram (texto)</Label>
+                <Label>Nome no Instagram (com @)</Label>
                 <input
                   value={draft.instagramHandle}
                   onChange={(e) => setDraft((d) => ({ ...d, instagramHandle: e.target.value }))}
@@ -460,42 +531,25 @@ function Admin() {
           </TabsContent>
 
           <TabsContent value="theme" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="font-serif text-xl">Cores (tema)</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Valores em <strong>oklch(...)</strong> ou qualquer CSS válido. Deixe vazio para voltar ao CSS do projeto.
-            </p>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2 sm:col-span-2">
-                <Label>--primary</Label>
-                <input
-                  value={draft.theme.primary}
-                  onChange={(e) => setDraft((d) => ({ ...d, theme: { ...d.theme, primary: e.target.value } }))}
-                  className="w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-sm"
-                  placeholder="oklch(0.55 0.05 145)"
-                />
-              </div>
-              <div className="space-y-2 sm:col-span-2">
-                <Label>--primary-foreground</Label>
-                <input
-                  value={draft.theme.primaryForeground}
-                  onChange={(e) =>
-                    setDraft((d) => ({ ...d, theme: { ...d.theme, primaryForeground: e.target.value } }))
-                  }
-                  className="w-full rounded-xl border border-border bg-background px-3 py-2 font-mono text-sm"
-                  placeholder="oklch(0.975 0.012 85)"
-                />
-              </div>
+            <h2 className="font-serif text-xl">Cores do site</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Toque nas cores; não precisa de escrever códigos.</p>
+            <div className="mt-6">
+              <AdminThemePanel
+                theme={draft.theme}
+                onThemeChange={(next) => setDraft((d) => ({ ...d, theme: next }))}
+              />
             </div>
           </TabsContent>
 
           <TabsContent value="prices" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="font-serif text-xl">Preços (USD)</h2>
+            <h2 className="font-serif text-xl">Preços nos serviços</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Só inglês/espanhol no site usam estes símbolos $ nos cartões de serviços. Deixe vazio para usar o texto dos ficheiros de tradução.
+              Só em inglês e espanhol no site aparecem estes preços em dólares ($). Deixe em branco para usar o texto
+              padrão do site.
             </p>
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
-                <Label>Birth (ex.: $3,800)</Label>
+                <Label>Nascimento (ex.: $3,800)</Label>
                 <input
                   value={draft.servicesPrices.birthUsd}
                   onChange={(e) =>
@@ -508,7 +562,7 @@ function Admin() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Postpartum (ex.: $95/hr)</Label>
+                <Label>Pós-parto (ex.: $95/hr)</Label>
                 <input
                   value={draft.servicesPrices.postpartumUsd}
                   onChange={(e) =>
@@ -521,7 +575,7 @@ function Admin() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Lactation (ex.: $195)</Label>
+                <Label>Amamentação (ex.: $195)</Label>
                 <input
                   value={draft.servicesPrices.lactationUsd}
                   onChange={(e) =>
@@ -537,13 +591,13 @@ function Admin() {
           </TabsContent>
 
           <TabsContent value="team" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="font-serif text-xl">Equipe / Zoom</h2>
+            <h2 className="font-serif text-xl">Link da videochamada (Zoom)</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              URL padrão do agendador Zoom (botão &quot;Agendar videochamada&quot; na página Equipe). Vazio = usar o link
-              pré-definido no código ({DEFAULT_TEAM_SCHEDULE_URL.slice(0, 48)}…).
+              Cole aqui o link do calendário Zoom que as visitantes devem abrir ao tocar em “Agendar videochamada” na
+              página da equipa. Se deixar em branco, o site usa o link que já veio configurado.
             </p>
             <div className="mt-6 space-y-2">
-              <Label>URL do agendador</Label>
+              <Label>Endereço do link (URL)</Label>
               <input
                 value={draft.teamDefaultScheduleUrl}
                 onChange={(e) => setDraft((d) => ({ ...d, teamDefaultScheduleUrl: e.target.value }))}
@@ -552,27 +606,24 @@ function Admin() {
               />
             </div>
             <p className="mt-6 text-sm text-muted-foreground">
-              Os cartões da equipa vêm da tabela <code className="rounded bg-muted px-1">doulas</code> no Supabase quando
-              configurado; caso contrário usa-se o conteúdo estático do código.
+              As fotos e textos das pessoas na página da equipa vêm da base de dados quando o site está ligado à
+              Internet; caso contrário usa-se o conteúdo fixo que veio no site.
             </p>
           </TabsContent>
 
           <TabsContent value="shop" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
             <h2 className="font-serif text-xl">Loja</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Com Supabase, a rota Shop lê <code className="rounded bg-muted px-1">shop_products</code> (activos). Se a
-              consulta falhar ou estiver vazia, usa-se <code className="rounded bg-muted px-1">src/data/shop-products.ts</code>{" "}
-              e imagens em <code className="rounded bg-muted px-1">src/assets/shop/</code>. Defina{" "}
-              <code className="rounded bg-muted px-1">image_url</code> no painel SQL ou Table Editor para substituir fotos.
+              Os produtos e fotos da loja são geridos na base de dados ou pelo técnico do site. Aqui não há botões para
+              mudar produtos — fale com quem mantém o site se precisar de alterar artigos ou imagens.
             </p>
           </TabsContent>
 
           {supabaseOk ? (
             <TabsContent value="doulas-db" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-              <h2 className="font-serif text-xl">Doulas (Supabase)</h2>
+              <h2 className="font-serif text-xl">Equipa (fotos e Stripe)</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Upload de fotos para o bucket <code className="rounded bg-muted px-1">doulas</code> e actualização de{" "}
-                <code className="rounded bg-muted px-1">stripe_account_id</code> por linha.
+                Por cada pessoa: pode carregar uma foto e, se o técnico pediu, colar o identificador da conta Stripe.
               </p>
               <div className="mt-6">
                 <DoulaSupabaseTab enabled={Boolean(session)} />
@@ -581,15 +632,15 @@ function Admin() {
           ) : null}
 
           <TabsContent value="stripe" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="font-serif text-xl">Stripe & carteiras</h2>
-            <ul className="mt-4 list-inside list-disc space-y-2 text-sm text-muted-foreground">
-              <li>Contas Connect (Standard ou Express) por doula — requer backend seguro e webhooks Stripe.</li>
-              <li>
-                O campo <code className="rounded bg-muted px-1">stripe_account_id</code> por doula está na tabela{" "}
-                <code className="rounded bg-muted px-1">doulas</code> e pode ser editado no separador Doulas (com sessão).
-              </li>
-              <li>Nunca colocar chaves secretas no front; usar variáveis de ambiente na Vercel e funções serverless.</li>
-            </ul>
+            <h2 className="font-serif text-xl">Pagamentos online</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Cartões e pagamentos seguros são montados pelo técnico do site (Stripe). Se precisar de mudar contas ou
+              preços ligados ao dinheiro, peça ajuda a essa pessoa — não é seguro tratar disso só por aqui.
+            </p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              O identificador da conta Stripe de cada doula pode ser preenchido no separador <strong>Equipa</strong>,
+              quando estiver com sessão iniciada.
+            </p>
           </TabsContent>
         </Tabs>
       </div>

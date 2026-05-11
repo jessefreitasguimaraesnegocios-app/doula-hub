@@ -1,4 +1,15 @@
--- Site-wide JSON (contacts, theme, USD prices, Zoom URL) — same shape as localStorage CMS v1
+-- All Things Babies — schema inicial Supabase (CMS + equipa + loja + Storage).
+--
+-- site_settings.payload = mesmo contrato que localStorage `atb-site-cms-v1` (SiteCmsV1):
+--   version, contactos, servicesPrices, theme, teamDefaultScheduleUrl,
+--   siteImages { home_hero, about_founder (imagem https OU .mp4), … }, contractedDoulas [ … ].
+-- O vídeo por defeito da página About vem do código (src/assets), não desta base; só entra no
+-- JSON se colar URL remota (ex. Storage) no painel «Fotos do site».
+-- Ver: src/lib/site-cms.ts e docs/supabase-integration.md
+--
+-- Slugs em `doulas` alinhados ao site estático / marcação: founder, sofia, elena, mei.
+
+-- Site-wide JSON (contacts, theme, USD prices, Zoom URL, photos CMS, private contractors list)
 CREATE TABLE public.site_settings (
   id text PRIMARY KEY DEFAULT 'main',
   payload jsonb NOT NULL DEFAULT '{}'::jsonb,

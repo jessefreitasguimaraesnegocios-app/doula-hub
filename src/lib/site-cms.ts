@@ -10,6 +10,36 @@ export const SITE_CMS_EVENT = "atb-site-cms";
 export const DEFAULT_TEAM_SCHEDULE_URL =
   "https://scheduler.zoom.us/jesse-freitas-p7edat/30-mins-with-jesse";
 
+/** Keys for `siteImages` — URL (https…) replaces the bundled photo on the public site. */
+export const SITE_IMAGE_KEYS = [
+  "home_hero",
+  "home_promise",
+  "home_cta_newborn",
+  "about_founder",
+  "about_campus",
+  "team_hero",
+  "team_member_founder",
+  "team_member_sofia",
+  "team_member_elena",
+  "team_member_mei",
+  "shop_hero",
+  "footer_logo",
+] as const;
+
+export type SiteImageKey = (typeof SITE_IMAGE_KEYS)[number];
+
+/** Registo privado no painel (não aparece no site público). */
+export type ContractedDoula = {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  /** Ex.: "US$ 500 / mês" — texto livre */
+  monthlyFeeDisplay: string;
+  notes: string;
+  photoUrl: string;
+};
+
 export type SiteCmsV1 = {
   version: 1;
   contactEmail: string;
@@ -30,6 +60,10 @@ export type SiteCmsV1 = {
     primaryForeground: string;
   };
   teamDefaultScheduleUrl: string;
+  /** Full URL per slot; empty = keep default image from the site code. */
+  siteImages: Partial<Record<SiteImageKey, string>>;
+  /** Doulas que trabalham consigo — só para o seu controlo no admin. */
+  contractedDoulas: ContractedDoula[];
 };
 
 export const DEFAULT_SITE_CMS: SiteCmsV1 = {
@@ -50,6 +84,8 @@ export const DEFAULT_SITE_CMS: SiteCmsV1 = {
     primaryForeground: "",
   },
   teamDefaultScheduleUrl: "",
+  siteImages: {},
+  contractedDoulas: [],
 };
 
 /** Merge a remote JSON payload (e.g. Supabase `site_settings.payload`) into defaults. */
@@ -62,6 +98,15 @@ function mergePartial(base: SiteCmsV1, partial: unknown): SiteCmsV1 {
   const p = partial as Record<string, unknown>;
   const sp = (p.servicesPrices as Record<string, unknown> | undefined) ?? {};
   const th = (p.theme as Record<string, unknown> | undefined) ?? {};
+  const si = p.siteImages;
+  const siteImages: Partial<Record<SiteImageKey, string>> = {
+    ...base.siteImages,
+    ...(si && typeof si === "object" && !Array.isArray(si) ? (si as Partial<Record<SiteImageKey, string>>) : {}),
+  };
+  const cd = p.contractedDoulas;
+  const contractedDoulas: ContractedDoula[] = Array.isArray(cd)
+    ? (cd as ContractedDoula[]).filter((x) => x && typeof x === "object" && typeof (x as ContractedDoula).id === "string")
+    : base.contractedDoulas;
   return {
     ...base,
     ...p,
@@ -73,6 +118,8 @@ function mergePartial(base: SiteCmsV1, partial: unknown): SiteCmsV1 {
       ...base.theme,
       ...(typeof th === "object" && th ? th : {}),
     },
+    siteImages,
+    contractedDoulas,
   } as SiteCmsV1;
 }
 
@@ -106,6 +153,12 @@ export function servicePriceUsdOverride(cms: SiteCmsV1, pkg: string): string | n
   if (pkg === "postpartum") return cms.servicesPrices.postpartumUsd.trim() || null;
   if (pkg === "lactation") return cms.servicesPrices.lactationUsd.trim() || null;
   return null;
+}
+
+/** Resolved image URL for a CMS slot (bundled path or remote URL). */
+export function pickSiteImageUrl(cms: SiteCmsV1, key: SiteImageKey, fallback: string): string {
+  const u = cms.siteImages?.[key]?.trim();
+  return u || fallback;
 }
 
 export function applySiteCmsTheme(cms: SiteCmsV1) {

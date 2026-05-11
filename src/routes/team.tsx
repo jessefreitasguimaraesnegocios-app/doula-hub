@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Video } from "lucide-react";
 import { toast } from "sonner";
 import { useSiteCms } from "@/hooks/use-site-cms";
-import { DEFAULT_TEAM_SCHEDULE_URL } from "@/lib/site-cms";
+import { DEFAULT_TEAM_SCHEDULE_URL, pickSiteImageUrl, type SiteCmsV1, type SiteImageKey } from "@/lib/site-cms";
 import { asStringArray, fetchPublishedDoulas, type DoulaRow } from "@/lib/supabase/queries";
 import raquelTeam from "@/assets/team-imani.png";
 import d2 from "@/assets/doula-2.jpg";
@@ -68,6 +68,11 @@ const BUNDLED_IMG: Record<string, string> = {
   mei: d4,
 };
 
+function resolveTeamMemberPhoto(cms: SiteCmsV1, slug: string, dbPhoto: string | null | undefined, bundledFallback: string): string {
+  const key = `team_member_${slug}` as SiteImageKey;
+  return pickSiteImageUrl(cms, key, dbPhoto?.trim() || bundledFallback);
+}
+
 type TeamCardModel = {
   key: string;
   slug: string;
@@ -82,7 +87,7 @@ type TeamCardModel = {
   langs: string[];
 };
 
-function staticTeamCards(): TeamCardModel[] {
+function staticTeamCards(cms: SiteCmsV1): TeamCardModel[] {
   return TEAM.map((m) => {
     if (m.kind === "founder") {
       return {
@@ -90,7 +95,7 @@ function staticTeamCards(): TeamCardModel[] {
         slug: "founder",
         kind: "founder",
         useI18n: true,
-        img: m.img,
+        img: resolveTeamMemberPhoto(cms, "founder", null, m.img),
         scheduleUrl: m.scheduleUrl,
         specs: [],
         langs: [],
@@ -101,7 +106,7 @@ function staticTeamCards(): TeamCardModel[] {
       slug: m.id,
       kind: "doula",
       useI18n: false,
-      img: m.img,
+      img: resolveTeamMemberPhoto(cms, m.id, null, m.img),
       scheduleUrl: m.scheduleUrl,
       name: m.name,
       role: m.role,
@@ -112,13 +117,13 @@ function staticTeamCards(): TeamCardModel[] {
   });
 }
 
-function teamCardsFromDb(rows: DoulaRow[]): TeamCardModel[] {
+function teamCardsFromDb(rows: DoulaRow[], cms: SiteCmsV1): TeamCardModel[] {
   return rows.map((r) => ({
     key: r.id,
     slug: r.slug,
     kind: r.kind,
     useI18n: r.use_i18n,
-    img: r.photo_url?.trim() || BUNDLED_IMG[r.slug] || raquelTeam,
+    img: resolveTeamMemberPhoto(cms, r.slug, r.photo_url, BUNDLED_IMG[r.slug] || raquelTeam),
     scheduleUrl: r.schedule_url,
     name: r.name ?? undefined,
     role: r.role ?? undefined,
@@ -178,14 +183,16 @@ function Team() {
   });
 
   const cards = useMemo(() => {
-    if (remoteDoulas && remoteDoulas.length > 0) return teamCardsFromDb(remoteDoulas);
-    return staticTeamCards();
-  }, [remoteDoulas]);
+    if (remoteDoulas && remoteDoulas.length > 0) return teamCardsFromDb(remoteDoulas, cms);
+    return staticTeamCards(cms);
+  }, [remoteDoulas, cms]);
+
+  const teamHeroSrc = pickSiteImageUrl(cms, "team_hero", teamHero);
 
   return (
     <div>
       <section className="relative h-[40vh] min-h-[320px] overflow-hidden">
-        <img src={teamHero} alt="" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
+        <img src={teamHeroSrc} alt="" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-linear-to-t from-background via-background/60 to-background/20" />
         <div className="relative mx-auto flex h-full max-w-4xl flex-col items-center justify-end px-6 pb-12 text-center">
           <h1 className="font-serif text-5xl text-foreground md:text-6xl">{t("team.title")}</h1>

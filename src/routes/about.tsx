@@ -1,8 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Award, Heart, Hand } from "lucide-react";
 import founder from "@/assets/founder.png";
+import aboutFounderVideo from "@/assets/about-founder-support.mp4";
 import certsPhoto from "@/assets/about-doula-campus.png";
+import { useSiteCms } from "@/hooks/use-site-cms";
+import { pickSiteImageUrl, type SiteCmsV1 } from "@/lib/site-cms";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -17,8 +21,65 @@ export const Route = createFileRoute("/about")({
   component: About,
 });
 
+function isVideoAssetUrl(url: string): boolean {
+  const base = (url.split("?")[0] ?? "").toLowerCase();
+  return /\.(mp4|webm|ogg)$/i.test(base);
+}
+
+function AboutFounderMedia({ cms }: { cms: SiteCmsV1 }) {
+  const primedFrame = useRef(false);
+  const override = cms.siteImages?.about_founder?.trim() ?? "";
+
+  if (override && !isVideoAssetUrl(override)) {
+    return (
+      <img
+        src={override}
+        alt="Portrait of the founder in doula scrubs, smiling"
+        width={1000}
+        height={1250}
+        className="aspect-4/5 w-full rounded-[2rem] object-cover shadow-(--shadow-warm)"
+      />
+    );
+  }
+
+  const videoSrc = override && isVideoAssetUrl(override) ? override : aboutFounderVideo;
+
+  const showFirstFrame = (v: HTMLVideoElement) => {
+    try {
+      v.pause();
+      v.currentTime = 0;
+    } catch {
+      /* ignore */
+    }
+  };
+
+  return (
+    <div className="aspect-4/5 w-full overflow-hidden rounded-[2rem] bg-muted shadow-(--shadow-warm)">
+      <video
+        src={videoSrc}
+        controls
+        playsInline
+        preload="metadata"
+        className="h-full w-full object-cover"
+        aria-label="Portrait of the founder in doula scrubs, smiling"
+        onLoadedData={(e) => {
+          const v = e.currentTarget;
+          if (primedFrame.current) return;
+          primedFrame.current = true;
+          showFirstFrame(v);
+        }}
+        onEnded={(e) => {
+          showFirstFrame(e.currentTarget);
+        }}
+      />
+    </div>
+  );
+}
+
 function About() {
   const { t } = useTranslation();
+  const cms = useSiteCms();
+  const campusSrc = pickSiteImageUrl(cms, "about_campus", certsPhoto);
   const certs = t("about.certs", { returnObjects: true }) as string[];
   const values = [
     { key: "one", icon: Heart },
@@ -28,13 +89,7 @@ function About() {
   return (
     <div>
       <section className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-20 md:grid-cols-2 md:py-28">
-        <img
-          src={founder}
-          alt="Portrait of the founder in doula scrubs, smiling"
-          width={1000}
-          height={1250}
-          className="aspect-4/5 w-full rounded-[2rem] object-cover shadow-(--shadow-warm)"
-        />
+        <AboutFounderMedia cms={cms} />
         <div>
           <h1 className="font-serif text-5xl text-foreground md:text-6xl">{t("about.title")}</h1>
           <p className="mt-6 whitespace-pre-line text-lg leading-relaxed text-muted-foreground">{t("about.body")}</p>
@@ -74,7 +129,7 @@ function About() {
             </ul>
           </div>
           <img
-            src={certsPhoto}
+            src={campusSrc}
             alt="Doula in scrubs smiling beside a hospital campus map"
             loading="lazy"
             width={1080}

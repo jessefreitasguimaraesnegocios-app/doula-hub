@@ -4,6 +4,8 @@ import { ArrowRight, Heart, Leaf, Sparkles, Quote } from "lucide-react";
 import heroImg from "@/assets/hero-doula.jpg";
 import newbornImg from "@/assets/cta-newborn.png";
 import promiseImg from "@/assets/home-promise-support.png";
+import { useSiteCms } from "@/hooks/use-site-cms";
+import { pickSiteImageUrl } from "@/lib/site-cms";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -20,6 +22,10 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const { t } = useTranslation();
+  const cms = useSiteCms();
+  const heroSrc = pickSiteImageUrl(cms, "home_hero", heroImg);
+  const promiseSrc = pickSiteImageUrl(cms, "home_promise", promiseImg);
+  const newbornSrc = pickSiteImageUrl(cms, "home_cta_newborn", newbornImg);
   const pillars = [
     { key: "one", icon: Heart },
     { key: "two", icon: Leaf },
@@ -61,7 +67,7 @@ function Home() {
           <div className="relative">
             <div className="absolute -inset-6 rounded-[3rem] bg-linear-to-br from-sage/30 to-clay/20 blur-2xl" />
             <img
-              src={heroImg}
+              src={heroSrc}
               alt="A pregnant person gently holding her belly"
               width={1600}
               height={1200}
@@ -81,7 +87,7 @@ function Home() {
       <section className="bg-[oklch(0.94_0.02_80)] py-24">
         <div className="mx-auto grid max-w-6xl gap-12 px-6 md:grid-cols-2 md:items-center">
           <img
-            src={promiseImg}
+            src={promiseSrc}
             alt="Doula comforting a pregnant person during labor in a hospital room"
             loading="lazy"
             width={1080}
@@ -158,7 +164,7 @@ function Home() {
       <section className="py-24">
         <div className="mx-auto max-w-5xl px-6">
           <div className="relative overflow-hidden rounded-[2.5rem] bg-primary px-8 py-16 text-center text-primary-foreground md:px-16 md:py-24">
-            <img src={newbornImg} alt="" loading="lazy" width={1080} height={1500} className="absolute inset-0 h-full w-full object-cover opacity-25" />
+            <img src={newbornSrc} alt="" loading="lazy" width={1080} height={1500} className="absolute inset-0 h-full w-full object-cover opacity-25" />
             <div className="relative mx-auto max-w-2xl">
               <h2 className="font-serif text-4xl md:text-5xl">{t("home.cta")}</h2>
               <p className="mt-4 text-base text-primary-foreground/80">{t("home.subtitle")}</p>

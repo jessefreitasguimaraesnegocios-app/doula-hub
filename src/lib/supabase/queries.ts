@@ -130,6 +130,22 @@ export async function uploadDoulaPhoto(file: File, slug: string): Promise<{ publ
   return { publicUrl: publicUrl || null, error: null };
 }
 
+/** Fotos do site / contratadas — bucket `doulas`, pasta `site/…` (mesmas permissões que fotos de equipa). */
+export async function uploadSiteCmsAsset(
+  file: File,
+  folder: string,
+): Promise<{ publicUrl: string | null; error: Error | null }> {
+  const client = getSupabaseBrowserClient();
+  if (!client) return { publicUrl: null, error: new Error("Supabase não configurado") };
+  const safeFolder = folder.replace(/[^a-z0-9_-]/gi, "_").slice(0, 80) || "misc";
+  const safeName = file.name.replace(/[^\w.\-]+/g, "_");
+  const path = `site/${safeFolder}/${Date.now()}-${safeName}`;
+  const { error: upErr } = await client.storage.from("doulas").upload(path, file, { upsert: true, contentType: file.type });
+  if (upErr) return { publicUrl: null, error: new Error(upErr.message) };
+  const { data } = client.storage.from("doulas").getPublicUrl(path);
+  return { publicUrl: data.publicUrl || null, error: null };
+}
+
 export async function fetchActiveShopProducts(): Promise<ShopProduct[] | null> {
   const client = getSupabaseBrowserClient();
   if (!client) return null;

@@ -3,12 +3,14 @@ import { useTranslation } from "react-i18next";
 import { Instagram, Mail, Heart } from "lucide-react";
 import logoMark from "@/assets/logo-mark.png";
 import { useSiteCms } from "@/hooks/use-site-cms";
+import { pickSiteImageUrl } from "@/lib/site-cms";
 
 const FALLBACK_EMAIL = "Doula@AllThingsBabies.com";
 
 export function Footer() {
   const { t } = useTranslation();
   const cms = useSiteCms();
+  const logoSrc = pickSiteImageUrl(cms, "footer_logo", logoMark);
   const contactEmail = cms.contactEmail.trim() || FALLBACK_EMAIL;
   const mailtoHref = `mailto:${contactEmail}?subject=${encodeURIComponent(t("footer.emailSubject"))}`;
 
@@ -21,7 +23,7 @@ export function Footer() {
             className="group inline-flex max-w-full items-center gap-4 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[oklch(0.94_0.02_80)]"
           >
             <img
-              src={logoMark}
+              src={logoSrc}
               alt=""
               width={96}
               height={96}

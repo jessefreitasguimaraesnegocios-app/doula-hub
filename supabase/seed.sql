@@ -1,0 +1,2 @@
+-- Opcional: dados só para desenvolvimento local (`supabase db reset`).
+-- O projecto já insere seeds na migration inicial; deixe vazio ou acrescente UPDATEs aqui.

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { TFunction } from "i18next";
 import { toast } from "sonner";
 import { Check, ArrowRight, ArrowLeft, ShieldCheck, Video, CalendarDays } from "lucide-react";
@@ -9,7 +9,7 @@ import d2 from "@/assets/doula-2.jpg";
 import d3 from "@/assets/doula-3.jpg";
 import d4 from "@/assets/doula-4.jpg";
 import { useSiteCms } from "@/hooks/use-site-cms";
-import { servicePriceUsdOverride } from "@/lib/site-cms";
+import { pickSiteImageUrl, servicePriceUsdOverride, type SiteImageKey } from "@/lib/site-cms";
 
 export const Route = createFileRoute("/booking")({
   head: () => ({
@@ -30,7 +30,13 @@ const DOULAS = [
   { id: "sofia", name: "Sofia Rivera", img: d2 },
   { id: "elena", name: "Elena Conti", img: d3 },
   { id: "mei", name: "Mei Tanaka", img: d4 },
-];
+] as const;
+
+function bookingDoulaSlot(id: string): SiteImageKey | null {
+  if (id === "any") return null;
+  if (id === "raquel") return "team_member_founder";
+  return `team_member_${id}` as SiteImageKey;
+}
 
 const SUPPORT_ORDER = ["birth", "postpartum", "lactation", "bereavement", "combo", "other"] as const;
 const LANG_ORDER = ["english", "spanish", "portuguese", "other"] as const;
@@ -144,6 +150,16 @@ function validateIntake(f: Form) {
 function Booking() {
   const { t, i18n } = useTranslation();
   const cms = useSiteCms();
+  const doulasWithImages = useMemo(
+    () =>
+      DOULAS.map((d) => {
+        if (!d.img) return { ...d, imgSrc: null as string | null };
+        const slot = bookingDoulaSlot(d.id);
+        if (!slot) return { ...d, imgSrc: null };
+        return { ...d, imgSrc: pickSiteImageUrl(cms, slot, d.img) };
+      }),
+    [cms],
+  );
   const allowUsdOverride = i18n.language === "en" || i18n.language === "es";
   const pkgPriceDisplay = (pkg: string) => {
     if (allowUsdOverride) {
@@ -269,7 +285,7 @@ function Booking() {
 
         {step === 1 && (
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {DOULAS.map((d) => {
+            {doulasWithImages.map((d) => {
               const sel = form.doula === d.id;
               return (
                 <button
@@ -280,8 +296,8 @@ function Booking() {
                     sel ? "border-primary" : "border-border hover:border-primary/40"
                   }`}
                 >
-                  {d.img ? (
-                    <img src={d.img} alt={d.name} className="aspect-square w-full object-cover" />
+                  {d.imgSrc ? (
+                    <img src={d.imgSrc} alt={d.name} className="aspect-square w-full object-cover" />
                   ) : (
                     <div className="grid aspect-square place-items-center bg-sage/20 font-serif text-3xl text-sage-deep">
                       ✦
