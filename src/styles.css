@@ -178,15 +178,20 @@
   }
 
   /*
-   * Sonner: runtime CSS fixes `[data-sonner-toaster]` with a huge z-index. The host `<section>`
-   * can still sit above the page and intercept clicks (esp. production / Safari). Click-through
-   * on the section; re-enable only on the actual toaster `<ol>`.
+   * Sonner: `[data-sonner-toaster]` is `position: fixed` with z-index ~1e9. The list `<ol>` can
+   * still overlap bottom-right CTAs (e.g. booking "Continue"). Never make the whole `<ol>`
+   * `pointer-events: auto` — only each `[data-sonner-toast]` should receive clicks.
    */
-  section[aria-label*="Notifications"] {
+  [data-sonner-toaster] {
     pointer-events: none !important;
   }
 
-  section[aria-label*="Notifications"] ol[data-sonner-toaster] {
+  [data-sonner-toast] {
     pointer-events: auto !important;
+  }
+
+  /* Host stays click-through when empty or between toasts */
+  section[aria-label*="Notifications"] {
+    pointer-events: none !important;
   }
 }

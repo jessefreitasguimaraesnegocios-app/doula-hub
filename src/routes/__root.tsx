@@ -147,7 +147,8 @@ function RootComponent() {
           </div>
           {/* Sonner usa z-index muito alto; sem isto o contentor pode roubar cliques quando não há toasts. */}
           <div className="pointer-events-none">
-            <Toaster />
+            {/* top-center avoids stacking over bottom-right CTAs (booking, checkout) */}
+            <Toaster position="top-center" />
           </div>
         </CartProvider>
       </I18nextProvider>
