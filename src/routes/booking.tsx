@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { TFunction } from "i18next";
 import { toast } from "sonner";
 import { Check, ArrowRight, ArrowLeft, ShieldCheck, Video, CalendarDays } from "lucide-react";
@@ -9,8 +9,20 @@ import d2 from "@/assets/doula-2.jpg";
 import d3 from "@/assets/doula-3.jpg";
 import d4 from "@/assets/doula-4.jpg";
 import { useSiteCms } from "@/hooks/use-site-cms";
-import { pickSiteImageUrl, servicePriceUsdOverride, type SiteCmsV1, type SiteImageKey } from "@/lib/site-cms";
+import {
+  pickSiteImageUrl,
+  servicePriceUsdOverride,
+  type SiteCmsV1,
+  type SiteImageKey,
+} from "@/lib/site-cms";
 import { completeBookingRequest } from "@/lib/booking/booking-fns";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/booking")({
   head: () => ({
@@ -51,10 +63,32 @@ function resolveBookingDoulaLabel(doulaId: string, t: TFunction, cms: SiteCmsV1)
   return DOULAS.find((d) => d.id === doulaId)?.name ?? "—";
 }
 
-const SUPPORT_ORDER = ["birth", "postpartum", "lactation", "bereavement", "combo", "other"] as const;
+const SUPPORT_ORDER = [
+  "birth",
+  "postpartum",
+  "lactation",
+  "bereavement",
+  "combo",
+  "other",
+] as const;
 const LANG_ORDER = ["english", "spanish", "portuguese", "other"] as const;
 
-const EMAIL_DOMAINS = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com", "live.com"] as const;
+const EMAIL_DOMAINS = [
+  "gmail.com",
+  "yahoo.com",
+  "hotmail.com",
+  "outlook.com",
+  "icloud.com",
+  "live.com",
+] as const;
+
+/** If i18n `returnObjects` ever fails in prod, avoid crashing step 3 (`platforms.map`). */
+const FALLBACK_SCHEDULE_PLATFORMS = [
+  "Zoom",
+  "Google Meet",
+  "Microsoft Teams",
+  "Apple FaceTime",
+] as const;
 
 function formatUSPhoneFromDigits(input: string): string {
   let d = input.replace(/\D/g, "");
@@ -206,7 +240,8 @@ function Booking() {
   const { t, i18n } = useTranslation();
   const cms = useSiteCms();
   const visibleContracted = useMemo(
-    () => cms.contractedDoulas.filter((c) => c.visibleOnSite && c.status === "active" && c.name.trim()),
+    () =>
+      cms.contractedDoulas.filter((c) => c.visibleOnSite && c.status === "active" && c.name.trim()),
     [cms.contractedDoulas],
   );
   const doulasWithImages = useMemo(() => {
@@ -260,14 +295,18 @@ function Booking() {
     date: "",
     time: "",
   });
-  const update = <K extends keyof Form>(k: K, v: Form[K]) => setForm((prev) => ({ ...prev, [k]: v }));
+  const update = <K extends keyof Form>(k: K, v: Form[K]) =>
+    setForm((prev) => ({ ...prev, [k]: v }));
 
   const handleZipPlace = useCallback((city: string, state: string) => {
     setForm((prev) => ({ ...prev, zipCity: city, zipState: state }));
   }, []);
 
   const stepKeys = ["package", "doula", "intake", "schedule", "payment"] as const;
-  const platforms = t("booking.schedule.platforms", { returnObjects: true }) as string[];
+  const platformsRaw = t("booking.schedule.platforms", { returnObjects: true });
+  const platforms = Array.isArray(platformsRaw)
+    ? (platformsRaw as string[])
+    : [...FALLBACK_SCHEDULE_PLATFORMS];
 
   const finishBooking = async () => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(form.date) || !form.time.trim()) {
@@ -317,7 +356,9 @@ function Booking() {
     if (step === 2 && !validateIntake(form)) {
       const missing = intakeMissingLabels(form, t);
       const detail =
-        missing.length > 0 ? t("booking.intake.fillRequiredDetail", { fields: missing.join(" · ") }) : t("booking.intake.fillRequired");
+        missing.length > 0
+          ? t("booking.intake.fillRequiredDetail", { fields: missing.join(" · ") })
+          : t("booking.intake.fillRequired");
       toast.error(detail);
       return;
     }
@@ -332,7 +373,10 @@ function Booking() {
         </div>
         <h1 className="mt-8 font-serif text-5xl text-foreground">{t("booking.payment.success")}</h1>
         <p className="mt-4 text-lg text-muted-foreground">{t("booking.payment.successBody")}</p>
-        <Link to="/" className="mt-10 rounded-full bg-primary px-8 py-4 text-sm font-medium text-primary-foreground">
+        <Link
+          to="/"
+          className="mt-10 rounded-full bg-primary px-8 py-4 text-sm font-medium text-primary-foreground"
+        >
           {t("nav.home")}
         </Link>
       </section>
@@ -363,7 +407,9 @@ function Booking() {
             >
               {i < step ? <Check className="h-4 w-4" /> : i + 1}
             </div>
-            <span className={`hidden text-xs sm:inline ${i === step ? "font-medium text-foreground" : "text-muted-foreground"}`}>
+            <span
+              className={`hidden text-xs sm:inline ${i === step ? "font-medium text-foreground" : "text-muted-foreground"}`}
+            >
               {t(`booking.steps.${k}`)}
             </span>
             {i < stepKeys.length - 1 && <span className="h-px flex-1 bg-border" />}
@@ -382,12 +428,18 @@ function Booking() {
                   type="button"
                   onClick={() => update("pkg", k)}
                   className={`rounded-2xl border-2 p-6 text-left transition ${
-                    sel ? "border-primary bg-primary/5" : "border-border bg-background hover:border-primary/40"
+                    sel
+                      ? "border-primary bg-primary/5"
+                      : "border-border bg-background hover:border-primary/40"
                   }`}
                 >
-                  <p className="font-serif text-xl text-foreground">{t(`services.items.${k}.name`)}</p>
+                  <p className="font-serif text-xl text-foreground">
+                    {t(`services.items.${k}.name`)}
+                  </p>
                   <p className="mt-1 font-serif text-2xl text-primary">{pkgPriceDisplay(k)}</p>
-                  <p className="mt-2 text-sm text-muted-foreground">{t(`services.items.${k}.body`)}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {t(`services.items.${k}.body`)}
+                  </p>
                 </button>
               );
             })}
@@ -408,7 +460,11 @@ function Booking() {
                   }`}
                 >
                   {d.imgSrc ? (
-                    <img src={d.imgSrc} alt={d.name} className="aspect-square w-full object-cover" />
+                    <img
+                      src={d.imgSrc}
+                      alt={d.name}
+                      className="aspect-square w-full object-cover"
+                    />
                   ) : (
                     <div className="grid aspect-square place-items-center bg-sage/20 font-serif text-3xl text-sage-deep">
                       ✦
@@ -426,10 +482,31 @@ function Booking() {
         {step === 2 && (
           <div className="space-y-8">
             <div className="grid gap-5 sm:grid-cols-2">
-              <BookField label={`${t("booking.intake.fullName")} *`} value={form.fullName} onChange={(v) => update("fullName", v)} required />
-              <BookEmailField label={`${t("booking.intake.email")} *`} value={form.email} onChange={(v) => update("email", v)} required />
-              <BookPhoneField label={`${t("booking.intake.phone")} *`} value={form.phone} onChange={(v) => update("phone", v)} required />
-              <BookDateUsField label={`${t("booking.intake.dueDate")} *`} value={form.dueDate} onChange={(v) => update("dueDate", v)} placeholder={t("booking.intake.datePlaceholder")} required />
+              <BookField
+                label={`${t("booking.intake.fullName")} *`}
+                value={form.fullName}
+                onChange={(v) => update("fullName", v)}
+                required
+              />
+              <BookEmailField
+                label={`${t("booking.intake.email")} *`}
+                value={form.email}
+                onChange={(v) => update("email", v)}
+                required
+              />
+              <BookPhoneField
+                label={`${t("booking.intake.phone")} *`}
+                value={form.phone}
+                onChange={(v) => update("phone", v)}
+                required
+              />
+              <BookDateUsField
+                label={`${t("booking.intake.dueDate")} *`}
+                value={form.dueDate}
+                onChange={(v) => update("dueDate", v)}
+                placeholder={t("booking.intake.datePlaceholder")}
+                required
+              />
             </div>
 
             <BookRadioGroup
@@ -494,7 +571,9 @@ function Booking() {
             <div>
               <p className="text-xs uppercase tracking-widest text-foreground/60">
                 {t("booking.intake.includeSupport")}{" "}
-                <span className="font-normal normal-case text-muted-foreground">({t("booking.intake.includeSupportHint")})</span>
+                <span className="font-normal normal-case text-muted-foreground">
+                  ({t("booking.intake.includeSupportHint")})
+                </span>
               </p>
               <div className="mt-3 flex flex-wrap gap-3">
                 {(
@@ -506,7 +585,9 @@ function Booking() {
                   <label
                     key={o.value}
                     className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2.5 text-sm transition ${
-                      form.includeSupport === o.value ? "border-primary bg-primary/5 text-foreground" : "border-border bg-background text-foreground/80"
+                      form.includeSupport === o.value
+                        ? "border-primary bg-primary/5 text-foreground"
+                        : "border-border bg-background text-foreground/80"
                     }`}
                   >
                     <input
@@ -547,7 +628,10 @@ function Booking() {
               onChange={(v) => update("preferredLanguage", v)}
               options={[
                 { value: "", label: t("booking.intake.selectPlaceholder") },
-                ...LANG_ORDER.map((key) => ({ value: key, label: t(`booking.intake.lang.${key}`) })),
+                ...LANG_ORDER.map((key) => ({
+                  value: key,
+                  label: t(`booking.intake.lang.${key}`),
+                })),
               ]}
               required
             />
@@ -565,7 +649,9 @@ function Booking() {
                   <label
                     key={o.value}
                     className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-5 py-2.5 text-sm transition ${
-                      form.babyCount === o.value ? "border-primary bg-primary/5 text-foreground" : "border-border bg-background text-foreground/80"
+                      form.babyCount === o.value
+                        ? "border-primary bg-primary/5 text-foreground"
+                        : "border-border bg-background text-foreground/80"
                     }`}
                   >
                     <input
@@ -591,7 +677,9 @@ function Booking() {
             <div>
               <label className="text-xs uppercase tracking-widest text-foreground/60">
                 {t("booking.intake.notesBeforeCall")}{" "}
-                <span className="font-normal normal-case text-muted-foreground">({t("booking.intake.optional")})</span>
+                <span className="font-normal normal-case text-muted-foreground">
+                  ({t("booking.intake.optional")})
+                </span>
               </label>
               <textarea
                 rows={4}
@@ -613,8 +701,18 @@ function Booking() {
                 onChange={(v) => update("platform", v)}
                 options={platforms.map((p) => ({ value: p, label: p }))}
               />
-              <BookField label={t("booking.schedule.date")} type="date" value={form.date} onChange={(v) => update("date", v)} />
-              <BookField label={t("booking.schedule.time")} type="time" value={form.time} onChange={(v) => update("time", v)} />
+              <BookField
+                label={t("booking.schedule.date")}
+                type="date"
+                value={form.date}
+                onChange={(v) => update("date", v)}
+              />
+              <BookField
+                label={t("booking.schedule.time")}
+                type="time"
+                value={form.time}
+                onChange={(v) => update("time", v)}
+              />
             </div>
             <div className="flex items-center gap-3 rounded-2xl bg-sage/15 p-4 text-sm text-foreground/80">
               <Video className="h-5 w-5 shrink-0 text-sage-deep" />
@@ -627,8 +725,14 @@ function Booking() {
           <div className="space-y-6">
             <p className="font-serif text-2xl text-foreground">{t("booking.payment.summary")}</p>
             <dl className="space-y-3 rounded-2xl bg-background p-6">
-              <Row label={t("booking.steps.package")} value={t(`services.items.${form.pkg}.name`)} />
-              <Row label={t("booking.steps.doula")} value={resolveBookingDoulaLabel(form.doula, t, cms)} />
+              <Row
+                label={t("booking.steps.package")}
+                value={t(`services.items.${form.pkg}.name`)}
+              />
+              <Row
+                label={t("booking.steps.doula")}
+                value={resolveBookingDoulaLabel(form.doula, t, cms)}
+              />
               <Row label={t("booking.intake.fullName")} value={form.fullName || "—"} />
               <Row label={t("booking.intake.email")} value={form.email || "—"} />
               <Row label={t("booking.intake.phone")} value={form.phone || "—"} />
@@ -649,13 +753,24 @@ function Booking() {
               />
               <Row label={t("booking.intake.supportType")} value={supportTypesSummary} />
               <Row
-                label={<span className="inline-flex items-center gap-1.5"><CalendarDays className="h-3.5 w-3.5" />{t("booking.steps.schedule")}</span>}
+                label={
+                  <span className="inline-flex items-center gap-1.5">
+                    <CalendarDays className="h-3.5 w-3.5" />
+                    {t("booking.steps.schedule")}
+                  </span>
+                }
                 value={`${form.date || "—"} ${form.time}  ·  ${form.platform}`}
               />
               <div className="my-2 border-t border-border" />
               <Row
-                label={<span className="font-medium text-foreground">{t("booking.payment.total")}</span>}
-                value={<span className="font-serif text-2xl text-primary">{pkgPriceDisplay(form.pkg)}</span>}
+                label={
+                  <span className="font-medium text-foreground">{t("booking.payment.total")}</span>
+                }
+                value={
+                  <span className="font-serif text-2xl text-primary">
+                    {pkgPriceDisplay(form.pkg)}
+                  </span>
+                }
               />
             </dl>
             <div className="flex items-start gap-3 rounded-2xl border border-border bg-background p-4 text-sm text-muted-foreground">
@@ -679,7 +794,11 @@ function Booking() {
             {t("booking.back")}
           </button>
           {step < stepKeys.length - 1 ? (
-            <button type="button" onClick={goNext} className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-medium text-primary-foreground hover:-translate-y-px">
+            <button
+              type="button"
+              onClick={goNext}
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-medium text-primary-foreground hover:-translate-y-px"
+            >
               {t("booking.next")} <ArrowRight className="h-4 w-4" />
             </button>
           ) : (
@@ -709,12 +828,12 @@ function BookSupportMultiPicker({
   onChange: (v: string[]) => void;
   t: TFunction;
 }) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [draft, setDraft] = useState<string[]>(value);
 
   const open = () => {
     setDraft([...value]);
-    dialogRef.current?.showModal();
+    setPickerOpen(true);
   };
 
   const toggle = (key: string) => {
@@ -723,7 +842,7 @@ function BookSupportMultiPicker({
 
   const commit = () => {
     onChange(draft);
-    dialogRef.current?.close();
+    setPickerOpen(false);
   };
 
   const summary =
@@ -744,42 +863,51 @@ function BookSupportMultiPicker({
         <span className="line-clamp-3">{summary}</span>
       </button>
 
-      <dialog
-        ref={dialogRef}
-        className="fixed left-1/2 top-1/2 z-50 w-[min(100%-2rem,28rem)] -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-border bg-card p-6 text-foreground shadow-lg backdrop:bg-black/50"
-      >
-        <p className="font-serif text-lg leading-snug">{t("booking.intake.supportDialogTitle")}</p>
-        <div className="mt-4 max-h-[min(60vh,22rem)] space-y-2 overflow-y-auto pr-1">
-          {SUPPORT_ORDER.map((key) => (
-            <label
-              key={key}
-              className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition ${
-                draft.includes(key) ? "border-primary bg-primary/5" : "border-border bg-background"
-              }`}
+      <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
+        <DialogContent className="max-h-[min(90vh,36rem)] w-[min(100vw-2rem,28rem)] max-w-[calc(100vw-2rem)] gap-0 overflow-hidden rounded-3xl border-border p-0 sm:rounded-3xl">
+          <DialogHeader className="space-y-0 px-6 pb-2 pt-6 text-left">
+            <DialogTitle className="font-serif text-lg font-normal leading-snug text-foreground">
+              {t("booking.intake.supportDialogTitle")}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="max-h-[min(60vh,22rem)] space-y-2 overflow-y-auto px-6 pb-2 pr-7">
+            {SUPPORT_ORDER.map((key) => (
+              <label
+                key={key}
+                className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition ${
+                  draft.includes(key)
+                    ? "border-primary bg-primary/5"
+                    : "border-border bg-background"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={draft.includes(key)}
+                  onChange={() => toggle(key)}
+                  className="size-4 shrink-0 rounded border border-input accent-primary"
+                />
+                <span>{t(`booking.intake.support.${key}`)}</span>
+              </label>
+            ))}
+          </div>
+          <DialogFooter className="flex-row flex-wrap justify-end gap-2 border-t border-border px-6 py-4 sm:space-x-0">
+            <button
+              type="button"
+              className="rounded-full border border-border bg-background px-5 py-2.5 text-sm text-foreground transition hover:bg-muted"
+              onClick={() => setPickerOpen(false)}
             >
-              <input
-                type="checkbox"
-                checked={draft.includes(key)}
-                onChange={() => toggle(key)}
-                className="size-4 shrink-0 rounded border border-input accent-primary"
-              />
-              <span>{t(`booking.intake.support.${key}`)}</span>
-            </label>
-          ))}
-        </div>
-        <div className="mt-6 flex flex-wrap justify-end gap-2 border-t border-border pt-4">
-          <button
-            type="button"
-            className="rounded-full border border-border bg-background px-5 py-2.5 text-sm text-foreground transition hover:bg-muted"
-            onClick={() => dialogRef.current?.close()}
-          >
-            {t("booking.intake.supportCancel")}
-          </button>
-          <button type="button" className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90" onClick={commit}>
-            {t("booking.intake.supportConfirm")}
-          </button>
-        </div>
-      </dialog>
+              {t("booking.intake.supportCancel")}
+            </button>
+            <button
+              type="button"
+              className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
+              onClick={commit}
+            >
+              {t("booking.intake.supportConfirm")}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -890,8 +1018,11 @@ function BookZipUsField({
 
   const digits = value.replace(/\D/g, "");
   const placeLine =
-    digits.length >= 5 && city && stateAbbr ? t("booking.intake.zipPlaceLine", { city, state: stateAbbr }) : null;
-  const loadLine = lookup === "loading" && digits.length >= 5 ? t("booking.intake.zipLookupLoading") : null;
+    digits.length >= 5 && city && stateAbbr
+      ? t("booking.intake.zipPlaceLine", { city, state: stateAbbr })
+      : null;
+  const loadLine =
+    lookup === "loading" && digits.length >= 5 ? t("booking.intake.zipLookupLoading") : null;
   const errLine = lookup === "none" ? t("booking.intake.zipLookupNone") : null;
 
   return (
@@ -909,7 +1040,9 @@ function BookZipUsField({
         className="mt-2 w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm tabular-nums focus:border-primary focus:outline-none"
       />
       {(placeLine || errLine || loadLine) && (
-        <p className={`mt-1.5 text-xs ${errLine ? "text-destructive" : "text-muted-foreground"}`}>{placeLine || errLine || loadLine}</p>
+        <p className={`mt-1.5 text-xs ${errLine ? "text-destructive" : "text-muted-foreground"}`}>
+          {placeLine || errLine || loadLine}
+        </p>
       )}
     </div>
   );
@@ -971,7 +1104,11 @@ function BookEmailField({
         className="mt-2 w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none"
       />
       {showDomains ? (
-        <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Email domain suggestions">
+        <div
+          className="mt-2 flex flex-wrap gap-2"
+          role="group"
+          aria-label="Email domain suggestions"
+        >
           {EMAIL_DOMAINS.map((dom) => (
             <button
               key={dom}
@@ -1074,10 +1211,19 @@ function BookRadioGroup({
           <label
             key={o.value}
             className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2.5 text-sm transition ${
-              value === o.value ? "border-primary bg-primary/5 text-foreground" : "border-border bg-background text-foreground/80"
+              value === o.value
+                ? "border-primary bg-primary/5 text-foreground"
+                : "border-border bg-background text-foreground/80"
             }`}
           >
-            <input type="radio" name={name} value={o.value} checked={value === o.value} onChange={() => onChange(o.value)} className="accent-primary" />
+            <input
+              type="radio"
+              name={name}
+              value={o.value}
+              checked={value === o.value}
+              onChange={() => onChange(o.value)}
+              className="accent-primary"
+            />
             {o.label}
           </label>
         ))}
