@@ -1,9 +1,11 @@
+import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -11,6 +13,7 @@ import {
 import appCss from "../styles.css?url";
 import { I18nextProvider } from "react-i18next";
 import i18n, { ensureI18nInitialized } from "../i18n";
+import { resetDocumentScrollLocks } from "@/lib/document-scroll";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { I18nClientLanguageSync } from "@/components/I18nClientLanguageSync";
@@ -130,6 +133,25 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  /** After client navigation, strip stale body scroll locks (e.g. /shop overlay) unless we're on /shop. */
+  useEffect(() => {
+    queueMicrotask(() => {
+      if (pathname !== "/shop") {
+        resetDocumentScrollLocks();
+      }
+    });
+  }, [pathname]);
+
+  /** bfcache restore can resurrect a page with overflow:hidden still on <body>. */
+  useEffect(() => {
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) resetDocumentScrollLocks();
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
