@@ -155,6 +155,15 @@ function RootComponent() {
     return () => window.removeEventListener("pageshow", onPageShow);
   }, []);
 
+  /** Radix modals can leave body scroll-locked if the tree unmounts mid-close; tab back should recover. */
+  useEffect(() => {
+    const onVis = () => {
+      if (document.visibilityState === "visible") resetDocumentScrollLocks();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <I18nextProvider i18n={i18n}>
