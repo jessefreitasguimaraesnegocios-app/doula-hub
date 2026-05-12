@@ -7,13 +7,11 @@ import {
   useRouter,
   useRouterState,
   HeadContent,
-  Scripts,
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
 import { I18nextProvider } from "react-i18next";
 import i18n, { ensureI18nInitialized } from "../i18n";
-import { normalizeHtmlLang } from "@/lib/i18n-locale";
 import { resetDocumentScrollLocks } from "@/lib/document-scroll";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
@@ -112,26 +110,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     ],
   }),
-  shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
 });
-
-function RootShell({ children }: { children: React.ReactNode }) {
-  const htmlLang = normalizeHtmlLang(i18n.resolvedLanguage ?? i18n.language);
-  return (
-    <html lang={htmlLang} suppressHydrationWarning>
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  );
-}
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
@@ -165,26 +147,29 @@ function RootComponent() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <I18nextProvider i18n={i18n}>
-        <CartProvider>
-          <I18nClientLanguageSync />
-          <SupabaseSiteBootstrap />
-          <SiteCmsThemeSync />
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            <main className="relative isolate flex-1">
-              <Outlet />
-            </main>
-            <Footer />
-          </div>
-          {/* Sonner usa z-index muito alto; sem isto o contentor pode roubar cliques quando não há toasts. */}
-          <div className="pointer-events-none">
-            {/* top-center avoids stacking over bottom-right CTAs (booking, checkout) */}
-            <Toaster position="top-center" style={{ zIndex: 60 }} />
-          </div>
-        </CartProvider>
-      </I18nextProvider>
-    </QueryClientProvider>
+    <>
+      <HeadContent />
+      <QueryClientProvider client={queryClient}>
+        <I18nextProvider i18n={i18n}>
+          <CartProvider>
+            <I18nClientLanguageSync />
+            <SupabaseSiteBootstrap />
+            <SiteCmsThemeSync />
+            <div className="flex min-h-screen flex-col">
+              <Header />
+              <main className="relative isolate flex-1">
+                <Outlet />
+              </main>
+              <Footer />
+            </div>
+            {/* Sonner usa z-index muito alto; sem isto o contentor pode roubar cliques quando não há toasts. */}
+            <div className="pointer-events-none">
+              {/* top-center avoids stacking over bottom-right CTAs (booking, checkout) */}
+              <Toaster position="top-center" style={{ zIndex: 60 }} />
+            </div>
+          </CartProvider>
+        </I18nextProvider>
+      </QueryClientProvider>
+    </>
   );
 }

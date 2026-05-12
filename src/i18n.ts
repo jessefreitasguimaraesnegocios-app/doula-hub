@@ -10,18 +10,17 @@ import { resolveLangForClientBootstrap } from "@/lib/i18n-locale";
 let initPromise: Promise<void> | null = null;
 
 /**
- * Ensures i18n is initialized before any route renders (SSR + client).
- * Avoids top-level `await` in this module, which can race with the first paint on some serverless bundles.
+ * Ensures i18n is initialized before any route renders.
+ * Avoids top-level `await` in this module, which can race with the first paint on some runtimes.
  *
- * SSR note: this module exports a singleton. `src/start.ts` middleware always awaits
- * `changeLanguage` per request before route rendering, which is the correct ordering for typical
- * single-flight SSR. Avoid reading `i18n.language` during async gaps before that middleware runs.
+ * This module exports a singleton. The root route loader awaits initialization so routes
+ * can safely use `useTranslation` on first paint.
  */
 export function ensureI18nInitialized(): Promise<void> {
   if (i18n.isInitialized) return Promise.resolve();
   if (!initPromise) {
     // Real browser only: some runtimes expose a partial `document` without cookies (tests / polyfills).
-    // SSR language is applied in `src/start.ts` middleware via `resolveLangForRequest` after init.
+    // Language is applied on the client via `I18nClientLanguageSync` and cookie detection.
     const isBrowser =
       typeof window !== "undefined" &&
       typeof document !== "undefined" &&

@@ -21,7 +21,24 @@ export default tseslint.config(
   },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ["api/**/*.ts", "vite-dev-api.ts", "vite.config.ts"],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: { ...globals.browser, ...globals.node },
+    },
+    plugins: {
+      prettier,
+    },
+    rules: {
+      "no-restricted-imports": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "prettier/prettier": ["error", { endOfLine: "auto" }],
+    },
+  },
+  {
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
+    ignores: ["api/**", "vite.config.ts", "vite-dev-api.ts"],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -40,7 +57,7 @@ export default tseslint.config(
             {
               name: "server-only",
               message:
-                "TanStack Start does not use the Next.js `server-only` package. Rename the module to `*.server.ts` or mark it with `@tanstack/react-start/server-only`.",
+                "This project does not use the Next.js `server-only` package. Use a `src/lib/server/*` module imported only from `/api` or dev middleware.",
             },
           ],
         },
