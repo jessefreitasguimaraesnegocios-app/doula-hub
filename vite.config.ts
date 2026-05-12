@@ -9,7 +9,8 @@ import { nitro } from "nitro/vite";
 
 // Vercel: Nitro emits the serverless output Vercel expects. Cloudflare's Vite plugin targets
 // Workers and is incompatible with that pipeline (root URL 404 on Vercel without Nitro).
-const onVercel = process.env.VERCEL === "1";
+// Vercel sets `VERCEL` during build and runtime (usually `1`; some tooling uses other truthy values).
+const onVercel = Boolean(process.env.VERCEL);
 
 // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
 // @cloudflare/vite-plugin builds from this — wrangler.jsonc main alone is insufficient.
@@ -18,5 +19,5 @@ export default defineConfig({
     server: { entry: "server" },
   },
   cloudflare: onVercel ? false : undefined,
-  plugins: onVercel ? [nitro()] : [],
+  plugins: onVercel ? [nitro({ preset: "vercel" })] : [],
 });

@@ -16,7 +16,13 @@ let initPromise: Promise<void> | null = null;
 export function ensureI18nInitialized(): Promise<void> {
   if (i18n.isInitialized) return Promise.resolve();
   if (!initPromise) {
-    const lng = typeof document !== "undefined" ? resolveLangForClientBootstrap() : "en";
+    // Real browser only: some runtimes expose a partial `document` without cookies (tests / polyfills).
+    // SSR language is applied in `src/start.ts` middleware via `resolveLangForRequest` after init.
+    const isBrowser =
+      typeof window !== "undefined" &&
+      typeof document !== "undefined" &&
+      typeof document.cookie === "string";
+    const lng = isBrowser ? resolveLangForClientBootstrap() : "en";
     initPromise = i18n
       .use(initReactI18next)
       .init({

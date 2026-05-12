@@ -17,11 +17,15 @@ export function SupabaseSiteBootstrap() {
     if (!client) return;
 
     void (async () => {
-      const payload = await fetchSiteSettingsPayload();
-      if (payload === null) return;
-      const merged = mergeSiteCmsFromRemote(payload);
-      setSiteCmsToStorage(merged);
-      applySiteCmsTheme(merged);
+      try {
+        const payload = await fetchSiteSettingsPayload();
+        if (payload === null) return;
+        const merged = mergeSiteCmsFromRemote(payload);
+        setSiteCmsToStorage(merged);
+        applySiteCmsTheme(merged);
+      } catch (e) {
+        console.error("[SupabaseSiteBootstrap] failed to merge site_settings", e);
+      }
     })();
   }, []);
 

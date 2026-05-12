@@ -45,6 +45,18 @@ export type CompleteBookingResult =
     }
   | { ok: false; error: string };
 
+function bookingInsertErrorMessage(insErr: { message?: string; code?: string }): string {
+  const msg = insErr.message ?? "";
+  const code = insErr.code ?? "";
+  if (code === "42P01" || /relation ["']?booking_requests/i.test(msg)) {
+    return (
+      "Database: table `booking_requests` is missing. Apply the Supabase migration " +
+      "`supabase/migrations/20260513120000_booking_requests.sql` (e.g. `supabase db push` or SQL Editor), then retry."
+    );
+  }
+  return msg;
+}
+
 export const completeBookingRequest = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => completeInput.parse(raw))
   .handler(async ({ data }): Promise<CompleteBookingResult> => {
@@ -78,7 +90,7 @@ export const completeBookingRequest = createServerFn({ method: "POST" })
         .maybeSingle();
 
       if (insErr) {
-        return { ok: false, error: insErr.message };
+        return { ok: false, error: bookingInsertErrorMessage(insErr) };
       }
       bookingId = row?.id ?? null;
     }

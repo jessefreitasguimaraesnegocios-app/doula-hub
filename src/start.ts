@@ -7,8 +7,17 @@ import { resolveLangForRequest } from "./lib/i18n-locale";
 /** Load resources then set language per request so SSR matches cookie / Accept-Language. */
 const i18nRequestMiddleware = createMiddleware().server(async ({ next, request }) => {
   await ensureI18nInitialized();
-  const lng = request ? resolveLangForRequest(request) : "en";
-  await i18n.changeLanguage(lng);
+  try {
+    const lng = request instanceof Request ? resolveLangForRequest(request) : "en";
+    await i18n.changeLanguage(lng);
+  } catch (e) {
+    console.error("[i18n middleware] failed to resolve language, falling back to en", e);
+    try {
+      await i18n.changeLanguage("en");
+    } catch {
+      /* ignore */
+    }
+  }
   return next();
 });
 
