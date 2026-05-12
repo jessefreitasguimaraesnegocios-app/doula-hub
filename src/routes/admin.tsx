@@ -25,7 +25,7 @@ import {
   setSiteCmsToStorage,
   type SiteCmsV1,
 } from "@/lib/site-cms";
-import { AdminBookingsPanel } from "@/components/admin/AdminBookingsPanel";
+import { AdminCrmPanel } from "@/components/admin/AdminCrmPanel";
 import { AdminContractedDoulasPanel } from "@/components/admin/AdminContractedDoulasPanel";
 import { AdminSitePhotosPanel } from "@/components/admin/AdminSitePhotosPanel";
 import { AdminThemePanel } from "@/components/admin/AdminThemePanel";
@@ -732,7 +732,10 @@ function Admin() {
               <h2 className="font-serif text-xl">{t("admin.bookings.title")}</h2>
               <p className="mt-1 text-sm text-muted-foreground">{t("admin.bookings.subtitle")}</p>
               <div className="mt-6">
-                <AdminBookingsPanel enabled={Boolean(session)} />
+                <AdminCrmPanel
+                  enabled={Boolean(session)}
+                  fromDisplayName={draft.emailFromName}
+                />
               </div>
             </TabsContent>
           ) : null}
