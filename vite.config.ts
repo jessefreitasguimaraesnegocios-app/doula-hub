@@ -14,9 +14,10 @@ import { nitro } from "nitro/vite";
 // Build outputs:
 // - VERCEL set: `.vercel/output/` (Nitro). There is NO `dist/server/` — do not point Vercel
 //   "Output Directory" at `dist`; leave framework detection / default so Nitro output is used.
-// - VERCEL unset: `dist/client/` + `dist/server/index.js` (TanStack SSR). Some tooling still
-//   resolves `dist/server/server.js`; `npm run build` runs `scripts/sync-dist-server-entry.mjs`
-//   to copy `index.js` → `server.js` when needed.
+// - VERCEL unset: `dist/client/` + `dist/server/index.js` (TanStack SSR). `vite preview`
+//   needs `dist/server/server.js`; run `npm run build` (sync runs after) or `npm run preview`
+//   (sync runs before preview). For a clean local bundle without VERCEL leaking from the shell,
+//   use `npm run build:preview`.
 const onVercel = Boolean(process.env.VERCEL);
 
 // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).

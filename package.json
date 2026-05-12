@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build && node scripts/sync-dist-server-entry.mjs",
+    "build:preview": "node scripts/build-for-preview.mjs",
     "build:dev": "vite build --mode development",
-    "preview": "vite preview",
+    "preview": "node scripts/sync-dist-server-entry.mjs && vite preview",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
