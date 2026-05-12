@@ -54,7 +54,7 @@ export function Header() {
           </Link>
           <Link
             to="/booking"
-            className="hidden rounded-full bg-primary px-5 py-2.5 text-xs font-medium uppercase tracking-wider text-primary-foreground shadow-(--shadow-soft) transition hover:bg-[oklch(0.5_0.05_145)] md:inline-block"
+            className="hidden rounded-full bg-primary px-5 py-2.5 text-xs font-medium uppercase tracking-wider text-primary-foreground shadow-[var(--shadow-soft)] transition hover:bg-[oklch(0.5_0.05_145)] md:inline-block"
           >
             {t("nav.book")}
           </Link>

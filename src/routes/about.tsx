@@ -32,7 +32,7 @@ function AboutFounderMedia({ cms }: { cms: SiteCmsV1 }) {
         alt="Portrait of the founder in doula scrubs, smiling"
         width={1000}
         height={1250}
-        className="aspect-4/5 w-full rounded-[2rem] object-cover shadow-(--shadow-warm)"
+        className="aspect-4/5 w-full rounded-[2rem] object-cover shadow-[var(--shadow-warm)]"
       />
     );
   }
@@ -49,7 +49,7 @@ function AboutFounderMedia({ cms }: { cms: SiteCmsV1 }) {
   };
 
   return (
-    <div className="aspect-4/5 w-full overflow-hidden rounded-[2rem] bg-muted shadow-(--shadow-warm)">
+    <div className="aspect-4/5 w-full overflow-hidden rounded-[2rem] bg-muted shadow-[var(--shadow-warm)]">
       <video
         src={videoSrc}
         controls
@@ -100,7 +100,7 @@ function About() {
           </h2>
           <div className="mt-12 grid gap-8 md:grid-cols-3">
             {values.map(({ key, icon: Icon }) => (
-              <div key={key} className="rounded-3xl bg-card p-8 shadow-(--shadow-soft)">
+              <div key={key} className="rounded-3xl bg-card p-8 shadow-[var(--shadow-soft)]">
                 <div className="grid h-12 w-12 place-items-center rounded-full bg-primary/10 text-primary">
                   <Icon className="h-5 w-5" />
                 </div>
@@ -139,7 +139,7 @@ function About() {
             loading="lazy"
             width={1080}
             height={1500}
-            className="aspect-4/5 w-full rounded-[2rem] object-cover shadow-(--shadow-soft)"
+            className="aspect-4/5 w-full rounded-[2rem] object-cover shadow-[var(--shadow-soft)]"
           />
         </div>
       </section>

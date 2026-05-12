@@ -101,7 +101,7 @@ function Contact() {
             setSending(false);
           }
         }}
-        className="space-y-5 rounded-3xl bg-card p-8 shadow-(--shadow-soft)"
+        className="space-y-5 rounded-3xl bg-card p-8 shadow-[var(--shadow-soft)]"
       >
         <Field
           label={t("contact.name")}

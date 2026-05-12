@@ -266,7 +266,7 @@ function Team() {
             return (
               <article
                 key={m.key}
-                className="group rounded-[2rem] bg-card p-6 shadow-(--shadow-soft) transition hover:shadow-(--shadow-warm)"
+                className="group rounded-[2rem] bg-card p-6 shadow-[var(--shadow-soft)] transition hover:shadow-[var(--shadow-warm)]"
               >
                 <div className="overflow-hidden rounded-[1.5rem]">
                   <img
@@ -318,7 +318,7 @@ function Team() {
                     onClick={() =>
                       openZoomSchedulerPopup(scheduleUrlForCard(m, cms.teamDefaultScheduleUrl), t)
                     }
-                    className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary bg-primary px-5 py-3.5 text-sm font-medium text-primary-foreground shadow-(--shadow-soft) transition hover:bg-primary/90"
+                    className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary bg-primary px-5 py-3.5 text-sm font-medium text-primary-foreground shadow-[var(--shadow-soft)] transition hover:bg-primary/90"
                   >
                     <Video className="h-4 w-4 shrink-0" aria-hidden />
                     {t("team.scheduleVideoCall")}
