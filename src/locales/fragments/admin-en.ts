@@ -91,6 +91,7 @@ const admin = {
     meetOpen: "Meet link",
     emailYes: "Sent",
     emailNo: "—",
+    phaseScheduleOnly: "Schedule only",
     intakeToggle: "Intake details",
     retry: "Retry",
   },

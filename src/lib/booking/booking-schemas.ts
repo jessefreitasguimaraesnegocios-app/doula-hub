@@ -18,9 +18,24 @@ export const bookingInputSchema = z.object({
 export const completeBookingInputSchema = bookingInputSchema.extend({
   sendClientEmail: z.boolean(),
   intake: z.record(z.string(), z.unknown()).optional().default({}),
+  /** When set, updates this CRM row instead of inserting (must match same client email). */
+  existingBookingId: z.string().uuid().optional(),
 });
 
 export type CompleteBookingPayload = z.infer<typeof completeBookingInputSchema>;
+
+/** Persist CRM when the user leaves the schedule step (before payment confirmation). */
+export const scheduleSnapshotInputSchema = bookingInputSchema.extend({
+  intake: z.record(z.string(), z.unknown()).optional().default({}),
+  /** Re-save the same draft row if the user edits schedule and advances again. */
+  existingPartialId: z.string().uuid().optional(),
+});
+
+export type ScheduleSnapshotPayload = z.infer<typeof scheduleSnapshotInputSchema>;
+
+export type ScheduleSnapshotResult =
+  | { ok: true; bookingId: string }
+  | { ok: false; error: string };
 
 /** Payload for resend / standalone booking confirmation e-mail (admin CRM). */
 export type BookingConfirmationEmailPayload = z.infer<typeof bookingInputSchema>;

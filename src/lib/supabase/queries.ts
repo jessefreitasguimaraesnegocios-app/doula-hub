@@ -188,6 +188,8 @@ export type BookingRequestRow = {
   google_sync_error: string | null;
   email_sent: boolean;
   email_error: string | null;
+  /** Present after migration `20260515120000_booking_submission_phase`; omitted rows treated as completed. */
+  submission_phase?: "schedule_saved" | "completed" | null;
 };
 
 export async function fetchBookingRequestsForAdmin(): Promise<BookingRequestRow[] | null> {
@@ -196,7 +198,7 @@ export async function fetchBookingRequestsForAdmin(): Promise<BookingRequestRow[
   const { data, error } = await client
     .from("booking_requests")
     .select(
-      "id, created_at, full_name, email, phone, pkg_key, pkg_label, doula_label, consult_date, consult_time, platform, meet_link, locale, intake, google_event_id, google_html_link, google_meet_link, google_sync_error, email_sent, email_error",
+      "id, created_at, full_name, email, phone, pkg_key, pkg_label, doula_label, consult_date, consult_time, platform, meet_link, locale, intake, google_event_id, google_html_link, google_meet_link, google_sync_error, email_sent, email_error, submission_phase",
     )
     .order("created_at", { ascending: false })
     .limit(200);

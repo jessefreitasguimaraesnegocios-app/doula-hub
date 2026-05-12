@@ -15,7 +15,7 @@ import {
   type SiteCmsV1,
   type SiteImageKey,
 } from "@/lib/site-cms";
-import { completeBookingRequest } from "@/lib/booking/booking-fns";
+import { completeBookingRequest, saveScheduleSnapshotRequest } from "@/lib/booking/booking-fns";
 import {
   Dialog,
   DialogContent,
@@ -220,16 +220,30 @@ function reviveForm(raw: unknown): Form {
   return merged;
 }
 
-function loadBookingWizardSnapshot(): { step: number; form: Form } | null {
+function loadBookingWizardSnapshot(): {
+  step: number;
+  form: Form;
+  partialBookingId: string | null;
+} | null {
   if (typeof sessionStorage === "undefined") return null;
   try {
     const raw = sessionStorage.getItem(BOOKING_WIZARD_STORAGE_KEY);
     if (!raw) return null;
-    const j = JSON.parse(raw) as { v?: unknown; step?: unknown; form?: unknown };
-    if (j.v !== 1) return null;
+    const j = JSON.parse(raw) as {
+      v?: unknown;
+      step?: unknown;
+      form?: unknown;
+      partialBookingId?: unknown;
+    };
+    if (j.v !== 1 && j.v !== 2) return null;
+    const pid =
+      typeof j.partialBookingId === "string" && /^[0-9a-f-]{36}$/i.test(j.partialBookingId)
+        ? j.partialBookingId
+        : null;
     return {
       step: typeof j.step === "number" && Number.isFinite(j.step) ? j.step : 0,
       form: reviveForm(j.form),
+      partialBookingId: pid,
     };
   } catch {
     return null;
@@ -328,6 +342,8 @@ function Booking() {
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
   const [finishBusy, setFinishBusy] = useState(false);
+  const [scheduleSaveBusy, setScheduleSaveBusy] = useState(false);
+  const [partialBookingId, setPartialBookingId] = useState<string | null>(null);
   const [form, setForm] = useState<Form>(() => defaultBookingForm());
 
   /** Restore before passive effects so we do not overwrite sessionStorage with defaults on first paint. */
@@ -337,6 +353,7 @@ function Booking() {
     const maxStep = 4;
     setStep(Math.min(Math.max(0, Math.floor(snap.step)), maxStep));
     setForm(snap.form);
+    if (snap.partialBookingId) setPartialBookingId(snap.partialBookingId);
   }, []);
 
   useEffect(() => {
@@ -346,11 +363,19 @@ function Booking() {
       return;
     }
     try {
-      sessionStorage.setItem(BOOKING_WIZARD_STORAGE_KEY, JSON.stringify({ v: 1, step, form }));
+      sessionStorage.setItem(
+        BOOKING_WIZARD_STORAGE_KEY,
+        JSON.stringify({
+          v: 2,
+          step,
+          form,
+          ...(partialBookingId ? { partialBookingId } : {}),
+        }),
+      );
     } catch {
       /* storage full or disabled */
     }
-  }, [step, form, done]);
+  }, [step, form, done, partialBookingId]);
 
   const update = <K extends keyof Form>(k: K, v: Form[K]) =>
     setForm((prev) => ({ ...prev, [k]: v }));
@@ -389,6 +414,7 @@ function Booking() {
           fromDisplayName: cms.emailFromName?.trim() || undefined,
           sendClientEmail: cms.emailAutomationBooking,
           intake: bookingIntakeSnapshot(form),
+          existingBookingId: partialBookingId ?? undefined,
         },
       });
       if (!r.ok) {
@@ -401,6 +427,7 @@ function Booking() {
       if (r.emailError) {
         toast.warning(t("booking.payment.emailSyncWarn", { detail: r.emailError }));
       }
+      setPartialBookingId(null);
       setDone(true);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t("booking.payment.saveFailedGeneric"));
@@ -417,6 +444,44 @@ function Booking() {
           ? t("booking.intake.fillRequiredDetail", { fields: missing.join(" · ") })
           : t("booking.intake.fillRequired");
       toast.error(detail);
+      return;
+    }
+    if (step === 3) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(form.date) || !form.time.trim()) {
+        toast.error(t("booking.schedule.fillDateTime"));
+        return;
+      }
+      void (async () => {
+        setScheduleSaveBusy(true);
+        try {
+          const doulaLabel = resolveBookingDoulaLabel(form.doula, t, cms);
+          const r = await saveScheduleSnapshotRequest({
+            data: {
+              fullName: form.fullName,
+              email: form.email,
+              phone: form.phone,
+              pkgKey: form.pkg,
+              pkgLabel: t(`services.items.${form.pkg}.name`),
+              doulaLabel,
+              date: form.date,
+              time: form.time,
+              platform: form.platform,
+              meetLink: cms.teamDefaultScheduleUrl?.trim() || undefined,
+              locale: i18n.language,
+              intake: bookingIntakeSnapshot(form),
+              existingPartialId: partialBookingId ?? undefined,
+            },
+          });
+          if (!r.ok) {
+            toast.error(r.error);
+            return;
+          }
+          setPartialBookingId(r.bookingId);
+          setStep(4);
+        } finally {
+          setScheduleSaveBusy(false);
+        }
+      })();
       return;
     }
     setStep((s) => s + 1);
@@ -853,10 +918,12 @@ function Booking() {
           {step < stepKeys.length - 1 ? (
             <button
               type="button"
+              disabled={scheduleSaveBusy}
               onClick={goNext}
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-medium text-primary-foreground hover:-translate-y-px"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-sm font-medium text-primary-foreground hover:-translate-y-px disabled:opacity-60"
             >
-              {t("booking.next")} <ArrowRight className="h-4 w-4" />
+              {scheduleSaveBusy && step === 3 ? "…" : t("booking.next")}{" "}
+              <ArrowRight className="h-4 w-4" />
             </button>
           ) : (
             <button

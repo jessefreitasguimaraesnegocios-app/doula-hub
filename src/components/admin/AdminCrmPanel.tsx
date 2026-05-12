@@ -357,6 +357,14 @@ export function AdminCrmPanel({
                         </div>
                       </div>
                       <div className="flex shrink-0 flex-wrap items-center gap-1.5">
+                        {(row.submission_phase ?? "completed") === "schedule_saved" ? (
+                          <Badge
+                            variant="outline"
+                            className="gap-1 border-amber-600/40 bg-amber-500/15 text-amber-950 dark:text-amber-100"
+                          >
+                            {t("admin.bookings.phaseScheduleOnly")}
+                          </Badge>
+                        ) : null}
                         {googleOk ? (
                           <Badge className="gap-1 bg-emerald-600/90 hover:bg-emerald-600">
                             <CheckCircle2 className="h-3 w-3" /> Google

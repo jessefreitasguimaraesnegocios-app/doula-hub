@@ -34,6 +34,13 @@ export function devApiMiddleware(): Connect.NextHandleFunction {
         res.end(JSON.stringify(result));
         return;
       }
+      if (url === "/api/booking-schedule-snapshot") {
+        const { runScheduleSnapshot } = await import("./src/lib/server/complete-booking.ts");
+        const result = await runScheduleSnapshot(data);
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify(result));
+        return;
+      }
       if (url === "/api/send-contact-inquiry") {
         const { runSendContactInquiryEmail, parseContactInquiryPayload } =
           await import("./src/lib/server/email-contact-inquiry.ts");

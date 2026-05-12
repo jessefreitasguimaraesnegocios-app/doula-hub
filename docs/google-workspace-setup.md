@@ -2,8 +2,9 @@
 
 Este site pode, ao concluir o fluxo em `/booking`:
 
-1. **Gravar** os dados da consulta em Supabase (`booking_requests`) — requer `SUPABASE_SERVICE_ROLE_KEY` no servidor.
-2. **Criar um evento** no Google Calendar com **Google Meet** — requer uma **service account** e a API Calendar.
+1. **Gravar no CRM ao sair do passo «Agenda»** (plataforma de vídeo + data + hora) — `POST /api/booking-schedule-snapshot` com `SUPABASE_SERVICE_ROLE_KEY`. O registo fica com `submission_phase = schedule_saved` (sem evento Google nem e-mail de confirmação até ao passo final).
+2. **Ao concluir o último passo**, o mesmo registo é atualizado (`submission_phase = completed`) e, se configurado, **cria-se o evento** no Google Calendar com **Google Meet** — service account + API Calendar.
+3. O e-mail de confirmação para a cliente continua a ser o **SMTP** configurado no CMS (separador E-mail no `/admin`), quando «automação de marcação» está ligada.
 
 O e-mail de confirmação para a cliente continua a ser o **SMTP** configurado no CMS (separador E-mail no `/admin`), quando «automação de marcação» está ligada.
 

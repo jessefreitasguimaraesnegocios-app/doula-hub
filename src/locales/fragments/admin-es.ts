@@ -93,6 +93,7 @@ const admin: AdminLocale = {
     meetOpen: "Enlace Meet",
     emailYes: "Enviado",
     emailNo: "—",
+    phaseScheduleOnly: "Solo programación",
     intakeToggle: "Detalles del formulario",
     retry: "Reintentar",
   },

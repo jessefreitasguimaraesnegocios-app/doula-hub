@@ -94,6 +94,7 @@ const admin: AdminLocale = {
     meetOpen: "Link Meet",
     emailYes: "Inviato",
     emailNo: "—",
+    phaseScheduleOnly: "Solo pianificazione",
     intakeToggle: "Dettagli intake",
     retry: "Riprova",
   },

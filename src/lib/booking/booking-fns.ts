@@ -1,4 +1,9 @@
-import type { CompleteBookingPayload, CompleteBookingResult } from "@/lib/booking/booking-schemas";
+import type {
+  CompleteBookingPayload,
+  CompleteBookingResult,
+  ScheduleSnapshotPayload,
+  ScheduleSnapshotResult,
+} from "@/lib/booking/booking-schemas";
 
 /**
  * Submits a booking via `/api/complete-booking` (Vercel serverless or Vite dev middleware).
@@ -18,4 +23,18 @@ export async function completeBookingRequest(payload: {
     return { ok: false, error: `Pedido falhou (${res.status}). Tente novamente.` };
   }
   return (await res.json()) as CompleteBookingResult;
+}
+
+export async function saveScheduleSnapshotRequest(payload: {
+  data: ScheduleSnapshotPayload;
+}): Promise<ScheduleSnapshotResult> {
+  const res = await fetch("/api/booking-schedule-snapshot", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    return { ok: false, error: `Pedido falhou (${res.status}). Tente novamente.` };
+  }
+  return (await res.json()) as ScheduleSnapshotResult;
 }
