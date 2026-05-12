@@ -43,6 +43,16 @@ const admin = {
     viewSite: "View site",
     signOut: "Sign out",
   },
+  workspace: {
+    barTitle: "Workspace",
+    barSubtitle: "Bookings and requests — open Settings for site content, colors, and e-mail.",
+    crmNeedsSupabase:
+      "Connect Supabase (environment variables) to load the bookings table here. You can still open Settings to edit the site.",
+  },
+  settings: {
+    button: "Settings",
+    sheetTitle: "Site settings",
+  },
   backup: {
     summary: "Only if needed: copy on your computer (file)",
     body: "This is optional. Use it to download a copy of your settings or bring an old copy — for example if you switched computers. Day to day: edit → Save changes.",

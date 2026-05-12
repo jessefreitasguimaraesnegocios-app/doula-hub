@@ -45,6 +45,17 @@ const admin: AdminLocale = {
     viewSite: "Ver o site",
     signOut: "Sair",
   },
+  workspace: {
+    barTitle: "Marcações",
+    barSubtitle:
+      "Consultas e pedidos — abra Configurações para conteúdo do site, cores, e-mail e restantes opções.",
+    crmNeedsSupabase:
+      "Ligue o Supabase (variáveis de ambiente) para ver as marcações aqui. As definições do site continuam disponíveis em Configurações.",
+  },
+  settings: {
+    button: "Configurações",
+    sheetTitle: "Configurações do site",
+  },
   backup: {
     summary: "Só se precisar: cópia no computador (arquivo)",
     body: "Isto é opcional. Use para baixar uma cópia das definições ou trazer uma cópia antiga — por exemplo se mudou de computador. O dia a dia: editar → Salvar alterações.",

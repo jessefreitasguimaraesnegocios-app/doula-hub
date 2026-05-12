@@ -53,9 +53,8 @@ export function devApiMiddleware(): Connect.NextHandleFunction {
         return;
       }
       if (url === "/api/send-booking-confirmation") {
-        const { runSendBookingConfirmationFromUnknown } = await import(
-          "./src/lib/server/email-booking-confirmation.ts"
-        );
+        const { runSendBookingConfirmationFromUnknown } =
+          await import("./src/lib/server/email-booking-confirmation.ts");
         const result = await runSendBookingConfirmationFromUnknown(data);
         res.setHeader("Content-Type", "application/json");
         res.end(JSON.stringify(result));

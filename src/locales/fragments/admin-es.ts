@@ -45,6 +45,17 @@ const admin: AdminLocale = {
     viewSite: "Ver el sitio",
     signOut: "Salir",
   },
+  workspace: {
+    barTitle: "Reservas",
+    barSubtitle:
+      "Consultas y solicitudes — abre Ajustes para el contenido del sitio, colores y correo.",
+    crmNeedsSupabase:
+      "Conecta Supabase (variables de entorno) para ver las reservas aquí. Los ajustes del sitio siguen en Ajustes.",
+  },
+  settings: {
+    button: "Ajustes",
+    sheetTitle: "Ajustes del sitio",
+  },
   backup: {
     summary: "Solo si lo necesitas: copia en el equipo (archivo)",
     body: "Es opcional. Sirve para descargar una copia de los ajustes o traer una copia antigua — por ejemplo si cambiaste de ordenador. El día a día: editar → Guardar cambios.",
