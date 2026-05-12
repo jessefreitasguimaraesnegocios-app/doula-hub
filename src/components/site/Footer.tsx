@@ -4,11 +4,16 @@ import { Instagram, Mail, Heart } from "lucide-react";
 import logoMark from "@/assets/logo-mark.png";
 import { useSiteCms } from "@/hooks/use-site-cms";
 import { pickSiteImageUrl } from "@/lib/site-cms";
-import { SiteSequentialNav } from "@/components/site/SiteSequentialNav";
+import { cn } from "@/lib/utils";
 
 const FALLBACK_EMAIL = "Doula@AllThingsBabies.com";
 
-export function Footer() {
+type FooterProps = {
+  /** When true, the sequential page nav sits directly above — skip extra top margin from main. */
+  tightTop?: boolean;
+};
+
+export function Footer({ tightTop }: FooterProps) {
   const { t } = useTranslation();
   const cms = useSiteCms();
   const logoSrc = pickSiteImageUrl(cms, "footer_logo", logoMark);
@@ -16,7 +21,12 @@ export function Footer() {
   const mailtoHref = `mailto:${contactEmail}?subject=${encodeURIComponent(t("footer.emailSubject"))}`;
 
   return (
-    <footer className="mt-24 border-t border-border/50 bg-[oklch(0.94_0.02_80)]">
+    <footer
+      className={cn(
+        "border-t border-border/40 bg-[oklch(0.94_0.02_80)]",
+        !tightTop && "mt-24",
+      )}
+    >
       <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 md:grid-cols-4">
         <div className="md:col-span-2">
           <Link
@@ -109,11 +119,6 @@ export function Footer() {
               </Link>
             </li>
           </ul>
-        </div>
-      </div>
-      <div className="border-t border-border/40 bg-[oklch(0.94_0.02_80)]">
-        <div className="mx-auto max-w-7xl px-6 py-10">
-          <SiteSequentialNav />
         </div>
       </div>
       <div className="border-t border-border/50">

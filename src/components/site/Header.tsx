@@ -1,14 +1,19 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Menu, X, ShoppingBag } from "lucide-react";
 import { useCart } from "@/context/cart-context";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
+function isShopPath(pathname: string) {
+  return pathname === "/shop" || pathname.startsWith("/shop/");
+}
+
 export function Header() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const { itemCount } = useCart();
+  const onShopPage = useRouterState({ select: (s) => isShopPath(s.location.pathname) });
 
   const links = [
     { to: "/", label: t("nav.home") },
@@ -40,18 +45,20 @@ export function Header() {
         </nav>
         <div className="flex items-center gap-3">
           <LanguageSwitcher />
-          <Link
-            to="/cart"
-            className="relative grid h-10 w-10 place-items-center rounded-full border border-border bg-card text-foreground/70 transition hover:text-primary"
-            aria-label={t("nav.cart")}
-          >
-            <ShoppingBag className="h-4 w-4" />
-            {itemCount > 0 ? (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
-                {itemCount > 99 ? "99+" : itemCount}
-              </span>
-            ) : null}
-          </Link>
+          {onShopPage ? (
+            <Link
+              to="/cart"
+              className="relative grid h-10 w-10 place-items-center rounded-full border border-border bg-card text-foreground/70 transition hover:text-primary"
+              aria-label={t("nav.cart")}
+            >
+              <ShoppingBag className="h-4 w-4" />
+              {itemCount > 0 ? (
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
+                  {itemCount > 99 ? "99+" : itemCount}
+                </span>
+              ) : null}
+            </Link>
+          ) : null}
           <Link
             to="/booking"
             className="hidden rounded-full bg-primary px-5 py-2.5 text-xs font-medium uppercase tracking-wider text-primary-foreground shadow-(--shadow-soft) transition hover:bg-[oklch(0.5_0.05_145)] md:inline-block"
@@ -76,18 +83,20 @@ export function Header() {
                 {l.label}
               </Link>
             ))}
-            <Link
-              to="/cart"
-              onClick={() => setOpen(false)}
-              className="mt-2 flex items-center justify-between rounded-lg px-3 py-2.5 text-sm text-foreground/80 hover:bg-muted"
-            >
-              <span>{t("nav.cart")}</span>
-              {itemCount > 0 ? (
-                <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-primary-foreground">
-                  {itemCount > 99 ? "99+" : itemCount}
-                </span>
-              ) : null}
-            </Link>
+            {onShopPage ? (
+              <Link
+                to="/cart"
+                onClick={() => setOpen(false)}
+                className="mt-2 flex items-center justify-between rounded-lg px-3 py-2.5 text-sm text-foreground/80 hover:bg-muted"
+              >
+                <span>{t("nav.cart")}</span>
+                {itemCount > 0 ? (
+                  <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-primary-foreground">
+                    {itemCount > 99 ? "99+" : itemCount}
+                  </span>
+                ) : null}
+              </Link>
+            ) : null}
             <Link
               to="/booking"
               onClick={() => setOpen(false)}

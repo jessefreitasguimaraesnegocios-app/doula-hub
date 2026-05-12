@@ -8,6 +8,7 @@ import {
   useRouterState,
   HeadContent,
 } from "@tanstack/react-router";
+import { getSiteMainPageIndex } from "@/lib/site-main-nav";
 
 import appCss from "../styles.css?url";
 import { I18nextProvider } from "react-i18next";
@@ -15,6 +16,7 @@ import i18n, { ensureI18nInitialized } from "../i18n";
 import { resetDocumentScrollLocks } from "@/lib/document-scroll";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { SiteSequentialNav } from "@/components/site/SiteSequentialNav";
 import { I18nClientLanguageSync } from "@/components/I18nClientLanguageSync";
 import { SiteCmsThemeSync } from "@/components/SiteCmsThemeSync";
 import { SupabaseSiteBootstrap } from "@/components/SupabaseSiteBootstrap";
@@ -117,7 +119,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { pathname, sequentialNavAboveFooter } = useRouterState({
+    select: (s) => {
+      const p = s.location.pathname;
+      return {
+        pathname: p,
+        sequentialNavAboveFooter: getSiteMainPageIndex(p) >= 0,
+      };
+    },
+  });
 
   /** After client navigation, strip stale body scroll locks (e.g. /shop overlay) unless we're on /shop. */
   useEffect(() => {
@@ -160,7 +170,8 @@ function RootComponent() {
               <main className="relative isolate flex-1">
                 <Outlet />
               </main>
-              <Footer />
+              <SiteSequentialNav />
+              <Footer tightTop={sequentialNavAboveFooter} />
             </div>
             {/* Sonner usa z-index muito alto; sem isto o contentor pode roubar cliques quando não há toasts. */}
             <div className="pointer-events-none">
