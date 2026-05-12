@@ -1,4 +1,20 @@
+import type { BookingConfirmationEmailPayload } from "@/lib/booking/booking-schemas";
+
 export type BookingEmailResult = { ok: true; skipped?: boolean } | { ok: false; error: string };
+
+export async function sendBookingConfirmationEmail(payload: {
+  data: BookingConfirmationEmailPayload;
+}): Promise<BookingEmailResult> {
+  const res = await fetch("/api/send-booking-confirmation", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    return { ok: false, error: `Pedido falhou (${res.status}). Tente novamente.` };
+  }
+  return (await res.json()) as BookingEmailResult;
+}
 
 type ContactPayload = {
   name: string;

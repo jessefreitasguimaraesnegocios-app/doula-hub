@@ -22,6 +22,9 @@ export const completeBookingInputSchema = bookingInputSchema.extend({
 
 export type CompleteBookingPayload = z.infer<typeof completeBookingInputSchema>;
 
+/** Payload for resend / standalone booking confirmation e-mail (admin CRM). */
+export type BookingConfirmationEmailPayload = z.infer<typeof bookingInputSchema>;
+
 export type CompleteBookingResult =
   | {
       ok: true;

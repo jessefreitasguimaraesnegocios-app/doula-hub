@@ -1,8 +1,18 @@
 import type { z } from "zod";
 
-import type { bookingInputSchema } from "../booking/booking-schemas";
+import { bookingInputSchema } from "../booking/booking-schemas";
 
 export type BookingEmailResult = { ok: true; skipped?: boolean } | { ok: false; error: string };
+
+export async function runSendBookingConfirmationFromUnknown(raw: unknown): Promise<BookingEmailResult> {
+  try {
+    const data = bookingInputSchema.parse(raw);
+    return await sendBookingConfirmationEmailImpl(data);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return { ok: false, error: msg };
+  }
+}
 
 export async function sendBookingConfirmationEmailImpl(
   data: z.infer<typeof bookingInputSchema>,
