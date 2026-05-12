@@ -20,15 +20,12 @@ export function Header() {
   ] as const;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/40 bg-background/80 backdrop-blur-xl pointer-events-none">
+    <header className="sticky top-0 z-40 border-b border-border/40 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        <Link
-          to="/"
-          className="pointer-events-auto font-serif text-xl tracking-tight text-foreground"
-        >
+        <Link to="/" className="font-serif text-xl tracking-tight text-foreground">
           {t("brand")}
         </Link>
-        <nav className="pointer-events-auto hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-8 md:flex">
           {links.map((l) => (
             <Link
               key={l.to}
@@ -41,7 +38,7 @@ export function Header() {
             </Link>
           ))}
         </nav>
-        <div className="pointer-events-auto flex items-center gap-3">
+        <div className="flex items-center gap-3">
           <LanguageSwitcher />
           <Link
             to="/cart"
@@ -67,7 +64,7 @@ export function Header() {
         </div>
       </div>
       {open && (
-        <div className="pointer-events-auto border-t border-border/40 bg-background md:hidden">
+        <div className="border-t border-border/40 bg-background md:hidden">
           <nav className="flex flex-col gap-1 px-6 py-4">
             {links.map((l) => (
               <Link

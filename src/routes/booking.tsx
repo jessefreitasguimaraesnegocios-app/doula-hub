@@ -474,9 +474,9 @@ function Booking() {
         ))}
       </ol>
 
-      <div className="relative mt-12 scroll-mt-28 rounded-[2rem] bg-card p-8 shadow-(--shadow-soft) md:p-12">
+      <div className="relative isolate mt-12 scroll-mt-28 rounded-[2rem] bg-card p-8 shadow-(--shadow-soft) md:p-12">
         {step === 0 && (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="relative z-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {PKGS.map((k) => {
               const sel = form.pkg === k;
               return (
@@ -484,7 +484,7 @@ function Booking() {
                   key={k}
                   type="button"
                   onClick={() => update("pkg", k)}
-                  className={`rounded-2xl border-2 p-6 text-left transition ${
+                  className={`cursor-pointer touch-manipulation rounded-2xl border-2 p-6 text-left transition active:scale-[0.99] ${
                     sel
                       ? "border-primary bg-primary/5"
                       : "border-border bg-background hover:border-primary/40"
@@ -840,7 +840,7 @@ function Booking() {
           </div>
         )}
 
-        <div className="relative mt-10 flex items-center justify-between gap-4">
+        <div className="relative z-2 mt-10 flex items-center justify-between gap-4">
           <button
             type="button"
             onClick={() => setStep((s) => Math.max(0, s - 1))}
