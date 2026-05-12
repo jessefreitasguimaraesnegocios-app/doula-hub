@@ -109,9 +109,9 @@ function Home() {
               height={1200}
               className="relative aspect-4/5 w-full rounded-[2.5rem] object-cover shadow-(--shadow-warm)"
             />
-            <div className="absolute -bottom-6 -left-6 hidden rounded-2xl bg-card p-5 shadow-(--shadow-soft) sm:block">
-              <p className="text-3xl font-serif text-primary">10+</p>
-              <p className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="absolute bottom-4 left-4 z-10 rounded-2xl bg-card p-4 shadow-(--shadow-soft) sm:-bottom-6 sm:-left-6 sm:p-5">
+              <p className="text-2xl font-serif text-primary sm:text-3xl">10+</p>
+              <p className="mt-1 text-[10px] uppercase leading-snug tracking-widest text-muted-foreground sm:text-xs">
                 Years caring
                 <br />
                 for families
