@@ -36,13 +36,13 @@ function HomePromiseMedia({ cms }: { cms: SiteCmsV1 }) {
         loading="lazy"
         width={1080}
         height={1500}
-        className="aspect-4/5 w-full rounded-[2rem] object-cover shadow-[var(--shadow-soft)]"
+        className="aspect-4/5 w-full rounded-[2rem] object-cover shadow-(--shadow-soft)"
       />
     );
   }
 
   return (
-    <div className="aspect-4/5 w-full overflow-hidden rounded-[2rem] shadow-[var(--shadow-soft)]">
+    <div className="aspect-4/5 w-full overflow-hidden rounded-[2rem] shadow-(--shadow-soft)">
       <video
         src={promiseSrc}
         className="h-full w-full object-cover"
@@ -87,7 +87,7 @@ function Home() {
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <Link
                 to="/booking"
-                className="group inline-flex items-center gap-2 rounded-full bg-primary px-7 py-4 text-sm font-medium text-primary-foreground shadow-[var(--shadow-warm)] transition hover:-translate-y-px"
+                className="group inline-flex items-center gap-2 rounded-full bg-primary px-7 py-4 text-sm font-medium text-primary-foreground shadow-(--shadow-warm) transition hover:-translate-y-px"
               >
                 {t("home.cta")}
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
@@ -107,9 +107,9 @@ function Home() {
               alt="A pregnant person gently holding her belly"
               width={1600}
               height={1200}
-              className="relative aspect-4/5 w-full rounded-[2.5rem] object-cover shadow-[var(--shadow-warm)]"
+              className="relative aspect-4/5 w-full rounded-[2.5rem] object-cover shadow-(--shadow-warm)"
             />
-            <div className="absolute -bottom-6 -left-6 hidden rounded-2xl bg-card p-5 shadow-[var(--shadow-soft)] sm:block">
+            <div className="absolute -bottom-6 -left-6 hidden rounded-2xl bg-card p-5 shadow-(--shadow-soft) sm:block">
               <p className="text-3xl font-serif text-primary">10+</p>
               <p className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">
                 Years caring
@@ -161,7 +161,7 @@ function Home() {
           </div>
           <ol className="mt-16 grid gap-8 md:grid-cols-4">
             {(["one", "three", "two", "four"] as const).map((k, i) => (
-              <li key={k} className="relative rounded-3xl bg-card p-8 shadow-[var(--shadow-soft)]">
+              <li key={k} className="relative rounded-3xl bg-card p-8 shadow-(--shadow-soft)">
                 <span className="font-serif text-5xl text-sage/60">0{i + 1}</span>
                 <p className="mt-3 font-serif text-xl text-foreground">
                   {t(`home.steps.${k}.title`)}
@@ -196,7 +196,7 @@ function Home() {
                 body: "From our first call I felt safe. She advocated for me when I couldn't find my own words.",
               },
             ].map((tt) => (
-              <figure key={tt.name} className="rounded-3xl bg-card p-8 shadow-[var(--shadow-soft)]">
+              <figure key={tt.name} className="rounded-3xl bg-card p-8 shadow-(--shadow-soft)">
                 <Quote className="h-6 w-6 text-clay" />
                 <blockquote className="mt-4 text-base leading-relaxed text-foreground/80">
                   "{tt.body}"

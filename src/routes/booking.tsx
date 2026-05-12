@@ -417,7 +417,7 @@ function Booking() {
         ))}
       </ol>
 
-      <div className="relative mt-12 flex max-sm:max-h-[calc(100dvh-11rem)] flex-col rounded-[2rem] bg-card p-8 shadow-[var(--shadow-soft)] sm:max-h-none md:p-12">
+      <div className="relative mt-12 flex max-sm:max-h-[calc(100dvh-11rem)] flex-col rounded-[2rem] bg-card p-8 shadow-(--shadow-soft) sm:max-h-none md:p-12">
         <div className="min-h-0 max-sm:flex-1 max-sm:overflow-y-auto max-sm:overscroll-y-contain max-sm:[-webkit-overflow-scrolling:touch]">
           {step === 0 && (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

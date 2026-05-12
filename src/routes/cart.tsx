@@ -34,7 +34,7 @@ function CartPage() {
       <h1 className="font-serif text-4xl text-foreground md:text-5xl">{t("cart.title")}</h1>
 
       {lines.length === 0 ? (
-        <div className="mt-12 rounded-3xl border border-border bg-card p-10 text-center shadow-[var(--shadow-soft)]">
+        <div className="mt-12 rounded-3xl border border-border bg-card p-10 text-center shadow-(--shadow-soft)">
           <p className="text-muted-foreground">{t("cart.empty")}</p>
           <Link
             to="/shop"
@@ -49,7 +49,7 @@ function CartPage() {
             {lines.map((line) => (
               <li
                 key={line.id}
-                className="flex gap-4 rounded-3xl border border-border bg-card p-4 shadow-[var(--shadow-soft)] sm:gap-6 sm:p-5"
+                className="flex gap-4 rounded-3xl border border-border bg-card p-4 shadow-(--shadow-soft) sm:gap-6 sm:p-5"
               >
                 <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-muted sm:h-28 sm:w-28">
                   <img

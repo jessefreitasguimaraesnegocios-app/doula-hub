@@ -49,8 +49,8 @@ function Services() {
                 key={k}
                 className={`relative flex flex-col rounded-[2rem] p-8 md:p-10 ${
                   featured
-                    ? "bg-primary text-primary-foreground shadow-[var(--shadow-warm)]"
-                    : "bg-card text-foreground shadow-[var(--shadow-soft)]"
+                    ? "bg-primary text-primary-foreground shadow-(--shadow-warm)"
+                    : "bg-card text-foreground shadow-(--shadow-soft)"
                 }`}
               >
                 {featured && (
