@@ -4,6 +4,7 @@ import { Instagram, Mail, Heart } from "lucide-react";
 import logoMark from "@/assets/logo-mark.png";
 import { useSiteCms } from "@/hooks/use-site-cms";
 import { pickSiteImageUrl } from "@/lib/site-cms";
+import { SiteSequentialNav } from "@/components/site/SiteSequentialNav";
 
 const FALLBACK_EMAIL = "Doula@AllThingsBabies.com";
 
@@ -108,6 +109,11 @@ export function Footer() {
               </Link>
             </li>
           </ul>
+        </div>
+      </div>
+      <div className="border-t border-border/40 bg-[oklch(0.94_0.02_80)]">
+        <div className="mx-auto max-w-7xl px-6 py-10">
+          <SiteSequentialNav />
         </div>
       </div>
       <div className="border-t border-border/50">
