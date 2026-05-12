@@ -346,10 +346,7 @@ function Booking() {
       return;
     }
     try {
-      sessionStorage.setItem(
-        BOOKING_WIZARD_STORAGE_KEY,
-        JSON.stringify({ v: 1, step, form }),
-      );
+      sessionStorage.setItem(BOOKING_WIZARD_STORAGE_KEY, JSON.stringify({ v: 1, step, form }));
     } catch {
       /* storage full or disabled */
     }
