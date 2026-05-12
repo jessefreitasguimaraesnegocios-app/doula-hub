@@ -417,377 +417,373 @@ function Booking() {
         ))}
       </ol>
 
-      <div className="relative mt-12 flex max-sm:max-h-[calc(100dvh-11rem)] flex-col rounded-[2rem] bg-card p-8 shadow-(--shadow-soft) sm:max-h-none md:p-12">
-        <div className="min-h-0 max-sm:flex-1 max-sm:overflow-y-auto max-sm:overscroll-y-contain max-sm:[-webkit-overflow-scrolling:touch]">
-          {step === 0 && (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {PKGS.map((k) => {
-                const sel = form.pkg === k;
-                return (
-                  <button
-                    key={k}
-                    type="button"
-                    onClick={() => update("pkg", k)}
-                    className={`rounded-2xl border-2 p-6 text-left transition ${
-                      sel
-                        ? "border-primary bg-primary/5"
-                        : "border-border bg-background hover:border-primary/40"
-                    }`}
-                  >
-                    <p className="font-serif text-xl text-foreground">
-                      {t(`services.items.${k}.name`)}
-                    </p>
-                    <p className="mt-1 font-serif text-2xl text-primary">{pkgPriceDisplay(k)}</p>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {t(`services.items.${k}.body`)}
-                    </p>
-                  </button>
-                );
-              })}
-            </div>
-          )}
+      <div className="relative z-0 mt-12 scroll-mt-28 rounded-[2rem] bg-card p-8 shadow-(--shadow-soft) md:p-12">
+        {step === 0 && (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {PKGS.map((k) => {
+              const sel = form.pkg === k;
+              return (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => update("pkg", k)}
+                  className={`rounded-2xl border-2 p-6 text-left transition ${
+                    sel
+                      ? "border-primary bg-primary/5"
+                      : "border-border bg-background hover:border-primary/40"
+                  }`}
+                >
+                  <p className="font-serif text-xl text-foreground">
+                    {t(`services.items.${k}.name`)}
+                  </p>
+                  <p className="mt-1 font-serif text-2xl text-primary">{pkgPriceDisplay(k)}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {t(`services.items.${k}.body`)}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
-          {step === 1 && (
-            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-              {doulasWithImages.map((d) => {
-                const sel = form.doula === d.id;
-                return (
-                  <button
-                    key={d.id}
-                    type="button"
-                    onClick={() => update("doula", d.id)}
-                    className={`overflow-hidden rounded-2xl border-2 text-left transition ${
-                      sel ? "border-primary" : "border-border hover:border-primary/40"
-                    }`}
-                  >
-                    {d.imgSrc ? (
-                      <img
-                        src={d.imgSrc}
-                        alt={d.name}
-                        className="aspect-square w-full object-cover"
-                      />
-                    ) : (
-                      <div className="grid aspect-square place-items-center bg-sage/20 font-serif text-3xl text-sage-deep">
-                        ✦
-                      </div>
-                    )}
-                    <p className="px-4 py-3 text-sm font-medium text-foreground">
-                      {d.id === "any" ? t("booking.doulaAny") : d.name}
-                    </p>
-                  </button>
-                );
-              })}
-            </div>
-          )}
+        {step === 1 && (
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {doulasWithImages.map((d) => {
+              const sel = form.doula === d.id;
+              return (
+                <button
+                  key={d.id}
+                  type="button"
+                  onClick={() => update("doula", d.id)}
+                  className={`overflow-hidden rounded-2xl border-2 text-left transition ${
+                    sel ? "border-primary" : "border-border hover:border-primary/40"
+                  }`}
+                >
+                  {d.imgSrc ? (
+                    <img
+                      src={d.imgSrc}
+                      alt={d.name}
+                      className="aspect-square w-full object-cover"
+                    />
+                  ) : (
+                    <div className="grid aspect-square place-items-center bg-sage/20 font-serif text-3xl text-sage-deep">
+                      ✦
+                    </div>
+                  )}
+                  <p className="px-4 py-3 text-sm font-medium text-foreground">
+                    {d.id === "any" ? t("booking.doulaAny") : d.name}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
-          {step === 2 && (
-            <div className="space-y-8">
-              <div className="grid gap-5 sm:grid-cols-2">
-                <BookField
-                  label={`${t("booking.intake.fullName")} *`}
-                  value={form.fullName}
-                  onChange={(v) => update("fullName", v)}
-                  required
-                />
-                <BookEmailField
-                  label={`${t("booking.intake.email")} *`}
-                  value={form.email}
-                  onChange={(v) => update("email", v)}
-                  required
-                />
-                <BookPhoneField
-                  label={`${t("booking.intake.phone")} *`}
-                  value={form.phone}
-                  onChange={(v) => update("phone", v)}
-                  required
-                />
-                <BookDateUsField
-                  label={`${t("booking.intake.dueDate")} *`}
-                  value={form.dueDate}
-                  onChange={(v) => update("dueDate", v)}
-                  placeholder={t("booking.intake.datePlaceholder")}
-                  required
-                />
-              </div>
-
-              <BookRadioGroup
-                legend={`${t("booking.intake.firstBaby")} *`}
-                name="firstBaby"
-                value={form.firstBaby}
-                onChange={(v) => update("firstBaby", v)}
-                options={[
-                  { value: "yes", label: t("booking.intake.yes") },
-                  { value: "no", label: t("booking.intake.no") },
-                ]}
-              />
-
-              <BookRadioGroup
-                legend={`${t("booking.intake.birthLocation")} *`}
-                name="birthLocation"
-                value={form.birthLocation}
-                onChange={(v) => update("birthLocation", v)}
-                options={[
-                  { value: "hospital", label: t("booking.intake.hospital") },
-                  { value: "birthCenter", label: t("booking.intake.birthCenter") },
-                  { value: "home", label: t("booking.intake.home") },
-                ]}
-              />
-
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div className="sm:col-span-2">
-                  <BookField
-                    label={`${t("booking.intake.hospitalProvider")} (${t("booking.intake.optional")})`}
-                    value={form.hospitalProvider}
-                    onChange={(v) => update("hospitalProvider", v)}
-                    hint={t("booking.intake.hospitalProviderHint")}
-                  />
-                </div>
-                <BookZipUsField
-                  label={`${t("booking.intake.zipCode")} *`}
-                  value={form.zipCode}
-                  onChange={(v) => update("zipCode", v)}
-                  onPlaceFound={handleZipPlace}
-                  city={form.zipCity}
-                  stateAbbr={form.zipState}
-                  placeholder={t("booking.intake.zipPlaceholder")}
-                  required
-                  t={t}
-                />
-                <BookField
-                  label={`${t("booking.intake.streetNumber")} *`}
-                  value={form.streetNumber}
-                  onChange={(v) => update("streetNumber", v)}
-                  placeholder={t("booking.intake.streetNumberPh")}
-                  required
-                />
-              </div>
-
-              <BookSupportMultiPicker
-                label={`${t("booking.intake.supportType")} *`}
-                value={form.supportTypes}
-                onChange={(v) => update("supportTypes", v)}
-                t={t}
-              />
-
-              <div>
-                <p className="text-xs uppercase tracking-widest text-foreground/60">
-                  {t("booking.intake.includeSupport")}{" "}
-                  <span className="font-normal normal-case text-muted-foreground">
-                    ({t("booking.intake.includeSupportHint")})
-                  </span>
-                </p>
-                <div className="mt-3 flex flex-wrap gap-3">
-                  {(
-                    [
-                      { value: "yes", label: t("booking.intake.yes") },
-                      { value: "no", label: t("booking.intake.no") },
-                    ] as const
-                  ).map((o) => (
-                    <label
-                      key={o.value}
-                      className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2.5 text-sm transition ${
-                        form.includeSupport === o.value
-                          ? "border-primary bg-primary/5 text-foreground"
-                          : "border-border bg-background text-foreground/80"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="includeSupport"
-                        value={o.value}
-                        checked={form.includeSupport === o.value}
-                        onChange={() => update("includeSupport", o.value)}
-                        className="accent-primary"
-                      />
-                      {o.label}
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {form.includeSupport === "yes" && (
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <BookField
-                    label={`${t("booking.intake.supportName")} *`}
-                    value={form.supportName}
-                    onChange={(v) => update("supportName", v)}
-                    required
-                  />
-                  <BookField
-                    label={`${t("booking.intake.supportRelation")} *`}
-                    value={form.supportRelation}
-                    onChange={(v) => update("supportRelation", v)}
-                    placeholder={t("booking.intake.supportRelationPh")}
-                    required
-                  />
-                </div>
-              )}
-
-              <BookSelect
-                label={`${t("booking.intake.preferredLanguage")} *`}
-                value={form.preferredLanguage}
-                onChange={(v) => update("preferredLanguage", v)}
-                options={[
-                  { value: "", label: t("booking.intake.selectPlaceholder") },
-                  ...LANG_ORDER.map((key) => ({
-                    value: key,
-                    label: t(`booking.intake.lang.${key}`),
-                  })),
-                ]}
+        {step === 2 && (
+          <div className="space-y-8">
+            <div className="grid gap-5 sm:grid-cols-2">
+              <BookField
+                label={`${t("booking.intake.fullName")} *`}
+                value={form.fullName}
+                onChange={(v) => update("fullName", v)}
                 required
               />
-
-              <div>
-                <p className="text-xs uppercase tracking-widest text-foreground/60">{`${t("booking.intake.babyCount")} *`}</p>
-                <div className="mt-3 flex flex-wrap gap-3">
-                  {(
-                    [
-                      { value: "1", label: t("booking.intake.babyCount1") },
-                      { value: "2", label: t("booking.intake.babyCount2") },
-                      { value: "3plus", label: t("booking.intake.babyCount3plus") },
-                    ] as const
-                  ).map((o) => (
-                    <label
-                      key={o.value}
-                      className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-5 py-2.5 text-sm transition ${
-                        form.babyCount === o.value
-                          ? "border-primary bg-primary/5 text-foreground"
-                          : "border-border bg-background text-foreground/80"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="babyCount"
-                        value={o.value}
-                        checked={form.babyCount === o.value}
-                        onChange={() => update("babyCount", o.value)}
-                        className="accent-primary"
-                      />
-                      {o.label}
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <BookField
-                label={`${t("booking.intake.howHeard")} (${t("booking.intake.optional")})`}
-                value={form.howHeard}
-                onChange={(v) => update("howHeard", v)}
+              <BookEmailField
+                label={`${t("booking.intake.email")} *`}
+                value={form.email}
+                onChange={(v) => update("email", v)}
+                required
               />
+              <BookPhoneField
+                label={`${t("booking.intake.phone")} *`}
+                value={form.phone}
+                onChange={(v) => update("phone", v)}
+                required
+              />
+              <BookDateUsField
+                label={`${t("booking.intake.dueDate")} *`}
+                value={form.dueDate}
+                onChange={(v) => update("dueDate", v)}
+                placeholder={t("booking.intake.datePlaceholder")}
+                required
+              />
+            </div>
 
-              <div>
-                <label className="text-xs uppercase tracking-widest text-foreground/60">
-                  {t("booking.intake.notesBeforeCall")}{" "}
-                  <span className="font-normal normal-case text-muted-foreground">
-                    ({t("booking.intake.optional")})
+            <BookRadioGroup
+              legend={`${t("booking.intake.firstBaby")} *`}
+              name="firstBaby"
+              value={form.firstBaby}
+              onChange={(v) => update("firstBaby", v)}
+              options={[
+                { value: "yes", label: t("booking.intake.yes") },
+                { value: "no", label: t("booking.intake.no") },
+              ]}
+            />
+
+            <BookRadioGroup
+              legend={`${t("booking.intake.birthLocation")} *`}
+              name="birthLocation"
+              value={form.birthLocation}
+              onChange={(v) => update("birthLocation", v)}
+              options={[
+                { value: "hospital", label: t("booking.intake.hospital") },
+                { value: "birthCenter", label: t("booking.intake.birthCenter") },
+                { value: "home", label: t("booking.intake.home") },
+              ]}
+            />
+
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <BookField
+                  label={`${t("booking.intake.hospitalProvider")} (${t("booking.intake.optional")})`}
+                  value={form.hospitalProvider}
+                  onChange={(v) => update("hospitalProvider", v)}
+                  hint={t("booking.intake.hospitalProviderHint")}
+                />
+              </div>
+              <BookZipUsField
+                label={`${t("booking.intake.zipCode")} *`}
+                value={form.zipCode}
+                onChange={(v) => update("zipCode", v)}
+                onPlaceFound={handleZipPlace}
+                city={form.zipCity}
+                stateAbbr={form.zipState}
+                placeholder={t("booking.intake.zipPlaceholder")}
+                required
+                t={t}
+              />
+              <BookField
+                label={`${t("booking.intake.streetNumber")} *`}
+                value={form.streetNumber}
+                onChange={(v) => update("streetNumber", v)}
+                placeholder={t("booking.intake.streetNumberPh")}
+                required
+              />
+            </div>
+
+            <BookSupportMultiPicker
+              label={`${t("booking.intake.supportType")} *`}
+              value={form.supportTypes}
+              onChange={(v) => update("supportTypes", v)}
+              t={t}
+            />
+
+            <div>
+              <p className="text-xs uppercase tracking-widest text-foreground/60">
+                {t("booking.intake.includeSupport")}{" "}
+                <span className="font-normal normal-case text-muted-foreground">
+                  ({t("booking.intake.includeSupportHint")})
+                </span>
+              </p>
+              <div className="mt-3 flex flex-wrap gap-3">
+                {(
+                  [
+                    { value: "yes", label: t("booking.intake.yes") },
+                    { value: "no", label: t("booking.intake.no") },
+                  ] as const
+                ).map((o) => (
+                  <label
+                    key={o.value}
+                    className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2.5 text-sm transition ${
+                      form.includeSupport === o.value
+                        ? "border-primary bg-primary/5 text-foreground"
+                        : "border-border bg-background text-foreground/80"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="includeSupport"
+                      value={o.value}
+                      checked={form.includeSupport === o.value}
+                      onChange={() => update("includeSupport", o.value)}
+                      className="accent-primary"
+                    />
+                    {o.label}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {form.includeSupport === "yes" && (
+              <div className="grid gap-5 sm:grid-cols-2">
+                <BookField
+                  label={`${t("booking.intake.supportName")} *`}
+                  value={form.supportName}
+                  onChange={(v) => update("supportName", v)}
+                  required
+                />
+                <BookField
+                  label={`${t("booking.intake.supportRelation")} *`}
+                  value={form.supportRelation}
+                  onChange={(v) => update("supportRelation", v)}
+                  placeholder={t("booking.intake.supportRelationPh")}
+                  required
+                />
+              </div>
+            )}
+
+            <BookSelect
+              label={`${t("booking.intake.preferredLanguage")} *`}
+              value={form.preferredLanguage}
+              onChange={(v) => update("preferredLanguage", v)}
+              options={[
+                { value: "", label: t("booking.intake.selectPlaceholder") },
+                ...LANG_ORDER.map((key) => ({
+                  value: key,
+                  label: t(`booking.intake.lang.${key}`),
+                })),
+              ]}
+              required
+            />
+
+            <div>
+              <p className="text-xs uppercase tracking-widest text-foreground/60">{`${t("booking.intake.babyCount")} *`}</p>
+              <div className="mt-3 flex flex-wrap gap-3">
+                {(
+                  [
+                    { value: "1", label: t("booking.intake.babyCount1") },
+                    { value: "2", label: t("booking.intake.babyCount2") },
+                    { value: "3plus", label: t("booking.intake.babyCount3plus") },
+                  ] as const
+                ).map((o) => (
+                  <label
+                    key={o.value}
+                    className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-5 py-2.5 text-sm transition ${
+                      form.babyCount === o.value
+                        ? "border-primary bg-primary/5 text-foreground"
+                        : "border-border bg-background text-foreground/80"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="babyCount"
+                      value={o.value}
+                      checked={form.babyCount === o.value}
+                      onChange={() => update("babyCount", o.value)}
+                      className="accent-primary"
+                    />
+                    {o.label}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <BookField
+              label={`${t("booking.intake.howHeard")} (${t("booking.intake.optional")})`}
+              value={form.howHeard}
+              onChange={(v) => update("howHeard", v)}
+            />
+
+            <div>
+              <label className="text-xs uppercase tracking-widest text-foreground/60">
+                {t("booking.intake.notesBeforeCall")}{" "}
+                <span className="font-normal normal-case text-muted-foreground">
+                  ({t("booking.intake.optional")})
+                </span>
+              </label>
+              <textarea
+                rows={4}
+                value={form.notesBeforeCall}
+                onChange={(e) => update("notesBeforeCall", e.target.value)}
+                className="mt-2 w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none"
+              />
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="space-y-6">
+            <p className="font-serif text-xl text-foreground">{t("booking.schedule.title")}</p>
+            <div className="grid gap-5 sm:grid-cols-3">
+              <BookSelect
+                label={t("booking.schedule.platform")}
+                value={form.platform}
+                onChange={(v) => update("platform", v)}
+                options={platforms.map((p) => ({ value: p, label: p }))}
+              />
+              <BookField
+                label={t("booking.schedule.date")}
+                type="date"
+                value={form.date}
+                onChange={(v) => update("date", v)}
+              />
+              <BookField
+                label={t("booking.schedule.time")}
+                type="time"
+                value={form.time}
+                onChange={(v) => update("time", v)}
+              />
+            </div>
+            <div className="flex items-center gap-3 rounded-2xl bg-sage/15 p-4 text-sm text-foreground/80">
+              <Video className="h-5 w-5 shrink-0 text-sage-deep" />
+              {t("booking.schedule.linkNote", { platform: form.platform })}
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className="space-y-6">
+            <p className="font-serif text-2xl text-foreground">{t("booking.payment.summary")}</p>
+            <dl className="space-y-3 rounded-2xl bg-background p-6">
+              <Row
+                label={t("booking.steps.package")}
+                value={t(`services.items.${form.pkg}.name`)}
+              />
+              <Row
+                label={t("booking.steps.doula")}
+                value={resolveBookingDoulaLabel(form.doula, t, cms)}
+              />
+              <Row label={t("booking.intake.fullName")} value={form.fullName || "—"} />
+              <Row label={t("booking.intake.email")} value={form.email || "—"} />
+              <Row label={t("booking.intake.phone")} value={form.phone || "—"} />
+              <Row
+                label={t("booking.intake.dueDate")}
+                value={isoToUsDisplay(form.dueDate) || form.dueDate || "—"}
+              />
+              <Row label={t("booking.intake.streetNumber")} value={form.streetNumber || "—"} />
+              <Row
+                label={t("booking.intake.zipCode")}
+                value={
+                  form.zipCode
+                    ? form.zipCity && form.zipState
+                      ? `${form.zipCode} · ${form.zipCity}, ${form.zipState}`
+                      : form.zipCode
+                    : "—"
+                }
+              />
+              <Row label={t("booking.intake.supportType")} value={supportTypesSummary} />
+              <Row
+                label={
+                  <span className="inline-flex items-center gap-1.5">
+                    <CalendarDays className="h-3.5 w-3.5" />
+                    {t("booking.steps.schedule")}
                   </span>
-                </label>
-                <textarea
-                  rows={4}
-                  value={form.notesBeforeCall}
-                  onChange={(e) => update("notesBeforeCall", e.target.value)}
-                  className="mt-2 w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm focus:border-primary focus:outline-none"
-                />
+                }
+                value={`${form.date || "—"} ${form.time}  ·  ${form.platform}`}
+              />
+              <div className="my-2 border-t border-border" />
+              <Row
+                label={
+                  <span className="font-medium text-foreground">{t("booking.payment.total")}</span>
+                }
+                value={
+                  <span className="font-serif text-2xl text-primary">
+                    {pkgPriceDisplay(form.pkg)}
+                  </span>
+                }
+              />
+            </dl>
+            <div className="flex items-start gap-3 rounded-2xl border border-border bg-background p-4 text-sm text-muted-foreground">
+              <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+              <div>
+                <p className="text-foreground">{t("booking.payment.secure")}</p>
+                <p className="mt-1 text-xs">{t("booking.payment.terms")}</p>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {step === 3 && (
-            <div className="space-y-6">
-              <p className="font-serif text-xl text-foreground">{t("booking.schedule.title")}</p>
-              <div className="grid gap-5 sm:grid-cols-3">
-                <BookSelect
-                  label={t("booking.schedule.platform")}
-                  value={form.platform}
-                  onChange={(v) => update("platform", v)}
-                  options={platforms.map((p) => ({ value: p, label: p }))}
-                />
-                <BookField
-                  label={t("booking.schedule.date")}
-                  type="date"
-                  value={form.date}
-                  onChange={(v) => update("date", v)}
-                />
-                <BookField
-                  label={t("booking.schedule.time")}
-                  type="time"
-                  value={form.time}
-                  onChange={(v) => update("time", v)}
-                />
-              </div>
-              <div className="flex items-center gap-3 rounded-2xl bg-sage/15 p-4 text-sm text-foreground/80">
-                <Video className="h-5 w-5 shrink-0 text-sage-deep" />
-                {t("booking.schedule.linkNote", { platform: form.platform })}
-              </div>
-            </div>
-          )}
-
-          {step === 4 && (
-            <div className="space-y-6">
-              <p className="font-serif text-2xl text-foreground">{t("booking.payment.summary")}</p>
-              <dl className="space-y-3 rounded-2xl bg-background p-6">
-                <Row
-                  label={t("booking.steps.package")}
-                  value={t(`services.items.${form.pkg}.name`)}
-                />
-                <Row
-                  label={t("booking.steps.doula")}
-                  value={resolveBookingDoulaLabel(form.doula, t, cms)}
-                />
-                <Row label={t("booking.intake.fullName")} value={form.fullName || "—"} />
-                <Row label={t("booking.intake.email")} value={form.email || "—"} />
-                <Row label={t("booking.intake.phone")} value={form.phone || "—"} />
-                <Row
-                  label={t("booking.intake.dueDate")}
-                  value={isoToUsDisplay(form.dueDate) || form.dueDate || "—"}
-                />
-                <Row label={t("booking.intake.streetNumber")} value={form.streetNumber || "—"} />
-                <Row
-                  label={t("booking.intake.zipCode")}
-                  value={
-                    form.zipCode
-                      ? form.zipCity && form.zipState
-                        ? `${form.zipCode} · ${form.zipCity}, ${form.zipState}`
-                        : form.zipCode
-                      : "—"
-                  }
-                />
-                <Row label={t("booking.intake.supportType")} value={supportTypesSummary} />
-                <Row
-                  label={
-                    <span className="inline-flex items-center gap-1.5">
-                      <CalendarDays className="h-3.5 w-3.5" />
-                      {t("booking.steps.schedule")}
-                    </span>
-                  }
-                  value={`${form.date || "—"} ${form.time}  ·  ${form.platform}`}
-                />
-                <div className="my-2 border-t border-border" />
-                <Row
-                  label={
-                    <span className="font-medium text-foreground">
-                      {t("booking.payment.total")}
-                    </span>
-                  }
-                  value={
-                    <span className="font-serif text-2xl text-primary">
-                      {pkgPriceDisplay(form.pkg)}
-                    </span>
-                  }
-                />
-              </dl>
-              <div className="flex items-start gap-3 rounded-2xl border border-border bg-background p-4 text-sm text-muted-foreground">
-                <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                <div>
-                  <p className="text-foreground">{t("booking.payment.secure")}</p>
-                  <p className="mt-1 text-xs">{t("booking.payment.terms")}</p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="relative z-10 mt-8 flex shrink-0 items-center justify-between gap-4 border-t border-border/40 pt-6 sm:mt-10 sm:border-t-0 sm:pt-0">
+        <div className="relative z-10 mt-10 flex items-center justify-between gap-4">
           <button
             type="button"
             onClick={() => setStep((s) => Math.max(0, s - 1))}
