@@ -63,3 +63,10 @@ export function setLangCookie(code: SupportedLang) {
   if (typeof document === "undefined") return;
   document.cookie = `${I18N_LANG_COOKIE}=${encodeURIComponent(code)}; Path=/; Max-Age=31536000; SameSite=Lax`;
 }
+
+/** BCP 47 base code for `<html lang>` — must match supported UI languages only. */
+export function normalizeHtmlLang(lng: string | undefined | null): SupportedLang {
+  if (!lng?.trim()) return "en";
+  const base = lng.trim().toLowerCase().slice(0, 2);
+  return isSupportedLang(base) ? base : "en";
+}

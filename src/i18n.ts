@@ -12,6 +12,10 @@ let initPromise: Promise<void> | null = null;
 /**
  * Ensures i18n is initialized before any route renders (SSR + client).
  * Avoids top-level `await` in this module, which can race with the first paint on some serverless bundles.
+ *
+ * SSR note: this module exports a singleton. `src/start.ts` middleware always awaits
+ * `changeLanguage` per request before route rendering, which is the correct ordering for typical
+ * single-flight SSR. Avoid reading `i18n.language` during async gaps before that middleware runs.
  */
 export function ensureI18nInitialized(): Promise<void> {
   if (i18n.isInitialized) return Promise.resolve();

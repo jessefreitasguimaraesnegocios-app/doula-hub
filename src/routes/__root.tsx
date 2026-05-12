@@ -13,6 +13,7 @@ import {
 import appCss from "../styles.css?url";
 import { I18nextProvider } from "react-i18next";
 import i18n, { ensureI18nInitialized } from "../i18n";
+import { normalizeHtmlLang } from "@/lib/i18n-locale";
 import { resetDocumentScrollLocks } from "@/lib/document-scroll";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
@@ -118,8 +119,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
+  const htmlLang = normalizeHtmlLang(i18n.resolvedLanguage ?? i18n.language);
   return (
-    <html lang="en">
+    <html lang={htmlLang} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

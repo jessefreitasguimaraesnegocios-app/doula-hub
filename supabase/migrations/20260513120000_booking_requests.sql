@@ -1,5 +1,8 @@
 -- Consultas concluídas no site (/booking): CRM + integração Google Calendar (inserção via service role no servidor).
--- Anon não tem acesso; só authenticated lê no painel; escrita só pelo servidor (SUPABASE_SERVICE_ROLE_KEY).
+-- Anon não tem acesso; só authenticated lê no painel.
+-- INSERT/UPDATE/DELETE: use o client com `SUPABASE_SERVICE_ROLE_KEY` no servidor (TanStack Start server fn);
+-- a role `service_role` ignora RLS no Postgres/Supabase — não é necessário policy de escrita para anon.
+-- O campo `locale` alinha-se a i18next (en | pt | es | it), ver `src/lib/i18n-locale.ts`.
 
 CREATE TABLE public.booking_requests (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
